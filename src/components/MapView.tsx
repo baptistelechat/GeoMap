@@ -15,7 +15,7 @@ export function MapView() {
   const { points } = usePointsStore();
 
   return (
-    <div className="h-full w-full">
+    <div className="h-full w-full relative z-0">
       <MapContainer
         center={[46.603354, 1.888334]}
         zoom={6}
