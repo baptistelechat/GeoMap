@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import { Menu, X, MapPin, ExternalLink } from 'lucide-react';
+import { Menu, MapPin, ExternalLink } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface MobileHeaderProps {
@@ -7,7 +6,6 @@ interface MobileHeaderProps {
 }
 
 export function MobileHeader({ onToggleSidebar }: MobileHeaderProps) {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
     <div className="lg:hidden bg-white shadow-sm border-b border-gray-200">

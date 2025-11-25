@@ -5,6 +5,7 @@ import { StreetViewFrame } from './StreetViewFrame';
 import { Plus, Download, Trash2, MapPin, ExternalLink } from 'lucide-react';
 import { exportToCSV, exportToJSON } from '@/utils/export';
 import { Link } from 'react-router-dom';
+import { Button } from "@/components/ui/button";
 
 export function Sidebar() {
   const { points, addPoint, removePoint } = usePointsStore();
@@ -121,12 +122,12 @@ export function Sidebar() {
             onChange={(e) => setFormData({ ...formData, streetViewUrl: e.target.value })}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-          <button
+          <Button
             type="submit"
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors shadow-sm"
+            className="w-full"
           >
             Ajouter le point
-          </button>
+          </Button>
         </form>
       </div>
 
