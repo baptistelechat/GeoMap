@@ -7,6 +7,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { StreetViewFrame } from "./StreetViewFrame";
 import { Input } from "./ui/input";
+import { Label } from "./ui/label";
 import { Textarea } from "./ui/textarea";
 
 export function Sidebar() {
@@ -83,53 +84,73 @@ export function Sidebar() {
           Ajouter un point
         </h2>
         <form onSubmit={handleSubmit} className="space-y-3">
-          <Input
-            type="text"
-            placeholder="Titre du point"
-            value={formData.title}
-            onChange={(e) =>
-              setFormData({ ...formData, title: e.target.value })
-            }
-            required
-          />
-          <div className="grid grid-cols-2 gap-2">
+          <div className="space-y-1">
+            <Label htmlFor="title">Titre</Label>
             <Input
-              type="number"
-              step="any"
-              placeholder="Latitude"
-              value={formData.lat}
+              id="title"
+              type="text"
+              placeholder="Ex: Tour Eiffel"
+              value={formData.title}
               onChange={(e) =>
-                setFormData({ ...formData, lat: e.target.value })
-              }
-              required
-            />
-            <Input
-              type="number"
-              step="any"
-              placeholder="Longitude"
-              value={formData.lng}
-              onChange={(e) =>
-                setFormData({ ...formData, lng: e.target.value })
+                setFormData({ ...formData, title: e.target.value })
               }
               required
             />
           </div>
-          <Textarea
-            placeholder="Notes (optionnel)"
-            value={formData.notes}
-            onChange={(e) =>
-              setFormData({ ...formData, notes: e.target.value })
-            }
-            className="h-20 resize-none"
-          />
-          <Input
-            type="url"
-            placeholder="URL Street View (optionnel)"
-            value={formData.streetViewUrl}
-            onChange={(e) =>
-              setFormData({ ...formData, streetViewUrl: e.target.value })
-            }
-          />
+          <div className="grid grid-cols-2 gap-2">
+            <div className="space-y-1">
+              <Label htmlFor="lat">Latitude</Label>
+              <Input
+                id="lat"
+                type="number"
+                step="any"
+                placeholder="Ex: 48.8584"
+                value={formData.lat}
+                onChange={(e) =>
+                  setFormData({ ...formData, lat: e.target.value })
+                }
+                required
+              />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="lng">Longitude</Label>
+              <Input
+                id="lng"
+                type="number"
+                step="any"
+                placeholder="Ex: 2.2945"
+                value={formData.lng}
+                onChange={(e) =>
+                  setFormData({ ...formData, lng: e.target.value })
+                }
+                required
+              />
+            </div>
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="notes">Notes</Label>
+            <Textarea
+              id="notes"
+              placeholder="Ex: Superbe vue depuis le Trocadéro..."
+              value={formData.notes}
+              onChange={(e) =>
+                setFormData({ ...formData, notes: e.target.value })
+              }
+              className="h-20 resize-none"
+            />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="streetViewUrl">URL Street View</Label>
+            <Input
+              id="streetViewUrl"
+              type="url"
+              placeholder="Ex: https://www.google.com/maps/..."
+              value={formData.streetViewUrl}
+              onChange={(e) =>
+                setFormData({ ...formData, streetViewUrl: e.target.value })
+              }
+            />
+          </div>
           <Button type="submit" className="w-full">
             Ajouter le point
           </Button>
