@@ -1,25 +1,27 @@
-import { useState } from 'react';
-import { usePointsStore } from '@/store/pointsStore';
-import { MapPoint } from '@/types/map';
-import { StreetViewFrame } from './StreetViewFrame';
-import { Plus, Download, Trash2, MapPin, ExternalLink } from 'lucide-react';
-import { exportToCSV, exportToJSON } from '@/utils/export';
-import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
+import { usePointsStore } from "@/store/pointsStore";
+import { MapPoint } from "@/types/map";
+import { exportToCSV, exportToJSON } from "@/utils/export";
+import { Download, ExternalLink, MapPin, Plus, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { StreetViewFrame } from "./StreetViewFrame";
+import { Input } from "./ui/input";
+import { Textarea } from "./ui/textarea";
 
 export function Sidebar() {
   const { points, addPoint, removePoint } = usePointsStore();
   const [formData, setFormData] = useState({
-    title: '',
-    lat: '',
-    lng: '',
-    notes: '',
-    streetViewUrl: ''
+    title: "",
+    lat: "",
+    lng: "",
+    notes: "",
+    streetViewUrl: "",
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.title || !formData.lat || !formData.lng) {
       return;
     }
@@ -31,18 +33,18 @@ export function Sidebar() {
       lng: parseFloat(formData.lng),
       notes: formData.notes || undefined,
       streetViewUrl: formData.streetViewUrl || undefined,
-      createdAt: Date.now()
+      createdAt: Date.now(),
     };
 
     addPoint(newPoint);
-    
+
     // Reset form
     setFormData({
-      title: '',
-      lat: '',
-      lng: '',
-      notes: '',
-      streetViewUrl: ''
+      title: "",
+      lat: "",
+      lng: "",
+      notes: "",
+      streetViewUrl: "",
     });
   };
 
@@ -81,51 +83,54 @@ export function Sidebar() {
           Ajouter un point
         </h2>
         <form onSubmit={handleSubmit} className="space-y-3">
-          <input
+          <Input
             type="text"
             placeholder="Titre du point"
             value={formData.title}
-            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            onChange={(e) =>
+              setFormData({ ...formData, title: e.target.value })
+            }
             required
           />
           <div className="grid grid-cols-2 gap-2">
-            <input
+            <Input
               type="number"
               step="any"
               placeholder="Latitude"
               value={formData.lat}
-              onChange={(e) => setFormData({ ...formData, lat: e.target.value })}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(e) =>
+                setFormData({ ...formData, lat: e.target.value })
+              }
               required
             />
-            <input
+            <Input
               type="number"
               step="any"
               placeholder="Longitude"
               value={formData.lng}
-              onChange={(e) => setFormData({ ...formData, lng: e.target.value })}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(e) =>
+                setFormData({ ...formData, lng: e.target.value })
+              }
               required
             />
           </div>
-          <textarea
+          <Textarea
             placeholder="Notes (optionnel)"
             value={formData.notes}
-            onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 h-20 resize-none"
+            onChange={(e) =>
+              setFormData({ ...formData, notes: e.target.value })
+            }
+            className="h-20 resize-none"
           />
-          <input
+          <Input
             type="url"
             placeholder="URL Street View (optionnel)"
             value={formData.streetViewUrl}
-            onChange={(e) => setFormData({ ...formData, streetViewUrl: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            onChange={(e) =>
+              setFormData({ ...formData, streetViewUrl: e.target.value })
+            }
           />
-          <Button
-            type="submit"
-            className="w-full"
-          >
+          <Button type="submit" className="w-full">
             Ajouter le point
           </Button>
         </form>
@@ -134,54 +139,69 @@ export function Sidebar() {
       {/* Liste des points */}
       <div className="flex-1 overflow-y-auto p-4">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-lg font-semibold text-gray-800">Points ({points.length})</h2>
+          <h2 className="text-lg font-semibold text-gray-800">
+            Points ({points.length})
+          </h2>
           <div className="flex gap-1">
-            <button
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={handleExportCSV}
               disabled={points.length === 0}
-              className="p-1 text-gray-600 hover:text-blue-600 transition-colors disabled:opacity-50"
               title="Exporter en CSV"
             >
               <Download size={16} />
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={handleExportJSON}
               disabled={points.length === 0}
-              className="p-1 text-gray-600 hover:text-blue-600 transition-colors disabled:opacity-50"
               title="Exporter en JSON"
             >
               <Download size={16} />
-            </button>
+            </Button>
           </div>
         </div>
-        
+
         {points.length === 0 ? (
-          <p className="text-gray-500 text-sm text-center py-8">Aucun point ajouté</p>
+          <p className="text-gray-500 text-sm text-center py-8">
+            Aucun point ajouté
+          </p>
         ) : (
           <div className="space-y-3">
             {points.map((point) => (
-              <div key={point.id} className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+              <div
+                key={point.id}
+                className="bg-gray-50 rounded-lg p-3 border border-gray-200"
+              >
                 <div className="flex items-start justify-between mb-2">
-                  <h3 className="font-medium text-gray-800 text-sm">{point.title}</h3>
-                  <button
+                  <h3 className="font-medium text-gray-800 text-sm">
+                    {point.title}
+                  </h3>
+                  <Button
+                    variant="destructive"
+                    size="icon"
                     onClick={() => removePoint(point.id)}
-                    className="text-red-500 hover:text-red-700 transition-colors"
                     title="Supprimer"
                   >
                     <Trash2 size={14} />
-                  </button>
+                  </Button>
                 </div>
-                
+
                 {point.streetViewUrl && (
                   <div className="mb-2">
-                    <StreetViewFrame url={point.streetViewUrl} title={point.title} />
+                    <StreetViewFrame
+                      url={point.streetViewUrl}
+                      title={point.title}
+                    />
                   </div>
                 )}
-                
+
                 {point.notes && (
                   <p className="text-xs text-gray-600 mb-2">{point.notes}</p>
                 )}
-                
+
                 <div className="text-xs text-gray-500">
                   <p>Lat: {point.lat.toFixed(6)}</p>
                   <p>Lng: {point.lng.toFixed(6)}</p>
