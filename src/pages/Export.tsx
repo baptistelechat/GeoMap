@@ -46,11 +46,11 @@ export default function Export() {
           </div>
 
           {/* Stats */}
-          <div className="bg-blue-50 rounded-lg p-4 mb-6">
-            <p className="text-blue-800 font-medium">
+          <div className="bg-primary-foreground rounded-lg p-4 mb-6">
+            <p className="text-primary font-medium">
               {points.length} point{points.length !== 1 ? "s" : ""} à exporter
             </p>
-            <p className="text-blue-600 text-sm mt-1">
+            <p className="text-primary text-sm mt-1">
               Dernière mise à jour : {new Date().toLocaleString("fr-FR")}
             </p>
           </div>
@@ -61,7 +61,7 @@ export default function Export() {
               variant="outline"
               onClick={handleExportCSV}
               disabled={points.length === 0 || isExporting}
-              className="w-full h-auto flex items-center justify-between p-4 border-2 border-gray-200 hover:border-blue-300 hover:bg-blue-50 hover:text-inherit"
+              className="w-full h-auto flex items-center justify-between p-4 border-2 border-gray-200 hover:border-primary hover:bg-primary-foreground hover:text-inherit"
             >
               <div className="flex items-center gap-3">
                 <FileText className="text-green-600" size={24} />
@@ -72,17 +72,17 @@ export default function Export() {
                   </p>
                 </div>
               </div>
-              <Download className="text-gray-400" size={20} />
+              <Download className="text-primary" size={20} />
             </Button>
 
             <Button
               variant="outline"
               onClick={handleExportJSON}
               disabled={points.length === 0 || isExporting}
-              className="w-full h-auto flex items-center justify-between p-4 border-2 border-gray-200 hover:border-blue-300 hover:bg-blue-50 hover:text-inherit"
+              className="w-full h-auto flex items-center justify-between p-4 border-2 border-gray-200 hover:border-primary hover:bg-primary-foreground hover:text-inherit"
             >
               <div className="flex items-center gap-3">
-                <FileJson className="text-blue-600" size={24} />
+                <FileJson className="text-primary" size={24} />
                 <div className="text-left">
                   <h3 className="font-semibold text-gray-800">Format JSON</h3>
                   <p className="text-sm text-gray-600">
@@ -90,7 +90,7 @@ export default function Export() {
                   </p>
                 </div>
               </div>
-              <Download className="text-gray-400" size={20} />
+              <Download className="text-primary" size={20} />
             </Button>
           </div>
 

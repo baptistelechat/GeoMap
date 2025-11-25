@@ -63,12 +63,12 @@ export function Sidebar() {
       <div className="p-4 border-b border-gray-200">
         <div className="flex items-center justify-between">
           <h1 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-            <MapPin className="text-blue-600" />
+            <MapPin className="text-primary" />
             GeoMark
           </h1>
           <Link
             to="/export"
-            className="p-2 text-gray-600 hover:text-blue-600 transition-colors"
+            className="p-2 text-gray-600 hover:text-primary transition-colors"
             title="Page d'export"
           >
             <ExternalLink size={20} />
