@@ -55,7 +55,7 @@ export function AddPointForm({ onSuccess }: { onSuccess?: () => void }) {
         <Input
           id="title"
           type="text"
-          placeholder="Ex: Tour Eiffel"
+          placeholder="Tour Eiffel"
           value={formData.title}
           onChange={(e) => setFormData({ ...formData, title: e.target.value })}
           required
@@ -68,7 +68,7 @@ export function AddPointForm({ onSuccess }: { onSuccess?: () => void }) {
             id="lat"
             type="number"
             step="any"
-            placeholder="Ex: 48.8584"
+            placeholder="48.8584"
             value={formData.lat}
             onChange={(e) => setFormData({ ...formData, lat: e.target.value })}
             required
@@ -80,7 +80,7 @@ export function AddPointForm({ onSuccess }: { onSuccess?: () => void }) {
             id="lng"
             type="number"
             step="any"
-            placeholder="Ex: 2.2945"
+            placeholder="2.2945"
             value={formData.lng}
             onChange={(e) => setFormData({ ...formData, lng: e.target.value })}
             required
@@ -91,7 +91,7 @@ export function AddPointForm({ onSuccess }: { onSuccess?: () => void }) {
         <Label htmlFor="notes">Notes</Label>
         <Textarea
           id="notes"
-          placeholder="Ex: Superbe vue depuis le Trocadéro..."
+          placeholder="Superbe vue depuis le Trocadéro..."
           value={formData.notes}
           onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
           className="h-20 resize-none"
@@ -102,7 +102,7 @@ export function AddPointForm({ onSuccess }: { onSuccess?: () => void }) {
         <Input
           id="streetViewUrl"
           type="url"
-          placeholder="Ex: https://www.google.com/maps/..."
+          placeholder="https://www.google.com/maps/..."
           value={formData.streetViewUrl}
           onChange={(e) =>
             setFormData({ ...formData, streetViewUrl: e.target.value })

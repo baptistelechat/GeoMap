@@ -1,5 +1,6 @@
 import { AddPointDialog } from "@/components/AddPointDialog";
 import { AddPointForm } from "@/components/AddPointForm";
+import { ExportDialog } from "@/components/ExportDialog";
 import { PointsList } from "@/components/PointsList";
 import { PointsListDialog } from "@/components/PointsListDialog";
 import { Button } from "@/components/ui/button";
@@ -17,23 +18,13 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { usePointsStore } from "@/store/pointsStore";
-import { exportToCSV, exportToJSON } from "@/utils/export";
-import { Download, ExternalLink, List, MapPin, Plus } from "lucide-react";
+import { List, MapPin, Plus } from "lucide-react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { points } = usePointsStore();
   const [addPointDialogOpen, setAddPointDialogOpen] = useState(false);
   const [listPointsDialogOpen, setListPointsDialogOpen] = useState(false);
-
-  const handleExportCSV = () => {
-    exportToCSV(points);
-  };
-
-  const handleExportJSON = () => {
-    exportToJSON(points);
-  };
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -54,11 +45,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               </div>
 
               <div className="flex items-center gap-1 group-data-[collapsible=icon]:hidden">
-                <Button variant="ghost" size="icon" asChild>
-                  <Link to="/export" title="Page d'export">
-                    <ExternalLink size={20} />
-                  </Link>
-                </Button>
                 <SidebarTrigger />
               </div>
 
@@ -111,28 +97,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <List className="mr-2 size-4 text-primary" />
               Points ({points.length})
             </SidebarGroupLabel>
-            <div className="flex gap-1">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleExportCSV}
-                disabled={points.length === 0}
-                title="Exporter en CSV"
-                className="h-6 w-6"
-              >
-                <Download size={14} />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleExportJSON}
-                disabled={points.length === 0}
-                title="Exporter en JSON"
-                className="h-6 w-6"
-              >
-                <Download size={14} />
-              </Button>
-            </div>
+            <ExportDialog />
           </div>
 
           <SidebarGroupContent>
