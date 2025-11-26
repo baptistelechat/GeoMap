@@ -43,7 +43,10 @@ export function ExportDialog() {
       </DialogTrigger>
       <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Exporter les données</DialogTitle>
+          <DialogTitle className="flex items-center gap-2">
+            <ExternalLink className="size-6 text-primary" />
+            Exporter les données
+          </DialogTitle>
           <DialogDescription>
             Choisissez le format d'exportation souhaité.
           </DialogDescription>

@@ -1,5 +1,7 @@
 import { AddPointDialog } from "@/components/AddPointDialog";
 import { AddPointForm } from "@/components/AddPointForm";
+import { ClearPointsDialog } from "@/components/ClearPointsDialog";
+import { DevTools } from "@/components/DevTools";
 import { ExportDialog } from "@/components/ExportDialog";
 import { PointsList } from "@/components/PointsList";
 import { PointsListDialog } from "@/components/PointsListDialog";
@@ -18,7 +20,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { usePointsStore } from "@/store/pointsStore";
-import { List, MapPin, Plus } from "lucide-react";
+import { FlaskConical, List, MapPin, Plus } from "lucide-react";
 import { useState } from "react";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -55,7 +57,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
-      <SidebarContent className="overflow-x-hidden">
+      <SidebarContent className="overflow-x-hidden pb-8">
         {/* Section Ajouter un point */}
         <SidebarGroup>
           <SidebarGroupLabel className="group-data-[collapsible=icon]:hidden">
@@ -97,7 +99,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <List className="mr-2 size-4 text-primary" />
               Points ({points.length})
             </SidebarGroupLabel>
-            <ExportDialog />
+            <div className="flex items-center gap-1">
+              <ClearPointsDialog />
+              <ExportDialog />
+            </div>
           </div>
 
           <SidebarGroupContent>
@@ -125,6 +130,23 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </div>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        <SidebarSeparator />
+
+        {/* Section Développement - Uniquement en DEV */}
+        {import.meta.env.DEV && (
+          <SidebarGroup>
+            <SidebarGroupLabel className="group-data-[collapsible=icon]:hidden">
+              <FlaskConical className="mr-2 size-4 text-primary" />
+              Développement
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <div className="group-data-[collapsible=icon]:hidden">
+                <DevTools />
+              </div>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
       </SidebarContent>
       <SidebarRail />
     </Sidebar>
