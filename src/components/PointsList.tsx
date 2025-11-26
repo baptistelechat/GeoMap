@@ -1,3 +1,14 @@
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { usePointsStore } from "@/store/pointsStore";
@@ -28,15 +39,37 @@ export function PointsList() {
             <Badge variant="secondary" className="font-mono text-xs">
               {point.lat.toFixed(4)}, {point.lng.toFixed(4)}
             </Badge>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => removePoint(point.id)}
-              className="size-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-              title="Supprimer"
-            >
-              <Trash2 className="size-4" />
-            </Button>
+
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="size-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                  title="Supprimer"
+                >
+                  <Trash2 className="size-4" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Êtes-vous sûr ?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Cette action est irréversible. Cela supprimera
+                    définitivement le point "{point.title}" de votre liste.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Annuler</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={() => removePoint(point.id)}
+                    className="bg-destructive hover:bg-destructive/90"
+                  >
+                    Supprimer
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         </div>
       ))}
