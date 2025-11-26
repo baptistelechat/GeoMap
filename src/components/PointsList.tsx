@@ -17,16 +17,24 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { usePointsStore } from "@/store/pointsStore";
-import { Trash2 } from "lucide-react";
+import { MapPinOff, Trash2 } from "lucide-react";
 
 export function PointsList() {
   const { points, removePoint } = usePointsStore();
+  const isMobile = useIsMobile();
 
   if (points.length === 0) {
     return (
-      <div className="p-4 text-center text-sm text-muted-foreground">
-        Aucun point ajouté
+      <div className="flex flex-col items-center justify-center p-8 text-center text-muted-foreground border-2 border-dashed rounded-lg mx-2">
+        <MapPinOff className="size-10 mb-3 opacity-50" />
+        <h3 className="font-semibold text-lg mb-1">Aucun point</h3>
+        <p className="text-sm max-w-[200px]">
+          {isMobile
+            ? 'Commencez par cliquer sur le bouton "+" pour ajouter votre premier point.'
+            : "Remplissez le formulaire pour ajouter votre premier point."}
+        </p>
       </div>
     );
   }
