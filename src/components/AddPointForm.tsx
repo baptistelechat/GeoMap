@@ -49,8 +49,8 @@ export function AddPointForm({ onSuccess }: { onSuccess?: () => void }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col h-full gap-3 p-2">
-      <div className="space-y-1">
+    <form onSubmit={handleSubmit} className="flex flex-col h-full gap-4 p-2">
+      <div className="space-y-2">
         <Label htmlFor="title">Titre</Label>
         <Input
           id="title"
@@ -62,7 +62,7 @@ export function AddPointForm({ onSuccess }: { onSuccess?: () => void }) {
         />
       </div>
       <div className="grid grid-cols-2 gap-2">
-        <div className="space-y-1">
+        <div className="space-y-2">
           <Label htmlFor="lat">Latitude</Label>
           <Input
             id="lat"
@@ -74,7 +74,7 @@ export function AddPointForm({ onSuccess }: { onSuccess?: () => void }) {
             required
           />
         </div>
-        <div className="space-y-1">
+        <div className="space-y-2">
           <Label htmlFor="lng">Longitude</Label>
           <Input
             id="lng"
@@ -87,7 +87,7 @@ export function AddPointForm({ onSuccess }: { onSuccess?: () => void }) {
           />
         </div>
       </div>
-      <div className="space-y-1">
+      <div className="space-y-2">
         <Label htmlFor="notes">Notes</Label>
         <Textarea
           id="notes"
@@ -97,7 +97,7 @@ export function AddPointForm({ onSuccess }: { onSuccess?: () => void }) {
           className="h-20 resize-none"
         />
       </div>
-      <div className="space-y-1">
+      <div className="space-y-2">
         <Label htmlFor="streetViewUrl">URL Street View</Label>
         <Input
           id="streetViewUrl"
