@@ -1,11 +1,18 @@
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { usePointsStore } from "@/store/pointsStore";
 import { exportToCSV, exportToJSON } from "@/utils/export";
-import { ArrowLeft, Download, FileJson, FileText } from "lucide-react";
+import { Download, FileJson, FileText, ExternalLink } from "lucide-react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
 
-export default function Export() {
+export function ExportDialog() {
   const { points } = usePointsStore();
   const [isExporting, setIsExporting] = useState(false);
 
@@ -28,25 +35,23 @@ export default function Export() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="max-w-md w-full">
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-6">
-            <Link
-              to="/"
-              className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors"
-            >
-              <ArrowLeft size={20} />
-              Retour
-            </Link>
-            <h1 className="text-2xl font-bold text-gray-800">
-              Exporter les données
-            </h1>
-          </div>
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="ghost" size="icon" title="Exporter les données">
+          <ExternalLink size={20} />
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Exporter les données</DialogTitle>
+          <DialogDescription>
+            Choisissez le format d'exportation souhaité.
+          </DialogDescription>
+        </DialogHeader>
 
+        <div className="space-y-6 py-4">
           {/* Stats */}
-          <div className="bg-primary-foreground rounded-lg p-4 mb-6">
+          <div className="bg-primary-foreground rounded-lg p-4">
             <p className="text-primary font-medium">
               {points.length} point{points.length !== 1 ? "s" : ""} à exporter
             </p>
@@ -96,7 +101,7 @@ export default function Export() {
 
           {/* Aperçu des données */}
           {points.length > 0 && (
-            <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+            <div className="p-4 bg-gray-50 rounded-lg">
               <h4 className="font-medium text-gray-800 mb-2">
                 Aperçu des données
               </h4>
@@ -113,7 +118,7 @@ export default function Export() {
             </div>
           )}
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
