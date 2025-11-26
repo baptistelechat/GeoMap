@@ -1,7 +1,7 @@
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { usePointsStore } from "@/store/pointsStore";
 import { Trash2 } from "lucide-react";
-import { StreetViewFrame } from "./StreetViewFrame";
 
 export function PointsList() {
   const { points, removePoint } = usePointsStore();
@@ -15,40 +15,28 @@ export function PointsList() {
   }
 
   return (
-    <div className="space-y-3 p-2">
+    <div className="w-full px-2 space-y-2">
       {points.map((point) => (
         <div
           key={point.id}
-          className="rounded-lg border bg-sidebar-accent/10 p-3 shadow-sm"
+          className="flex items-center justify-between p-3 border rounded-lg bg-card shadow-sm"
         >
-          <div className="mb-2 flex items-start justify-between">
-            <h3 className="font-medium text-sm text-sidebar-foreground">
-              {point.title}
-            </h3>
+          <span className="font-medium truncate mr-2 text-sm">
+            {point.title}
+          </span>
+          <div className="flex items-center gap-2 shrink-0">
+            <Badge variant="secondary" className="font-mono text-xs">
+              {point.lat.toFixed(4)}, {point.lng.toFixed(4)}
+            </Badge>
             <Button
               variant="ghost"
               size="icon"
               onClick={() => removePoint(point.id)}
+              className="size-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
               title="Supprimer"
-              className="h-6 w-6 text-destructive hover:bg-destructive/10 hover:text-destructive"
             >
-              <Trash2 size={14} />
+              <Trash2 className="size-4" />
             </Button>
-          </div>
-
-          {point.streetViewUrl && (
-            <div className="mb-2">
-              <StreetViewFrame url={point.streetViewUrl} title={point.title} />
-            </div>
-          )}
-
-          {point.notes && (
-            <p className="mb-2 text-xs text-muted-foreground">{point.notes}</p>
-          )}
-
-          <div className="text-xs text-muted-foreground/80">
-            <p>Lat: {point.lat.toFixed(6)}</p>
-            <p>Lng: {point.lng.toFixed(6)}</p>
           </div>
         </div>
       ))}
