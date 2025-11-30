@@ -27,6 +27,7 @@
     "clsx": "^2.1.1",
     "file-saver": "^2.0.5",
     "leaflet": "^1.9.4",
+    "leaflet-minimap": "^3.6.1",
     "leaflet.markercluster": "^1.5.3",
     "lucide-react": "^0.511.0",
     "papaparse": "^5.5.3",
