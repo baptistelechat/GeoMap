@@ -30,6 +30,13 @@ export function MapView() {
         />
         <MarkerClusterGroup
           chunkedLoading
+          polygonOptions={{
+            fillColor: "var(--primary)",
+            color: "var(--primary)",
+            weight: 2,
+            opacity: 1,
+            fillOpacity: 0.3,
+          }}
           iconCreateFunction={(cluster) => {
             const count = cluster.getChildCount();
             // Simple custom icon for cluster
