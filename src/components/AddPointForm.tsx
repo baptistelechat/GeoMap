@@ -77,7 +77,7 @@ export function AddPointForm({ onSuccess }: { onSuccess?: () => void }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col h-full gap-4 p-2">
+    <form onSubmit={handleSubmit} className="flex flex-col h-full gap-4 px-2">
       <div className="space-y-2">
         <Label htmlFor="title">Titre</Label>
         <Input

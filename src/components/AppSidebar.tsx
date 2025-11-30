@@ -60,7 +60,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent className="overflow-x-hidden pb-8">
         {/* Section Ajouter un point */}
         <SidebarGroup>
-          <SidebarGroupLabel className="group-data-[collapsible=icon]:hidden">
+          <SidebarGroupLabel className="group-data-[collapsible=icon]:hidden mb-2">
             <Plus className="mr-2 size-4 text-primary" />
             Ajouter un point
           </SidebarGroupLabel>
@@ -95,7 +95,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {/* Section Liste des points */}
         <SidebarGroup className="flex-1">
           <div className="flex items-center justify-between px-2 py-1 group-data-[collapsible=icon]:hidden">
-            <SidebarGroupLabel>
+            <SidebarGroupLabel className="group-data-[collapsible=icon]:hidden mb-2">
               <List className="mr-2 size-4 text-primary" />
               Points ({points.length})
             </SidebarGroupLabel>
@@ -136,7 +136,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {/* Section Développement - Uniquement en DEV */}
         {import.meta.env.DEV && (
           <SidebarGroup>
-            <SidebarGroupLabel className="group-data-[collapsible=icon]:hidden">
+            <SidebarGroupLabel className="group-data-[collapsible=icon]:hidden mb-2">
               <FlaskConical className="mr-2 size-4 text-primary" />
               Développement
             </SidebarGroupLabel>

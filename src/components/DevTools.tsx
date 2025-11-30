@@ -81,13 +81,12 @@ export function DevTools() {
   return (
     <Button
       variant="outline"
-      size="sm"
-      className="w-full justify-start gap-2"
+      className="w-full justify-start gap-2 p-6"
       onClick={generateTestPoints}
       title="Générer 15 points de test (Nantes, Le Mans & Tours)"
     >
       <Database className="size-4" />
-      <span>Générer Données Test</span>
+      Générer Données Test
     </Button>
   );
 }
