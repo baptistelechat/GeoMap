@@ -1,44 +1,190 @@
-import { LocateControl as Locate } from "leaflet.locatecontrol";
-import "leaflet.locatecontrol/dist/L.Control.Locate.min.css";
-import { useEffect } from "react";
-import { useMap } from "react-leaflet";
+import * as L from "leaflet";
+import { Loader2, Locate } from "lucide-react";
+import { useEffect, useState } from "react";
+import { createRoot, Root } from "react-dom/client";
+import { Circle, Marker, Popup, useMap } from "react-leaflet";
+
+// Custom icon for user location (Primary color dot with white border)
+const locationIcon = new L.DivIcon({
+  html: `
+    <div class="relative flex items-center justify-center w-full h-full">
+      <div class="absolute w-4 h-4 bg-primary rounded-full border-2 border-white shadow-lg animate-pulse"></div>
+      <div class="absolute w-4 h-4 bg-primary rounded-full opacity-20 animate-ping"></div>
+    </div>
+  `,
+  className: "custom-user-location-marker",
+  iconSize: [16, 16],
+  iconAnchor: [8, 8],
+});
 
 export function LocateControl() {
   const map = useMap();
+  const [position, setPosition] = useState<L.LatLng | null>(null);
+  const [accuracy, setAccuracy] = useState<number | null>(null);
+
+  // Configuration: Disable large circle by default as requested
+  const SHOW_ACCURACY_CIRCLE = false;
 
   useEffect(() => {
     if (!map) return;
 
-    const locateControl = new Locate({
-      position: "topleft",
-      flyTo: true,
-      strings: {
-        title: "Me localiser",
-        popup: "Vous êtes ici",
+    // Create a custom Leaflet Control
+    const CustomControl = L.Control.extend({
+      options: {
+        position: "topleft",
       },
-      locateOptions: {
-        enableHighAccuracy: true,
-        maxZoom: 16,
+
+      onAdd: function () {
+        const container = L.DomUtil.create(
+          "div",
+          "leaflet-bar leaflet-control flex flex-col"
+        );
+
+        // Prevent map clicks/scrolls through the control
+        L.DomEvent.disableClickPropagation(container);
+        L.DomEvent.disableScrollPropagation(container);
+
+        // Use React to render the button inside the Leaflet control container
+        const root = createRoot(container);
+
+        // For simplicity and robustness, we'll render a component that triggers the parent's logic
+        root.render(
+          <LocateButton
+            onClick={() => {
+              renderButton(container, true);
+              map.locate({
+                setView: true,
+                enableHighAccuracy: true,
+                maxZoom: 18,
+              });
+            }}
+            isLoading={false}
+          />
+        );
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (container as any)._reactRoot = root;
+
+        return container;
       },
-      // Style options to match the app theme
-      circleStyle: {
-        color: "var(--primary)",
-        fillColor: "var(--primary)",
-        fillOpacity: 0.2,
-        weight: 2,
-      },
-      markerStyle: {
-        color: "var(--primary)",
-        fillColor: "var(--primary)",
+
+      onRemove: function () {
+        const container = this.getContainer();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        if (container && (container as any)._reactRoot) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          ((container as any)._reactRoot as Root).unmount();
+        }
       },
     });
 
-    locateControl.addTo(map);
+    const control = new CustomControl();
+    map.addControl(control);
+
+    // Event handlers
+    const onLocationFound = (e: L.LocationEvent) => {
+      setPosition(e.latlng);
+      setAccuracy(e.accuracy);
+      renderButton(control.getContainer(), false);
+    };
+
+    const onLocationError = (e: L.ErrorEvent) => {
+      console.error("Location error:", e.message);
+      alert("Impossible de vous localiser. Vérifiez vos autorisations GPS.");
+      renderButton(control.getContainer(), false);
+    };
+
+    // Helper to re-render button
+    const renderButton = (
+      container: HTMLElement | undefined,
+      loading: boolean
+    ) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      if (!container || !(container as any)._reactRoot) return;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ((container as any)._reactRoot as Root).render(
+        <LocateButton
+          onClick={() => {
+            renderButton(container, true);
+            map.locate({
+              setView: true,
+              enableHighAccuracy: true,
+              maxZoom: 18,
+            });
+          }}
+          isLoading={loading}
+        />
+      );
+    };
+
+    map.on("locationfound", onLocationFound);
+    map.on("locationerror", onLocationError);
 
     return () => {
-      locateControl.remove();
+      map.removeControl(control);
+      map.off("locationfound", onLocationFound);
+      map.off("locationerror", onLocationError);
     };
   }, [map]);
 
-  return null;
+  return (
+    <>
+      {position && (
+        <>
+          <Marker position={position} icon={locationIcon}>
+            <Popup>Vous êtes ici</Popup>
+          </Marker>
+          {SHOW_ACCURACY_CIRCLE && accuracy && (
+            <Circle
+              center={position}
+              radius={accuracy}
+              pathOptions={{
+                color: "var(--primary)",
+                fillColor: "var(--primary)",
+                fillOpacity: 0.1,
+                weight: 1,
+                opacity: 0.5,
+              }}
+            />
+          )}
+        </>
+      )}
+    </>
+  );
+}
+
+// Isolated Button Component
+function LocateButton({
+  onClick,
+  isLoading,
+}: {
+  onClick: () => void;
+  isLoading: boolean;
+}) {
+  return (
+    <a
+      className="leaflet-control-locate flex items-center justify-center bg-white hover:bg-gray-50 text-black cursor-pointer"
+      href="#"
+      title="Me localiser"
+      role="button"
+      onClick={(e) => {
+        e.preventDefault();
+        onClick();
+      }}
+      style={{
+        width: "30px",
+        height: "30px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        borderBottom: "none",
+      }}
+    >
+      {isLoading ? (
+        <Loader2 className="h-4 w-4 animate-spin text-primary" />
+      ) : (
+        <Locate className="h-4 w-4 text-black" />
+      )}
+    </a>
+  );
 }

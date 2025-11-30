@@ -56,9 +56,6 @@ importers:
       leaflet-minimap:
         specifier: ^3.6.1
         version: 3.6.1
-      leaflet.locatecontrol:
-        specifier: ^0.85.1
-        version: 0.85.1
       leaflet.markercluster:
         specifier: ^1.5.3
         version: 1.5.3(leaflet@1.9.4)
@@ -99,9 +96,6 @@ importers:
       '@eslint/js':
         specifier: ^9.25.0
         version: 9.39.1
-      '@types/leaflet.locatecontrol':
-        specifier: ^0.82.1
-        version: 0.82.1
       '@types/leaflet.markercluster':
         specifier: ^1.5.6
         version: 1.5.6
@@ -1167,9 +1161,6 @@ packages:
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
 
-  '@types/leaflet.locatecontrol@0.82.1':
-    resolution: {integrity: sha512-AcDyhhPDrF48iRa0/ShKgtAgR7a6ts2SzsoUUM9/+IwTZl/1iPP/JIg+wpwoobTMfx+bF2mUUkXKRwieveVgNQ==}
-
   '@types/leaflet.markercluster@1.5.6':
     resolution: {integrity: sha512-I7hZjO2+isVXGYWzKxBp8PsCzAYCJBc29qBdFpquOCkS7zFDqUsUvkEOyQHedsk/Cy5tocQzf+Ndorm5W9YKTQ==}
 
@@ -1580,9 +1571,6 @@ packages:
 
   leaflet-minimap@3.6.1:
     resolution: {integrity: sha512-6px8f6cfv1rKB6ACpL6bbUFGxipZOq4KsntJgBj9nOcW1RYa5+xFp8emOZwks9X+VtVVsQEwWwfgT1kTTL/LzA==}
-
-  leaflet.locatecontrol@0.85.1:
-    resolution: {integrity: sha512-aB2qrwZO7Vs4EbWja6pyGy6Y1Mr2yeOqH3PN+Ocnjb4pgpiwYsX1AOI0mppVYzUTO2zwjafxVTOffiwEE32udA==}
 
   leaflet.markercluster@1.5.3:
     resolution: {integrity: sha512-vPTw/Bndq7eQHjLBVlWpnGeLa3t+3zGiuM7fJwCkiMFq+nmRuG3RI3f7f4N4TDX7T4NpbAXpR2+NTRSEGfCSeA==}
@@ -2907,10 +2895,6 @@ snapshots:
 
   '@types/json-schema@7.0.15': {}
 
-  '@types/leaflet.locatecontrol@0.82.1':
-    dependencies:
-      '@types/leaflet': 1.9.21
-
   '@types/leaflet.markercluster@1.5.6':
     dependencies:
       '@types/leaflet': 1.9.21
@@ -3358,8 +3342,6 @@ snapshots:
       json-buffer: 3.0.1
 
   leaflet-minimap@3.6.1: {}
-
-  leaflet.locatecontrol@0.85.1: {}
 
   leaflet.markercluster@1.5.3(leaflet@1.9.4):
     dependencies:
