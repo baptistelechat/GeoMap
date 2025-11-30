@@ -5,6 +5,7 @@ import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import { MarkerPopup } from "./MarkerPopup";
 import { MiniMapControl } from "./MiniMapControl";
+import { LocateControl } from "./LocateControl";
 
 const customIcon = new Icon({
   iconUrl:
@@ -60,6 +61,7 @@ export function MapView() {
           ))}
         </MarkerClusterGroup>
         <MiniMapControl />
+        <LocateControl />
       </MapContainer>
     </div>
   );

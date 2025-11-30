@@ -37,7 +37,12 @@ export function ExportDialog() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="ghost" size="icon" title="Exporter les données">
+        <Button
+          variant="ghost"
+          size="icon"
+          title="Exporter les données"
+          disabled={points.length === 0 || isExporting}
+        >
           <ExternalLink size={20} />
         </Button>
       </DialogTrigger>
