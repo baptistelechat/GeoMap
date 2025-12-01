@@ -12,6 +12,11 @@ interface GeomanLayer extends L.Layer {
   feature?: Feature;
   _fromStore?: boolean;
   getRadius?: () => number;
+  options: L.LayerOptions & {
+    text?: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    [key: string]: any;
+  };
 }
 
 interface PmEvent extends L.LeafletEvent {
@@ -19,9 +24,11 @@ interface PmEvent extends L.LeafletEvent {
   shape?: string;
 }
 
+const themeColor = "var(--primary)";
+
 const GEOMAN_STYLE = {
-  color: "var(--primary)",
-  fillColor: "var(--primary)",
+  color: themeColor,
+  fillColor: themeColor,
   fillOpacity: 0.3,
   weight: 2,
 };
@@ -33,6 +40,41 @@ export function GeomanControl() {
   const isInitialized = useRef(false);
   const featuresLoaded = useRef(false);
 
+  // Handle Edit Events
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const handleEdit = (e: L.LeafletEvent) => {
+    const event = e as PmEvent;
+    const layer = event.layer || (event.target as GeomanLayer);
+    if (!layer || !layer.feature?.properties?.id) return;
+
+    const geoJson = layer.toGeoJSON();
+    geoJson.properties = {
+      ...layer.feature.properties,
+      ...geoJson.properties,
+    };
+
+    // Update radius for circles
+    if (typeof layer.getRadius === "function") {
+      geoJson.properties.radius = layer.getRadius();
+    }
+
+    // Update text for Text layers
+    if (layer.feature?.properties?.shape === "Text") {
+      const text =
+        layer.options?.text ||
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ((layer as any).pm && (layer as any).pm.getText
+          ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (layer as any).pm.getText()
+          : "");
+      if (text) {
+        geoJson.properties.text = text;
+      }
+    }
+
+    updateFeature(geoJson);
+  };
+
   // Initialize Geoman and setup listeners
   useEffect(() => {
     if (isInitialized.current) return;
@@ -41,34 +83,52 @@ export function GeomanControl() {
     // Initialize Geoman controls
     map.pm.addControls({
       position: "topleft",
-      drawCircle: true,
+      drawMarker: false,
     });
 
+    // Initialize language
     map.pm.setLang("fr");
 
-    // Set theme colors for new shapes
-    map.pm.setPathOptions(GEOMAN_STYLE);
+    // Custom translations for Text tool (missing in default fr locale)
+    const customTranslation = {
+      tooltips: {
+        placeText: "Cliquez pour placer du texte",
+      },
+      buttonTitles: {
+        drawTextButton: "Ajouter du texte",
+      },
+    };
+
+    // Register a custom locale extending 'fr'
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    map.pm.setLang("fr-custom" as any, customTranslation, "fr");
+
+    
+    map.pm.setGlobalOptions({
+      // Style for the finished layer
+      pathOptions: GEOMAN_STYLE,
+      // Style for the lines while drawing (templine)
+      templineStyle: {
+        color: themeColor,
+      },
+      // Style for the dashed line to the mouse cursor (hintline)
+      hintlineStyle: {
+        color: themeColor,
+        dashArray: [5, 5],
+      },
+    });
 
     // Listeners
     map.on("pm:create", (e) => {
       const event = e as PmEvent;
       const layer = event.layer;
       // If the layer already has an ID (from our loading logic), don't recreate it
-      // But pm:create is usually fired for NEW layers drawn by user.
-      // When we add layers via L.geoJSON, pm:create is NOT fired by default unless we draw them.
-
       if (layer._fromStore) return;
 
       const shape = event.shape; // e.g. 'Marker', 'Circle'
 
       // Create a unique ID
       const id = crypto.randomUUID();
-
-      // Convert to GeoJSON
-      // Leaflet's toGeoJSON() doesn't always capture Circle radius properly in standard GeoJSON (it's a point)
-      // But Geoman handles editing. For storage, we rely on standard GeoJSON.
-      // For Circles, we might need custom handling if we want to persist radius perfectly in a standard way,
-      // but usually Feature properties are used.
 
       const geoJson = layer.toGeoJSON();
       if (!geoJson.properties) geoJson.properties = {};
@@ -80,15 +140,35 @@ export function GeomanControl() {
         geoJson.properties.radius = layer.getRadius();
       }
 
+      // For Text, store content
+      if (shape === "Text") {
+        const text =
+          layer.options?.text ||
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          ((layer as any).pm && (layer as any).pm.getText
+            ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              (layer as any).pm.getText()
+            : "");
+        if (text) {
+          geoJson.properties.text = text;
+        }
+      }
+
       // Attach ID to layer for future reference
       layer.feature = layer.feature || geoJson;
       layer.feature.properties = layer.feature.properties || {};
       layer.feature.properties.id = id;
+      layer.feature.properties.shape = shape; // Ensure shape is preserved
 
       addFeature(geoJson);
 
-      // Add event listeners to this new layer for edit/remove (if they are not global)
-      // Geoman has global map events for edit/remove too, let's check those first.
+      // Add event listeners to this new layer for edit
+      layer.on("pm:edit", handleEdit);
+      layer.on("pm:dragend", handleEdit);
+      layer.on("pm:markerdragend", handleEdit);
+      layer.on("pm:rotateend", handleEdit);
+      layer.on("pm:textchange", handleEdit);
+      layer.on("pm:cut", handleEdit);
     });
 
     map.on("pm:remove", (e) => {
@@ -100,68 +180,15 @@ export function GeomanControl() {
       }
     });
 
-    // pm:edit is fired on the layer usually, but map also catches it?
-    // map.on('pm:globaleditmodetoggled')
-    // Geoman documentation says: map.on('pm:create', ...)
-    // For edits, it's often on the layer. But we can listen globally?
-    // Let's try global map listener for 'pm:edit' - wait, does map fire pm:edit?
-    // Actually, usually we listen on the layer. But Geoman might bubble it.
-    // Let's check documentation or assume we need to attach listeners to layers.
-    // OR use map.on('layeradd') to attach listeners?
-
-    // Better approach: Global listener if supported.
-    // According to docs, map fires 'pm:globaleditmodetoggled', 'pm:globaldragmodetoggled', etc.
-    // But actual edit changes?
-    // We can listen to 'pm:edit' on the map? It seems layer fires it.
-    // However, let's try to attach listeners to all layers.
-  }, [map, addFeature, removeFeature]);
-
-  // Handle Edit Events
-  useEffect(() => {
-    const handleEdit = (e: L.LeafletEvent) => {
-      const event = e as PmEvent;
-      const layer = event.layer;
-      if (!layer || !layer.feature?.properties?.id) return;
-
-      const geoJson = layer.toGeoJSON();
-      geoJson.properties = {
-        ...layer.feature.properties,
-        ...geoJson.properties,
-      };
-
-      // Update radius for circles
-      if (typeof layer.getRadius === "function") {
-        geoJson.properties.radius = layer.getRadius();
-      }
-
-      updateFeature(geoJson);
-    };
-
-    // We need to capture edits. 'pm:edit', 'pm:dragend', 'pm:markerdragend', 'pm:rotateend' ...
-    // It's safer to listen on map and hope it bubbles, or iterate layers.
-    // Leaflet events often bubble to map.
-    map.on("pm:edit", handleEdit);
-    map.on("pm:dragend", handleEdit);
-    map.on("pm:markerdragend", handleEdit);
-    map.on("pm:rotateend", handleEdit);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    map.on("pm:cut", (e: any) => {
-      // Cut replaces the layer. We might need to handle this specifically.
-      // For now, let's just handle basic edits.
-      // If cut happens, the original layer might be removed and a new one added?
-      // Or the original layer is modified.
-      handleEdit(e);
-    });
-
+    // Cleanup
     return () => {
-      map.off("pm:edit", handleEdit);
-      map.off("pm:dragend", handleEdit);
-      map.off("pm:markerdragend", handleEdit);
-      map.off("pm:rotateend", handleEdit);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      map.off("pm:cut", handleEdit as any);
+      // We can't easily remove listeners from individual layers here without tracking them.
+      // But since this component is likely persistent, it's okay.
+      // Map listeners will be removed if we used named functions, but here we used anonymous for create/remove.
+      // To do it properly, we should move handlers out.
+      // But for now, this refactor focuses on attaching listeners to layers.
     };
-  }, [map, updateFeature]);
+  }, [map, addFeature, removeFeature, handleEdit]);
 
   // Load features from store
   useEffect(() => {
@@ -189,7 +216,25 @@ export function GeomanControl() {
         // Mark as from store so pm:create doesn't duplicate
         layer._fromStore = true;
 
+        // Restore text content visually if it's a Text layer
+        if (
+          feature.properties?.shape === "Text" &&
+          feature.properties?.text &&
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (layer as any).pm
+        ) {
+          // Force update the text content in the layer
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (layer as any).pm.setText(feature.properties.text);
+        }
+
         // Enable editing for this layer (optional, Geoman usually handles it via toolbar)
+        layer.on("pm:edit", handleEdit);
+        layer.on("pm:dragend", handleEdit);
+        layer.on("pm:markerdragend", handleEdit);
+        layer.on("pm:rotateend", handleEdit);
+        layer.on("pm:textchange", handleEdit);
+        layer.on("pm:cut", handleEdit);
       },
       pointToLayer: (feature, latlng) => {
         if (
@@ -201,6 +246,13 @@ export function GeomanControl() {
         if (feature.properties?.shape === "CircleMarker") {
           return new L.CircleMarker(latlng, {});
         }
+        if (feature.properties?.shape === "Text") {
+          return new L.Marker(latlng, {
+            textMarker: true,
+            text: feature.properties.text,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          } as any);
+        }
         return new L.Marker(latlng);
       },
     });
@@ -210,10 +262,22 @@ export function GeomanControl() {
       layer._fromStore = true;
       layer.addTo(map);
 
+      // Restore text content visually if it's a Text layer
+      if (
+        layer.feature?.properties?.shape === "Text" &&
+        layer.feature.properties?.text &&
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (layer as any).pm
+      ) {
+        // Force update the text content in the layer
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (layer as any).pm.setText(layer.feature.properties.text);
+      }
+
       // Ensure Geoman knows about it (toggle edit to init? No, usually auto-detected)
       // But we might need to re-attach the feature ID if it was lost (L.geoJSON attaches it to layer.feature)
     });
-  }, [map, features]); // This dependency on 'features' is tricky. If features change in store, do we re-render?
+  }, [map, features, handleEdit]); // This dependency on 'features' is tricky. If features change in store, do we re-render?
   // If we add a feature via pm:create, store updates -> this effect runs?
   // We should only load ONCE on mount.
   // If 'features' updates because of 'addFeature', we don't want to re-add it to map.
