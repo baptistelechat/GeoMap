@@ -1,6 +1,8 @@
 import { useGeomarkStore } from "@/store/geomarkStore";
 import "@geoman-io/leaflet-geoman-free";
 import "@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css";
+import { area as turfArea } from "@turf/area";
+import { length as turfLength } from "@turf/length";
 import type { Feature, GeoJsonObject } from "geojson";
 import * as L from "leaflet";
 import { useEffect, useRef } from "react";
@@ -40,6 +42,65 @@ export function GeomanControl() {
   const isInitialized = useRef(false);
   const featuresLoaded = useRef(false);
 
+  // Function to calculate and show measurement on click
+  const handleLayerClick = (e: L.LeafletMouseEvent) => {
+    const layer = e.target as GeomanLayer;
+    const geoJson = layer.toGeoJSON();
+
+    const title = "Mesures";
+    let content = "";
+
+    if (geoJson.geometry.type === "LineString") {
+      const len = turfLength(geoJson, { units: "meters" });
+      const lenKm = turfLength(geoJson, { units: "kilometers" });
+      content = `
+        <div class="text-sm font-semibold">${title}</div>
+        <div>Longueur: ${
+          len < 1000 ? `${len.toFixed(2)} m` : `${lenKm.toFixed(2)} km`
+        }</div>
+      `;
+    } else if (
+      geoJson.geometry.type === "Polygon" ||
+      geoJson.geometry.type === "MultiPolygon"
+    ) {
+      const a = turfArea(geoJson); // m²
+      const aHectare = a / 10000;
+
+      const perim = turfLength(geoJson, { units: "meters" });
+      const perimKm = turfLength(geoJson, { units: "kilometers" });
+
+      content = `
+        <div class="text-sm font-semibold">${title}</div>
+        <div>Surface: ${
+          a < 10000 ? `${a.toFixed(2)} m²` : `${aHectare.toFixed(2)} ha`
+        }</div>
+        <div>Périmètre: ${
+          perim < 1000 ? `${perim.toFixed(2)} m` : `${perimKm.toFixed(2)} km`
+        }</div>
+      `;
+    } else if (layer instanceof L.Circle) {
+      const radius = layer.getRadius();
+      const areaCircle = Math.PI * radius * radius;
+      const perimeterCircle = 2 * Math.PI * radius;
+      const areaHectare = areaCircle / 10000;
+
+      content = `
+        <div class="text-sm font-semibold">${title}</div>
+        <div>Rayon: ${radius.toFixed(2)} m</div>
+        <div>Surface: ${
+          areaCircle < 10000
+            ? `${areaCircle.toFixed(2)} m²`
+            : `${areaHectare.toFixed(2)} ha`
+        }</div>
+        <div>Circonférence: ${perimeterCircle.toFixed(2)} m</div>
+      `;
+    }
+
+    if (content) {
+      L.popup().setLatLng(e.latlng).setContent(content).openOn(e.target._map);
+    }
+  };
+
   // Handle Edit Events
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleEdit = (e: L.LeafletEvent) => {
@@ -70,6 +131,17 @@ export function GeomanControl() {
       if (text) {
         geoJson.properties.text = text;
       }
+    }
+
+    // Ensure shape is updated if it changed (e.g. Rectangle edited to Polygon)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const currentShape = (layer as any).pm?.getShape
+      ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (layer as any).pm.getShape()
+      : layer.feature?.properties?.shape;
+
+    if (currentShape) {
+      geoJson.properties.shape = currentShape;
     }
 
     updateFeature(geoJson);
@@ -103,7 +175,6 @@ export function GeomanControl() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     map.pm.setLang("fr-custom" as any, customTranslation, "fr");
 
-    
     map.pm.setGlobalOptions({
       // Style for the finished layer
       pathOptions: GEOMAN_STYLE,
@@ -169,6 +240,9 @@ export function GeomanControl() {
       layer.on("pm:rotateend", handleEdit);
       layer.on("pm:textchange", handleEdit);
       layer.on("pm:cut", handleEdit);
+
+      // Add click listener for measurement
+      layer.on("click", handleLayerClick);
     });
 
     map.on("pm:remove", (e) => {
@@ -180,14 +254,7 @@ export function GeomanControl() {
       }
     });
 
-    // Cleanup
-    return () => {
-      // We can't easily remove listeners from individual layers here without tracking them.
-      // But since this component is likely persistent, it's okay.
-      // Map listeners will be removed if we used named functions, but here we used anonymous for create/remove.
-      // To do it properly, we should move handlers out.
-      // But for now, this refactor focuses on attaching listeners to layers.
-    };
+    return () => {};
   }, [map, addFeature, removeFeature, handleEdit]);
 
   // Load features from store
@@ -195,23 +262,10 @@ export function GeomanControl() {
     if (featuresLoaded.current) return;
     featuresLoaded.current = true;
 
-    // We need to add existing features to the map
-    // But we must be careful not to double-add if strict mode runs twice or something.
-    // We use a flag.
-
     const geoJsonLayer = L.geoJSON(features as GeoJsonObject[], {
       style: () => GEOMAN_STYLE,
       onEachFeature: (feature, l) => {
         const layer = l as GeomanLayer;
-        // Restore radius for circles
-        if (
-          feature.properties?.shape === "Circle" &&
-          feature.properties?.radius
-        ) {
-          // L.geoJSON creates a Marker for Point geometry. We need to replace it with Circle if it was a circle.
-          // But wait, standard GeoJSON is Point.
-          // We can use pointToLayer option.
-        }
 
         // Mark as from store so pm:create doesn't duplicate
         layer._fromStore = true;
@@ -235,6 +289,9 @@ export function GeomanControl() {
         layer.on("pm:rotateend", handleEdit);
         layer.on("pm:textchange", handleEdit);
         layer.on("pm:cut", handleEdit);
+
+        // Add click listener for measurement
+        layer.on("click", handleLayerClick);
       },
       pointToLayer: (feature, latlng) => {
         if (
@@ -273,21 +330,8 @@ export function GeomanControl() {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (layer as any).pm.setText(layer.feature.properties.text);
       }
-
-      // Ensure Geoman knows about it (toggle edit to init? No, usually auto-detected)
-      // But we might need to re-attach the feature ID if it was lost (L.geoJSON attaches it to layer.feature)
     });
-  }, [map, features, handleEdit]); // This dependency on 'features' is tricky. If features change in store, do we re-render?
-  // If we add a feature via pm:create, store updates -> this effect runs?
-  // We should only load ONCE on mount.
-  // If 'features' updates because of 'addFeature', we don't want to re-add it to map.
-  // So we should remove 'features' from dependency array or handle diffs.
-  // Given 'featuresLoaded' ref, it will only run once.
-  // BUT if we reload the page, it runs once.
-  // If we persist, it runs once.
-
-  // What if data comes in later (async persist rehydration)?
-  // Zustand persist is usually synchronous if localStorage.
+  }, [map, features, handleEdit]);
 
   return null;
 }
