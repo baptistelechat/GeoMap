@@ -7,13 +7,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { usePointsStore } from "@/store/pointsStore";
+import { useGeomarkStore } from "@/store/geomarkStore";
 import { exportToCSV, exportToJSON } from "@/utils/export";
 import { Download, FileJson, FileText, ExternalLink } from "lucide-react";
 import { useState } from "react";
 
 export function ExportDialog() {
-  const { points } = usePointsStore();
+  const { points } = useGeomarkStore();
   const [isExporting, setIsExporting] = useState(false);
 
   const handleExportCSV = async () => {

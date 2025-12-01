@@ -1,10 +1,10 @@
 import { Button } from "@/components/ui/button";
-import { usePointsStore } from "@/store/pointsStore";
+import { useGeomarkStore } from "@/store/geomarkStore";
 import { MapPoint } from "@/types/map";
 import { Database } from "lucide-react";
 
 export function DevTools() {
-  const { addPoint } = usePointsStore();
+  const { addPoint } = useGeomarkStore();
 
   const generateTestPoints = () => {
     // Coordonnées de base pour Nantes, Le Mans et Tours

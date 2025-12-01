@@ -1,9 +1,10 @@
-import { usePointsStore } from "@/store/pointsStore";
+import { useGeomarkStore } from "@/store/geomarkStore";
 import "@/vendor/SmoothWheelZoom.js";
 import * as L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
+import { GeomanControl } from "./GeomanControl";
 import { LocateControl } from "./LocateControl";
 import { MarkerPopup } from "./MarkerPopup";
 import { MiniMapControl } from "./MiniMapControl";
@@ -23,7 +24,7 @@ const customIcon = new L.Icon({
 });
 
 export function MapView() {
-  const { points } = usePointsStore();
+  const { points } = useGeomarkStore();
 
   return (
     <div className="h-full w-full relative z-0">
@@ -35,6 +36,7 @@ export function MapView() {
         smoothWheelZoom={true} // Enable smooth scroll wheel zoom
         smoothSensitivity={1} // Adjust sensitivity if needed
       >
+        <GeomanControl />
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

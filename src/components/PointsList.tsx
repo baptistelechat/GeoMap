@@ -18,11 +18,11 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { usePointsStore } from "@/store/pointsStore";
+import { useGeomarkStore } from "@/store/geomarkStore";
 import { MapPinOff, Trash2 } from "lucide-react";
 
 export function PointsList() {
-  const { points, removePoint } = usePointsStore();
+  const { points, removePoint } = useGeomarkStore();
   const isMobile = useIsMobile();
 
   if (points.length === 0) {

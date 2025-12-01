@@ -10,12 +10,12 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { usePointsStore } from "@/store/pointsStore";
+import { useGeomarkStore } from "@/store/geomarkStore";
 import { Trash2 } from "lucide-react";
 import { useState } from "react";
 
 export function ClearPointsDialog() {
-  const { points, clearPoints } = usePointsStore();
+  const { points, clearPoints } = useGeomarkStore();
   const [open, setOpen] = useState(false);
 
   if (points.length === 0) return null;

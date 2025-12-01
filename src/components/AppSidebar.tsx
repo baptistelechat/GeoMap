@@ -19,12 +19,12 @@ import {
   SidebarSeparator,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { usePointsStore } from "@/store/pointsStore";
+import { useGeomarkStore } from "@/store/geomarkStore";
 import { FlaskConical, List, MapPin, Plus } from "lucide-react";
 import { useState } from "react";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { points } = usePointsStore();
+  const { points } = useGeomarkStore();
   const [addPointDialogOpen, setAddPointDialogOpen] = useState(false);
   const [listPointsDialogOpen, setListPointsDialogOpen] = useState(false);
 

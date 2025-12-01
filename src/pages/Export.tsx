@@ -1,12 +1,12 @@
 import { Button } from "@/components/ui/button";
-import { usePointsStore } from "@/store/pointsStore";
+import { useGeomarkStore } from "@/store/geomarkStore";
 import { exportToCSV, exportToJSON } from "@/utils/export";
 import { ArrowLeft, Download, FileJson, FileText } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
 export default function Export() {
-  const { points } = usePointsStore();
+  const { points } = useGeomarkStore();
   const [isExporting, setIsExporting] = useState(false);
 
   const handleExportCSV = async () => {
