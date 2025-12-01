@@ -133,17 +133,6 @@ export function GeomanControl() {
       }
     }
 
-    // Ensure shape is updated if it changed (e.g. Rectangle edited to Polygon)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const currentShape = (layer as any).pm?.getShape
-      ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (layer as any).pm.getShape()
-      : layer.feature?.properties?.shape;
-
-    if (currentShape) {
-      geoJson.properties.shape = currentShape;
-    }
-
     updateFeature(geoJson);
   };
 
