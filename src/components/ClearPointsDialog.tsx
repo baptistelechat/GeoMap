@@ -10,11 +10,16 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { useGeomarkStore } from "@/store/geomarkStore";
 import { Trash2 } from "lucide-react";
 import { useState } from "react";
 
-export function ClearPointsDialog() {
+interface ClearPointsDialogProps {
+  mode?: "icon" | "text";
+}
+
+export function ClearPointsDialog({ mode = "icon" }: ClearPointsDialogProps) {
   const { points, clearPoints } = useGeomarkStore();
   const [open, setOpen] = useState(false);
 
@@ -25,11 +30,15 @@ export function ClearPointsDialog() {
       <AlertDialogTrigger asChild>
         <Button
           variant="ghost"
-          size="icon"
-          className="size-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+          size={mode === "icon" ? "icon" : "sm"}
+          className={cn(
+            "text-muted-foreground hover:text-destructive hover:bg-destructive/10",
+            mode === "icon" ? "size-8" : ""
+          )}
           title="Tout supprimer"
         >
-          <Trash2 className="size-4" />
+          <Trash2 className={cn("size-4", mode === "text" && "mr-2")} />
+          {mode === "text" && "Tout supprimer"}
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>

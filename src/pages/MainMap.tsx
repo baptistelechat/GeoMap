@@ -1,13 +1,11 @@
 import { AddPointDialog } from "@/components/AddPointDialog";
 import { AppSidebar } from "@/components/AppSidebar";
+import { DevTools } from "@/components/DevTools";
 import { MapView } from "@/components/MapView";
 import { PointsListDialog } from "@/components/PointsListDialog";
 import { Button } from "@/components/ui/button";
-import {
-  SidebarInset,
-  SidebarProvider,
-} from "@/components/ui/sidebar";
-import { List, Plus } from "lucide-react";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { FlaskConical, List, Plus } from "lucide-react";
 
 export default function MainMap() {
   return (
@@ -26,7 +24,7 @@ export default function MainMap() {
                 size="icon"
                 title="Ajouter un point"
               >
-                <Plus className="size-6"/>
+                <Plus className="size-6" />
               </Button>
             }
           />
@@ -38,10 +36,20 @@ export default function MainMap() {
                 size="icon"
                 title="Liste des points"
               >
-                <List className="size-6"/>
+                <List className="size-6" />
               </Button>
             }
           />
+          {import.meta.env.DEV && (
+            <DevTools
+              className="rounded-full shadow-lg size-12"
+              variant="outline"
+              size="icon"
+              title="Générer des points"
+            >
+              <FlaskConical className="size-6" />
+            </DevTools>
+          )}
         </div>
       </SidebarInset>
     </SidebarProvider>

@@ -88,10 +88,40 @@ export function LocateControl() {
       renderButton(control.getContainer(), false);
     };
 
-    const onLocationError = (e: L.ErrorEvent) => {
-      console.error("Location error:", e.message);
-      alert("Impossible de vous localiser. Vérifiez vos autorisations GPS.");
-      renderButton(control.getContainer(), false);
+    const onLocationError = async (e: L.ErrorEvent) => {
+      console.warn("GPS failed, attempting IP fallback...", e.message);
+
+      try {
+        // Fallback : Géolocalisation IP (fonctionne en HTTP)
+        // Note: ip-api.com est gratuit pour usage non-commercial (45 req/min)
+        const res = await fetch("http://ip-api.com/json/");
+        const data = await res.json();
+
+        if (data.status === "success") {
+          const latlng = new L.LatLng(data.lat, data.lon);
+
+          setPosition(latlng);
+          setAccuracy(5000); // Précision arbitraire "ville"
+
+          map.flyTo(latlng, 13);
+
+          // Feedback utilisateur
+          alert(
+            "⚠️ Localisation GPS impossible (connexion non sécurisée).\n\n" +
+              "Une position approximative basée sur votre adresse IP a été utilisée."
+          );
+        } else {
+          throw new Error("IP Geolocation failed");
+        }
+      } catch (err) {
+        console.error("Fallback failed:", err);
+        alert(
+          "Impossible de vous localiser.\n\n" +
+            "Le GPS nécessite HTTPS et la localisation IP a échoué."
+        );
+      } finally {
+        renderButton(control.getContainer(), false);
+      }
     };
 
     // Helper to re-render button

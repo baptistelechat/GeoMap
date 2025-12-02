@@ -1,9 +1,15 @@
 import { Button } from "@/components/ui/button";
+import { generateId } from "@/lib/utils";
 import { useGeomarkStore } from "@/store/geomarkStore";
 import { MapPoint } from "@/types/map";
 import { Database } from "lucide-react";
 
-export function DevTools() {
+export function DevTools({
+  className,
+  variant = "outline",
+  children,
+  ...props
+}: React.ComponentProps<typeof Button>) {
   const { addPoint } = useGeomarkStore();
 
   const generateTestPoints = () => {
@@ -22,7 +28,7 @@ export function DevTools() {
       const lng = centers.nantes.lng + (Math.random() - 0.5) * 0.04;
 
       points.push({
-        id: crypto.randomUUID(),
+        id: generateId(),
         title: `Nantes Point ${i + 1}`,
         lat,
         lng,
@@ -40,7 +46,7 @@ export function DevTools() {
       const lng = centers.leMans.lng + (Math.random() - 0.5) * 0.04;
 
       points.push({
-        id: crypto.randomUUID(),
+        id: generateId(),
         title: `Le Mans Point ${i + 1}`,
         lat,
         lng,
@@ -60,7 +66,7 @@ export function DevTools() {
       const lng = centers.tours.lng + (Math.random() - 0.5) * 0.04;
 
       points.push({
-        id: crypto.randomUUID(),
+        id: generateId(),
         title: `Tours Point ${i + 1}`,
         lat,
         lng,
@@ -80,13 +86,18 @@ export function DevTools() {
 
   return (
     <Button
-      variant="outline"
-      className="w-full justify-start gap-2 p-6"
+      variant={variant}
+      className={className ?? "w-full justify-start gap-2 p-6"}
       onClick={generateTestPoints}
       title="Générer 15 points de test (Nantes, Le Mans & Tours)"
+      {...props}
     >
-      <Database className="size-4" />
-      Générer Données Test
+      {children ?? (
+        <>
+          <Database className="size-4" />
+          Générer Données Test
+        </>
+      )}
     </Button>
   );
 }

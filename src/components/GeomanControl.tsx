@@ -1,6 +1,7 @@
 import { useGeomarkStore } from "@/store/geomarkStore";
 import "@geoman-io/leaflet-geoman-free";
 import "@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css";
+import { generateId } from "@/lib/utils";
 import { area as turfArea } from "@turf/area";
 import { length as turfLength } from "@turf/length";
 import type { Feature, GeoJsonObject } from "geojson";
@@ -188,7 +189,7 @@ export function GeomanControl() {
       const shape = event.shape; // e.g. 'Marker', 'Circle'
 
       // Create a unique ID
-      const id = crypto.randomUUID();
+      const id = generateId();
 
       const geoJson = layer.toGeoJSON();
       if (!geoJson.properties) geoJson.properties = {};

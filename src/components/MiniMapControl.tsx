@@ -1,3 +1,4 @@
+import { useIsMobile } from "@/hooks/use-mobile";
 import * as L from "leaflet";
 import "leaflet-minimap";
 import "leaflet-minimap/dist/Control.MiniMap.min.css";
@@ -6,6 +7,7 @@ import { useMap } from "react-leaflet";
 
 export function MiniMapControl() {
   const map = useMap();
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     if (!map) return;
@@ -22,7 +24,7 @@ export function MiniMapControl() {
 
     const miniMap = new L.Control.MiniMap(miniMapLayer, {
       toggleDisplay: true,
-      minimized: false,
+      minimized: isMobile,
       position: "bottomright",
       width: 150,
       height: 150,
@@ -50,7 +52,7 @@ export function MiniMapControl() {
     return () => {
       miniMap.remove();
     };
-  }, [map]);
+  }, [map, isMobile]);
 
   return null;
 }

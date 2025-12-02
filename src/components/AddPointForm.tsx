@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { generateId } from "@/lib/utils";
 import { useGeomarkStore } from "@/store/geomarkStore";
 import { MapPoint } from "@/types/map";
 import { useEffect, useState } from "react";
@@ -51,7 +52,7 @@ export function AddPointForm({ onSuccess }: { onSuccess?: () => void }) {
     }
 
     const newPoint: MapPoint = {
-      id: crypto.randomUUID(),
+      id: generateId(),
       title: formData.title,
       lat: parseFloat(formData.lat),
       lng: parseFloat(formData.lng),
