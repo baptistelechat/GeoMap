@@ -108,7 +108,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarGroupContent>
             {/* Liste visible en mode étendu */}
             <div className="group-data-[collapsible=icon]:hidden">
-              <PointsList />
+              <PointsList limit={10} />
+              {points.length > 10 && (
+                <Button
+                  variant="link"
+                  className="w-full mt-2 text-muted-foreground"
+                  onClick={() => setListPointsDialogOpen(true)}
+                >
+                  Voir plus
+                </Button>
+              )}
             </div>
 
             {/* Bouton Dialog visible uniquement en mode réduit */}

@@ -23,11 +23,19 @@ import { MapPinOff, Trash2 } from "lucide-react";
 
 interface PointsListProps {
   onPointClick?: () => void;
+  limit?: number;
 }
 
-export function PointsList({ onPointClick }: PointsListProps) {
+export function PointsList({ onPointClick, limit }: PointsListProps) {
   const { points, removePoint, setFlyToLocation } = useGeomarkStore();
   const isMobile = useIsMobile();
+
+  // Show newest points first
+  // If limit is set: take last 'limit' points (newest) then reverse
+  // If no limit: take all points and reverse
+  const displayPoints = limit
+    ? points.slice(-limit).reverse()
+    : [...points].reverse();
 
   if (points.length === 0) {
     return (
@@ -46,7 +54,7 @@ export function PointsList({ onPointClick }: PointsListProps) {
   return (
     <TooltipProvider>
       <div className="w-full px-2 space-y-2">
-        {points.map((point) => {
+        {displayPoints.map((point) => {
           const ItemContent = (
             <div
               className="flex items-center justify-between p-3 border rounded-lg bg-card shadow-sm cursor-pointer hover:bg-accent transition-colors"
