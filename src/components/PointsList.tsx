@@ -18,12 +18,24 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { usePointsStore } from "@/store/pointsStore";
+import { useGeomarkStore } from "@/store/geomarkStore";
 import { MapPinOff, Trash2 } from "lucide-react";
 
-export function PointsList() {
-  const { points, removePoint } = usePointsStore();
+interface PointsListProps {
+  onPointClick?: () => void;
+  limit?: number;
+}
+
+export function PointsList({ onPointClick, limit }: PointsListProps) {
+  const { points, removePoint, setFlyToLocation } = useGeomarkStore();
   const isMobile = useIsMobile();
+
+  // Show newest points first
+  // If limit is set: take last 'limit' points (newest) then reverse
+  // If no limit: take all points and reverse
+  const displayPoints = limit
+    ? points.slice(-limit).reverse()
+    : [...points].reverse();
 
   if (points.length === 0) {
     return (
@@ -42,9 +54,15 @@ export function PointsList() {
   return (
     <TooltipProvider>
       <div className="w-full px-2 space-y-2">
-        {points.map((point) => {
+        {displayPoints.map((point) => {
           const ItemContent = (
-            <div className="flex items-center justify-between p-3 border rounded-lg bg-card shadow-sm">
+            <div
+              className="flex items-center justify-between p-3 border rounded-lg bg-card shadow-sm cursor-pointer hover:bg-accent transition-colors"
+              onClick={() => {
+                setFlyToLocation({ lat: point.lat, lng: point.lng, zoom: 16 });
+                onPointClick?.();
+              }}
+            >
               <span className="font-medium truncate mr-2 text-sm">
                 {point.title}
               </span>

@@ -7,13 +7,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { usePointsStore } from "@/store/pointsStore";
+import { useGeomarkStore } from "@/store/geomarkStore";
 import { exportToCSV, exportToJSON } from "@/utils/export";
 import { Download, FileJson, FileText, ExternalLink } from "lucide-react";
 import { useState } from "react";
 
 export function ExportDialog() {
-  const { points } = usePointsStore();
+  const { points } = useGeomarkStore();
   const [isExporting, setIsExporting] = useState(false);
 
   const handleExportCSV = async () => {
@@ -37,13 +37,21 @@ export function ExportDialog() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="ghost" size="icon" title="Exporter les données">
+        <Button
+          variant="ghost"
+          size="icon"
+          title="Exporter les données"
+          disabled={points.length === 0 || isExporting}
+        >
           <ExternalLink size={20} />
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Exporter les données</DialogTitle>
+          <DialogTitle className="flex items-center gap-2">
+            <ExternalLink className="size-6 text-primary" />
+            Exporter les données
+          </DialogTitle>
           <DialogDescription>
             Choisissez le format d'exportation souhaité.
           </DialogDescription>

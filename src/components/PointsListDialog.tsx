@@ -8,7 +8,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
-import { usePointsStore } from "@/store/pointsStore";
+import { useGeomarkStore } from "@/store/geomarkStore";
 import { exportToCSV, exportToJSON } from "@/utils/export";
 import { Download, List } from "lucide-react";
 import { useState } from "react";
@@ -26,7 +26,7 @@ export function PointsListDialog({
   onOpenChange,
   className,
 }: PointsListDialogProps) {
-  const { points } = usePointsStore();
+  const { points } = useGeomarkStore();
   const [internalOpen, setInternalOpen] = useState(false);
   const isControlled = open !== undefined;
   const show = isControlled ? open : internalOpen;
@@ -59,7 +59,7 @@ export function PointsListDialog({
             Liste des points ({points.length})
           </DialogTitle>
         </DialogHeader>
-        
+
         <div className="flex gap-2 mb-2 shrink-0">
           <Button
             variant="outline"
@@ -84,7 +84,7 @@ export function PointsListDialog({
         </div>
 
         <div className="flex-1 overflow-y-auto min-h-0">
-          <PointsList />
+          <PointsList onPointClick={() => setShow(false)} />
         </div>
       </DialogContent>
     </Dialog>

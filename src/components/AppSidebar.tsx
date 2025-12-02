@@ -1,5 +1,7 @@
 import { AddPointDialog } from "@/components/AddPointDialog";
 import { AddPointForm } from "@/components/AddPointForm";
+import { ClearPointsDialog } from "@/components/ClearPointsDialog";
+import { DevTools } from "@/components/DevTools";
 import { ExportDialog } from "@/components/ExportDialog";
 import { PointsList } from "@/components/PointsList";
 import { PointsListDialog } from "@/components/PointsListDialog";
@@ -17,12 +19,12 @@ import {
   SidebarSeparator,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { usePointsStore } from "@/store/pointsStore";
-import { List, MapPin, Plus } from "lucide-react";
+import { useGeomarkStore } from "@/store/geomarkStore";
+import { FlaskConical, List, MapPin, Plus } from "lucide-react";
 import { useState } from "react";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { points } = usePointsStore();
+  const { points } = useGeomarkStore();
   const [addPointDialogOpen, setAddPointDialogOpen] = useState(false);
   const [listPointsDialogOpen, setListPointsDialogOpen] = useState(false);
 
@@ -55,10 +57,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
-      <SidebarContent className="overflow-x-hidden">
+      <SidebarContent className="overflow-x-hidden pb-8">
         {/* Section Ajouter un point */}
         <SidebarGroup>
-          <SidebarGroupLabel className="group-data-[collapsible=icon]:hidden">
+          <SidebarGroupLabel className="group-data-[collapsible=icon]:hidden mb-2">
             <Plus className="mr-2 size-4 text-primary" />
             Ajouter un point
           </SidebarGroupLabel>
@@ -93,17 +95,29 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {/* Section Liste des points */}
         <SidebarGroup className="flex-1">
           <div className="flex items-center justify-between px-2 py-1 group-data-[collapsible=icon]:hidden">
-            <SidebarGroupLabel>
+            <SidebarGroupLabel className="group-data-[collapsible=icon]:hidden mb-2">
               <List className="mr-2 size-4 text-primary" />
               Points ({points.length})
             </SidebarGroupLabel>
-            <ExportDialog />
+            <div className="flex items-center gap-1">
+              <ClearPointsDialog />
+              <ExportDialog />
+            </div>
           </div>
 
           <SidebarGroupContent>
             {/* Liste visible en mode étendu */}
             <div className="group-data-[collapsible=icon]:hidden">
-              <PointsList />
+              <PointsList limit={10} />
+              {points.length > 10 && (
+                <Button
+                  variant="link"
+                  className="w-full mt-2 text-muted-foreground"
+                  onClick={() => setListPointsDialogOpen(true)}
+                >
+                  Voir plus
+                </Button>
+              )}
             </div>
 
             {/* Bouton Dialog visible uniquement en mode réduit */}
@@ -125,6 +139,23 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </div>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        <SidebarSeparator />
+
+        {/* Section Développement - Uniquement en DEV */}
+        {import.meta.env.DEV && (
+          <SidebarGroup>
+            <SidebarGroupLabel className="group-data-[collapsible=icon]:hidden mb-2">
+              <FlaskConical className="mr-2 size-4 text-primary" />
+              Développement
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <div className="group-data-[collapsible=icon]:hidden">
+                <DevTools />
+              </div>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
       </SidebarContent>
       <SidebarRail />
     </Sidebar>
