@@ -6,6 +6,7 @@ import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import { GeomanControl } from "./GeomanControl";
 import { LocateControl } from "./LocateControl";
+import MapController from "./MapController";
 import { MarkerPopup } from "./MarkerPopup";
 import { MiniMapControl } from "./MiniMapControl";
 
@@ -36,6 +37,7 @@ export function MapView() {
         smoothWheelZoom={true} // Enable smooth scroll wheel zoom
         smoothSensitivity={1} // Adjust sensitivity if needed
       >
+        <MapController />
         <GeomanControl />
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

@@ -21,8 +21,12 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useGeomarkStore } from "@/store/geomarkStore";
 import { MapPinOff, Trash2 } from "lucide-react";
 
-export function PointsList() {
-  const { points, removePoint } = useGeomarkStore();
+interface PointsListProps {
+  onPointClick?: () => void;
+}
+
+export function PointsList({ onPointClick }: PointsListProps) {
+  const { points, removePoint, setFlyToLocation } = useGeomarkStore();
   const isMobile = useIsMobile();
 
   if (points.length === 0) {
@@ -44,7 +48,13 @@ export function PointsList() {
       <div className="w-full px-2 space-y-2">
         {points.map((point) => {
           const ItemContent = (
-            <div className="flex items-center justify-between p-3 border rounded-lg bg-card shadow-sm">
+            <div
+              className="flex items-center justify-between p-3 border rounded-lg bg-card shadow-sm cursor-pointer hover:bg-accent transition-colors"
+              onClick={() => {
+                setFlyToLocation({ lat: point.lat, lng: point.lng, zoom: 16 });
+                onPointClick?.();
+              }}
+            >
               <span className="font-medium truncate mr-2 text-sm">
                 {point.title}
               </span>

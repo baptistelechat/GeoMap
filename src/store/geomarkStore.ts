@@ -17,6 +17,10 @@ interface GeomarkStore {
   removeFeature: (id: string) => void;
   setFeatures: (features: Feature[]) => void;
   clearFeatures: () => void;
+
+  // Map Control
+  flyToLocation: { lat: number; lng: number; zoom?: number } | null;
+  setFlyToLocation: (location: { lat: number; lng: number; zoom?: number } | null) => void;
 }
 
 export const useGeomarkStore = create<GeomarkStore>()(
@@ -57,9 +61,18 @@ export const useGeomarkStore = create<GeomarkStore>()(
         })),
       setFeatures: (features) => set({ features }),
       clearFeatures: () => set({ features: [] }),
+
+      // Map Control Implementation
+      flyToLocation: null,
+      setFlyToLocation: (location) => set({ flyToLocation: location }),
     }),
     {
       name: "geomark-storage", // Unified storage key
+      partialize: (state) => ({
+        points: state.points,
+        features: state.features,
+        // Exclude flyToLocation from persistence
+      }),
     }
   )
 );

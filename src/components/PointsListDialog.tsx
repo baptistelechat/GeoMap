@@ -59,7 +59,7 @@ export function PointsListDialog({
             Liste des points ({points.length})
           </DialogTitle>
         </DialogHeader>
-        
+
         <div className="flex gap-2 mb-2 shrink-0">
           <Button
             variant="outline"
@@ -84,7 +84,7 @@ export function PointsListDialog({
         </div>
 
         <div className="flex-1 overflow-y-auto min-h-0">
-          <PointsList />
+          <PointsList onPointClick={() => setShow(false)} />
         </div>
       </DialogContent>
     </Dialog>
