@@ -1,3 +1,4 @@
+import { ClearPointsDialog } from "@/components/ClearPointsDialog";
 import { PointsList } from "@/components/PointsList";
 import { Button } from "@/components/ui/button";
 import {
@@ -54,10 +55,13 @@ export function PointsListDialog({
         )}
       >
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <List className="size-6 text-primary" />
-            Liste des points ({points.length})
-          </DialogTitle>
+          <div className="flex items-center justify-between mr-8">
+            <DialogTitle className="flex items-center gap-2">
+              <List className="size-6 text-primary" />
+              Liste des points ({points.length})
+            </DialogTitle>
+            <ClearPointsDialog mode="text" />
+          </div>
         </DialogHeader>
 
         <div className="flex gap-2 mb-2 shrink-0">
