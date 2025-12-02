@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { generateId } from "@/lib/utils";
 import { useGeomarkStore } from "@/store/geomarkStore";
 import { MapPoint } from "@/types/map";
 import { Database } from "lucide-react";
@@ -27,7 +28,7 @@ export function DevTools({
       const lng = centers.nantes.lng + (Math.random() - 0.5) * 0.04;
 
       points.push({
-        id: crypto.randomUUID(),
+        id: generateId(),
         title: `Nantes Point ${i + 1}`,
         lat,
         lng,
@@ -45,7 +46,7 @@ export function DevTools({
       const lng = centers.leMans.lng + (Math.random() - 0.5) * 0.04;
 
       points.push({
-        id: crypto.randomUUID(),
+        id: generateId(),
         title: `Le Mans Point ${i + 1}`,
         lat,
         lng,
@@ -65,7 +66,7 @@ export function DevTools({
       const lng = centers.tours.lng + (Math.random() - 0.5) * 0.04;
 
       points.push({
-        id: crypto.randomUUID(),
+        id: generateId(),
         title: `Tours Point ${i + 1}`,
         lat,
         lng,
