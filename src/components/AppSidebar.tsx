@@ -93,7 +93,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarSeparator />
 
         {/* Section Liste des points */}
-        <SidebarGroup className="flex-1">
+        <SidebarGroup className="flex-1 group-data-[collapsible=icon]:flex-none">
           <div className="flex items-center justify-between px-2 py-1 group-data-[collapsible=icon]:hidden">
             <SidebarGroupLabel className="group-data-[collapsible=icon]:hidden mb-2">
               <List className="mr-2 size-4 text-primary" />
@@ -152,6 +152,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarGroupContent>
               <div className="group-data-[collapsible=icon]:hidden">
                 <DevTools />
+              </div>
+              <div className="hidden group-data-[collapsible=icon]:flex justify-center py-2">
+                <DevTools
+                  variant="ghost"
+                  size="icon"
+                  className="size-8 text-primary"
+                  title="Générer des points"
+                >
+                  <FlaskConical className="size-5" />
+                </DevTools>
               </div>
             </SidebarGroupContent>
           </SidebarGroup>

@@ -3,7 +3,12 @@ import { useGeomarkStore } from "@/store/geomarkStore";
 import { MapPoint } from "@/types/map";
 import { Database } from "lucide-react";
 
-export function DevTools() {
+export function DevTools({
+  className,
+  variant = "outline",
+  children,
+  ...props
+}: React.ComponentProps<typeof Button>) {
   const { addPoint } = useGeomarkStore();
 
   const generateTestPoints = () => {
@@ -80,13 +85,18 @@ export function DevTools() {
 
   return (
     <Button
-      variant="outline"
-      className="w-full justify-start gap-2 p-6"
+      variant={variant}
+      className={className ?? "w-full justify-start gap-2 p-6"}
       onClick={generateTestPoints}
       title="Générer 15 points de test (Nantes, Le Mans & Tours)"
+      {...props}
     >
-      <Database className="size-4" />
-      Générer Données Test
+      {children ?? (
+        <>
+          <Database className="size-4" />
+          Générer Données Test
+        </>
+      )}
     </Button>
   );
 }
