@@ -93,6 +93,8 @@ export function PointForm({
       setFlyToLocation({ lat: newPoint.lat, lng: newPoint.lng, zoom: 16 });
     } else {
       addPoint(newPoint);
+      // On creation, we also want to fly to the new point
+      setFlyToLocation({ lat: newPoint.lat, lng: newPoint.lng, zoom: 16 });
     }
 
     setFormData({
@@ -169,9 +171,7 @@ export function PointForm({
           }`}
         >
           <div className="space-y-2">
-            <Label htmlFor="lat">
-              Latitude
-            </Label>
+            <Label htmlFor="lat">Latitude</Label>
             <Input
               id="lat"
               type="number"
