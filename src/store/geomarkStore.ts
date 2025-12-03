@@ -7,6 +7,7 @@ interface GeomarkStore {
   // Points
   points: MapPoint[];
   addPoint: (point: MapPoint) => void;
+  updatePoint: (point: MapPoint) => void;
   removePoint: (id: string) => void;
   clearPoints: () => void;
 
@@ -20,7 +21,9 @@ interface GeomarkStore {
 
   // Map Control
   flyToLocation: { lat: number; lng: number; zoom?: number } | null;
-  setFlyToLocation: (location: { lat: number; lng: number; zoom?: number } | null) => void;
+  setFlyToLocation: (
+    location: { lat: number; lng: number; zoom?: number } | null
+  ) => void;
 }
 
 export const useGeomarkStore = create<GeomarkStore>()(
@@ -31,6 +34,12 @@ export const useGeomarkStore = create<GeomarkStore>()(
       addPoint: (point) =>
         set((state) => ({
           points: [...state.points, point],
+        })),
+      updatePoint: (updatedPoint) =>
+        set((state) => ({
+          points: state.points.map((p) =>
+            p.id === updatedPoint.id ? updatedPoint : p
+          ),
         })),
       removePoint: (id) =>
         set((state) => ({

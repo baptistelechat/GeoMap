@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { PointDialog } from "@/components/PointDialog";
 import {
   Tooltip,
   TooltipContent,
@@ -19,7 +20,7 @@ import {
 } from "@/components/ui/tooltip";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useGeomarkStore } from "@/store/geomarkStore";
-import { MapPinOff, Trash2 } from "lucide-react";
+import { MapPinOff, Pencil, Trash2 } from "lucide-react";
 
 interface PointsListProps {
   onPointClick?: () => void;
@@ -70,6 +71,22 @@ export function PointsList({ onPointClick, limit }: PointsListProps) {
                 <Badge variant="secondary" className="font-mono text-xs">
                   {point.lat.toFixed(4)}, {point.lng.toFixed(4)}
                 </Badge>
+
+                <div onClick={(e) => e.stopPropagation()}>
+                  <PointDialog
+                    point={point}
+                    trigger={
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="size-8 text-muted-foreground hover:text-primary hover:bg-primary/10"
+                        title="Modifier"
+                      >
+                        <Pencil className="size-4" />
+                      </Button>
+                    }
+                  />
+                </div>
 
                 <AlertDialog>
                   <AlertDialogTrigger asChild>

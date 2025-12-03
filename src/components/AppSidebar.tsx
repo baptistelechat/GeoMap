@@ -1,8 +1,8 @@
-import { AddPointDialog } from "@/components/AddPointDialog";
-import { AddPointForm } from "@/components/AddPointForm";
 import { ClearPointsDialog } from "@/components/ClearPointsDialog";
 import { DevTools } from "@/components/DevTools";
 import { ExportDialog } from "@/components/ExportDialog";
+import { PointDialog } from "@/components/PointDialog";
+import { PointForm } from "@/components/PointForm";
 import { PointsList } from "@/components/PointsList";
 import { PointsListDialog } from "@/components/PointsListDialog";
 import { Button } from "@/components/ui/button";
@@ -25,7 +25,7 @@ import { useState } from "react";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { points } = useGeomarkStore();
-  const [addPointDialogOpen, setAddPointDialogOpen] = useState(false);
+  const [pointDialogOpen, setPointDialogOpen] = useState(false);
   const [listPointsDialogOpen, setListPointsDialogOpen] = useState(false);
 
   return (
@@ -67,14 +67,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarGroupContent>
             {/* Formulaire visible en mode étendu */}
             <div className="group-data-[collapsible=icon]:hidden">
-              <AddPointForm />
+              <PointForm />
             </div>
 
             {/* Bouton Dialog visible uniquement en mode réduit */}
             <div className="hidden group-data-[collapsible=icon]:flex justify-center py-2">
-              <AddPointDialog
-                open={addPointDialogOpen}
-                onOpenChange={setAddPointDialogOpen}
+              <PointDialog
+                open={pointDialogOpen}
+                onOpenChange={setPointDialogOpen}
                 trigger={
                   <Button
                     variant="ghost"

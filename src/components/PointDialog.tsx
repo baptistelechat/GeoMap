@@ -1,4 +1,4 @@
-import { AddPointForm } from "@/components/AddPointForm";
+import { PointForm } from "@/components/PointForm";
 import {
   Dialog,
   DialogContent,
@@ -7,22 +7,25 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
-import { Plus } from "lucide-react";
+import { MapPoint } from "@/types/map";
+import { Pencil, Plus } from "lucide-react";
 import { useState } from "react";
 
-interface AddPointDialogProps {
+interface PointDialogProps {
   trigger?: React.ReactNode;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   className?: string;
+  point?: MapPoint;
 }
 
-export function AddPointDialog({
+export function PointDialog({
   trigger,
   open,
   onOpenChange,
   className,
-}: AddPointDialogProps) {
+  point,
+}: PointDialogProps) {
   const [internalOpen, setInternalOpen] = useState(false);
   const isControlled = open !== undefined;
   const show = isControlled ? open : internalOpen;
@@ -43,12 +46,24 @@ export function AddPointDialog({
       >
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Plus className="size-6 text-primary" />
-            Ajouter un point
+            {point ? (
+              <>
+                <Pencil className="size-6 text-primary" />
+                Modifier le point
+              </>
+            ) : (
+              <>
+                <Plus className="size-6 text-primary" />
+                Ajouter un point
+              </>
+            )}
           </DialogTitle>
         </DialogHeader>
         <div className="flex-1 overflow-y-auto min-h-0">
-          <AddPointForm onSuccess={() => setShow && setShow(false)} />
+          <PointForm
+            onSuccess={() => setShow && setShow(false)}
+            point={point}
+          />
         </div>
       </DialogContent>
     </Dialog>

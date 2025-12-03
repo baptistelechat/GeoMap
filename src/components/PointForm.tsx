@@ -8,16 +8,35 @@ import { useGeomarkStore } from "@/store/geomarkStore";
 import { MapPoint } from "@/types/map";
 import { useEffect, useState } from "react";
 
-export function AddPointForm({ onSuccess }: { onSuccess?: () => void }) {
-  const { addPoint } = useGeomarkStore();
+export function PointForm({
+  onSuccess,
+  point,
+}: {
+  onSuccess?: () => void;
+  point?: MapPoint;
+}) {
+  const { addPoint, updatePoint, setFlyToLocation } = useGeomarkStore();
   const [isManualCoords, setIsManualCoords] = useState(false);
   const [formData, setFormData] = useState({
-    title: "",
-    lat: "",
-    lng: "",
-    notes: "",
-    streetViewUrl: "",
+    title: point?.title || "",
+    lat: point?.lat.toString() || "",
+    lng: point?.lng.toString() || "",
+    notes: point?.notes || "",
+    streetViewUrl: point?.streetViewUrl || "",
   });
+
+  // Update form data if point changes
+  useEffect(() => {
+    if (point) {
+      setFormData({
+        title: point.title,
+        lat: point.lat.toString(),
+        lng: point.lng.toString(),
+        notes: point.notes || "",
+        streetViewUrl: point.streetViewUrl || "",
+      });
+    }
+  }, [point]);
 
   // Extraction automatique des coordonnées depuis l'URL Google Maps
   useEffect(() => {
@@ -51,17 +70,30 @@ export function AddPointForm({ onSuccess }: { onSuccess?: () => void }) {
       return;
     }
 
+    const lat = parseFloat(formData.lat);
+    const lng = parseFloat(formData.lng);
+
+    if (isNaN(lat) || isNaN(lng)) {
+      return;
+    }
+
     const newPoint: MapPoint = {
-      id: generateId(),
+      id: point?.id || generateId(),
       title: formData.title,
-      lat: parseFloat(formData.lat),
-      lng: parseFloat(formData.lng),
+      lat,
+      lng,
       notes: formData.notes || undefined,
       streetViewUrl: formData.streetViewUrl || undefined,
-      createdAt: Date.now(),
+      createdAt: point?.createdAt || Date.now(),
     };
 
-    addPoint(newPoint);
+    if (point) {
+      updatePoint(newPoint);
+      // On editing, we want to fly to the point to show the update
+      setFlyToLocation({ lat: newPoint.lat, lng: newPoint.lng, zoom: 16 });
+    } else {
+      addPoint(newPoint);
+    }
 
     setFormData({
       title: "",
@@ -173,7 +205,7 @@ export function AddPointForm({ onSuccess }: { onSuccess?: () => void }) {
 
       <div className="mt-auto pt-4">
         <Button type="submit" className="w-full">
-          Ajouter le point
+          {point ? "Modifier le point" : "Ajouter le point"}
         </Button>
       </div>
     </form>
