@@ -1,8 +1,4 @@
-import {
-  AVAILABLE_COLORS,
-  AVAILABLE_ICONS,
-  MarkerIcon,
-} from "@/components/MarkerIcon";
+import { AVAILABLE_ICONS, MarkerIcon } from "@/components/MarkerIcon";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,6 +8,7 @@ import { generateId } from "@/lib/utils";
 import { useGeomarkStore } from "@/store/geomarkStore";
 import { MapPoint } from "@/types/map";
 import { useEffect, useState } from "react";
+import { ColorPicker } from "./ColorPicker";
 
 export function PointForm({
   onSuccess,
@@ -28,7 +25,7 @@ export function PointForm({
     lng: point?.lng.toString() || "",
     notes: point?.notes || "",
     streetViewUrl: point?.streetViewUrl || "",
-    color: point?.color || AVAILABLE_COLORS[3].value, // Default Green
+    color: point?.color || "#22c55e", // Default Green
     icon: point?.icon || AVAILABLE_ICONS[0].name, // Default Pin
   });
 
@@ -41,7 +38,7 @@ export function PointForm({
         lng: point.lng.toString(),
         notes: point.notes || "",
         streetViewUrl: point.streetViewUrl || "",
-        color: point.color || AVAILABLE_COLORS[3].value,
+        color: point.color || "#22c55e",
         icon: point.icon || AVAILABLE_ICONS[0].name,
       });
     }
@@ -114,7 +111,7 @@ export function PointForm({
       lng: "",
       notes: "",
       streetViewUrl: "",
-      color: AVAILABLE_COLORS[5].value,
+      color: "#22c55e",
       icon: AVAILABLE_ICONS[0].name,
     });
     setIsManualCoords(false);
@@ -143,7 +140,6 @@ export function PointForm({
         <div className="flex flex-col gap-3 p-3 border rounded-lg bg-muted/30">
           <div className="flex items-center gap-4">
             <div className="flex flex-col items-center gap-1">
-              <span className="text-xs text-muted-foreground">Aperçu</span>
               <MarkerIcon
                 iconName={formData.icon}
                 color={formData.color}
@@ -151,24 +147,10 @@ export function PointForm({
               />
             </div>
             <div className="flex-1 space-y-2">
-              <div className="flex flex-wrap gap-1.5">
-                {AVAILABLE_COLORS.map((color) => (
-                  <button
-                    key={color.value}
-                    type="button"
-                    className={`w-6 h-6 rounded-full border-2 transition-all ${
-                      formData.color === color.value
-                        ? "border-primary scale-110"
-                        : "border-transparent hover:scale-110"
-                    }`}
-                    style={{ backgroundColor: color.value }}
-                    onClick={() =>
-                      setFormData({ ...formData, color: color.value })
-                    }
-                    title={color.name}
-                  />
-                ))}
-              </div>
+              <ColorPicker
+                color={formData.color}
+                onChange={(color) => setFormData({ ...formData, color })}
+              />
             </div>
           </div>
           <div className="grid grid-cols-5 gap-2">
