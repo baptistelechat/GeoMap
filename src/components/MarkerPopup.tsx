@@ -1,6 +1,9 @@
+import { DeletePointDialog } from "@/components/DeletePointDialog";
+import { PointDialog } from "@/components/PointDialog";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { MapPoint } from "@/types/map";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, Pencil, Trash2 } from "lucide-react";
 
 interface MarkerPopupProps {
   point: MapPoint;
@@ -10,7 +13,7 @@ export function MarkerPopup({ point }: MarkerPopupProps) {
   return (
     <div className="p-2 min-w-[200px] flex flex-col gap-2">
       <h3 className="font-semibold text-gray-800">{point.title}</h3>
-      <div >
+      <div>
         <Badge variant="secondary" className="font-mono text-xs">
           {point.lat.toFixed(6)}, {point.lng.toFixed(6)}
         </Badge>
@@ -18,17 +21,50 @@ export function MarkerPopup({ point }: MarkerPopupProps) {
       {point.notes && (
         <p className="m-0 text-sm text-gray-600 break-words">{point.notes}</p>
       )}
-      {point.streetViewUrl && (
-        <a
-          href={point.streetViewUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-1 text-sm text-primary hover:text-primary/80 transition-colors"
-        >
-          <ExternalLink size={14} />
-          Voir Street View
-        </a>
-      )}
+      <div className="flex items-center justify-between pt-2 mt-1 border-t gap-2">
+        {point.streetViewUrl ? (
+          <a
+            href={point.streetViewUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 text-sm text-primary hover:text-primary/80 transition-colors"
+          >
+            <ExternalLink size={14} />
+            Street View
+          </a>
+        ) : (
+          <div /> /* Spacer if no link */
+        )}
+
+        <div className="flex items-center gap-1">
+          <PointDialog
+            point={point}
+            trigger={
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-7 text-muted-foreground hover:text-primary hover:bg-primary/10"
+                title="Modifier"
+              >
+                <Pencil className="size-3.5" />
+              </Button>
+            }
+          />
+          <DeletePointDialog
+            point={point}
+            trigger={
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                title="Supprimer"
+              >
+                <Trash2 className="size-3.5" />
+              </Button>
+            }
+          />
+        </div>
+      </div>
     </div>
   );
 }

@@ -1,17 +1,6 @@
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import { PointDialog } from "@/components/PointDialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { PointDialog } from "@/components/PointDialog";
 import {
   Tooltip,
   TooltipContent,
@@ -21,6 +10,7 @@ import {
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useGeomarkStore } from "@/store/geomarkStore";
 import { MapPinOff, Pencil, Trash2 } from "lucide-react";
+import { DeletePointDialog } from "./DeletePointDialog";
 
 interface PointsListProps {
   onPointClick?: () => void;
@@ -28,7 +18,7 @@ interface PointsListProps {
 }
 
 export function PointsList({ onPointClick, limit }: PointsListProps) {
-  const { points, removePoint, setFlyToLocation } = useGeomarkStore();
+  const { points, setFlyToLocation } = useGeomarkStore();
   const isMobile = useIsMobile();
 
   // Show newest points first
@@ -88,42 +78,22 @@ export function PointsList({ onPointClick, limit }: PointsListProps) {
                   />
                 </div>
 
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="size-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-                      title="Supprimer"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <Trash2 className="size-4" />
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Êtes-vous sûr ?</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        Cette action est irréversible. Cela supprimera
-                        définitivement le point "{point.title}" de votre liste.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel onClick={(e) => e.stopPropagation()}>
-                        Annuler
-                      </AlertDialogCancel>
-                      <AlertDialogAction
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          removePoint(point.id);
-                        }}
-                        className="bg-destructive hover:bg-destructive/90"
+                <div onClick={(e) => e.stopPropagation()}>
+                  <DeletePointDialog
+                    point={point}
+                    trigger={
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="size-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                        title="Supprimer"
+                        onClick={(e) => e.stopPropagation()}
                       >
-                        Supprimer
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
+                        <Trash2 className="size-4" />
+                      </Button>
+                    }
+                  />
+                </div>
               </div>
             </div>
           );
