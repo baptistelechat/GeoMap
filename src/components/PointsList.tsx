@@ -11,6 +11,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useGeomarkStore } from "@/store/geomarkStore";
 import { MapPinOff, Pencil, Trash2 } from "lucide-react";
 import { DeletePointDialog } from "./DeletePointDialog";
+import { MarkerIcon } from "./MarkerIcon";
 
 interface PointsListProps {
   onPointClick?: () => void;
@@ -54,9 +55,16 @@ export function PointsList({ onPointClick, limit }: PointsListProps) {
                 onPointClick?.();
               }}
             >
-              <span className="font-medium truncate mr-2 text-sm">
-                {point.title}
-              </span>
+              <div className="flex items-center gap-3 overflow-hidden">
+                <MarkerIcon
+                  iconName={point.icon}
+                  color={point.color}
+                  className="w-8 h-8 shrink-0"
+                />
+                <span className="font-medium truncate text-sm">
+                  {point.title}
+                </span>
+              </div>
               <div className="flex items-center gap-2 shrink-0">
                 <Badge variant="secondary" className="font-mono text-xs">
                   {point.lat.toFixed(4)}, {point.lng.toFixed(4)}

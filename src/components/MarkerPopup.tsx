@@ -1,4 +1,5 @@
 import { DeletePointDialog } from "@/components/DeletePointDialog";
+import { MarkerIcon } from "@/components/MarkerIcon";
 import { PointDialog } from "@/components/PointDialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,7 +13,16 @@ interface MarkerPopupProps {
 export function MarkerPopup({ point }: MarkerPopupProps) {
   return (
     <div className="p-2 min-w-[200px] flex flex-col gap-2">
-      <h3 className="font-semibold text-gray-800">{point.title}</h3>
+      <div className="flex items-center gap-2">
+        <MarkerIcon
+          iconName={point.icon}
+          color={point.color}
+          className="size-8 shrink-0"
+        />
+        <h3 className="font-semibold text-gray-800 leading-tight">
+          {point.title}
+        </h3>
+      </div>
       <div>
         <Badge variant="secondary" className="font-mono text-xs">
           {point.lat.toFixed(6)}, {point.lng.toFixed(6)}

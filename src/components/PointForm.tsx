@@ -1,3 +1,8 @@
+import {
+  AVAILABLE_COLORS,
+  AVAILABLE_ICONS,
+  MarkerIcon,
+} from "@/components/MarkerIcon";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,6 +28,8 @@ export function PointForm({
     lng: point?.lng.toString() || "",
     notes: point?.notes || "",
     streetViewUrl: point?.streetViewUrl || "",
+    color: point?.color || AVAILABLE_COLORS[3].value, // Default Green
+    icon: point?.icon || AVAILABLE_ICONS[0].name, // Default Pin
   });
 
   // Update form data if point changes
@@ -34,6 +41,8 @@ export function PointForm({
         lng: point.lng.toString(),
         notes: point.notes || "",
         streetViewUrl: point.streetViewUrl || "",
+        color: point.color || AVAILABLE_COLORS[3].value,
+        icon: point.icon || AVAILABLE_ICONS[0].name,
       });
     }
   }, [point]);
@@ -84,6 +93,8 @@ export function PointForm({
       lng,
       notes: formData.notes || undefined,
       streetViewUrl: formData.streetViewUrl || undefined,
+      color: formData.color,
+      icon: formData.icon,
       createdAt: point?.createdAt || Date.now(),
     };
 
@@ -103,6 +114,8 @@ export function PointForm({
       lng: "",
       notes: "",
       streetViewUrl: "",
+      color: AVAILABLE_COLORS[5].value,
+      icon: AVAILABLE_ICONS[0].name,
     });
     setIsManualCoords(false);
 
@@ -123,6 +136,60 @@ export function PointForm({
           onChange={(e) => setFormData({ ...formData, title: e.target.value })}
           required
         />
+      </div>
+
+      <div className="space-y-3">
+        <Label>Apparence</Label>
+        <div className="flex flex-col gap-3 p-3 border rounded-lg bg-muted/30">
+          <div className="flex items-center gap-4">
+            <div className="flex flex-col items-center gap-1">
+              <span className="text-xs text-muted-foreground">Aperçu</span>
+              <MarkerIcon
+                iconName={formData.icon}
+                color={formData.color}
+                className="w-10 h-10"
+              />
+            </div>
+            <div className="flex-1 space-y-2">
+              <div className="flex flex-wrap gap-1.5">
+                {AVAILABLE_COLORS.map((color) => (
+                  <button
+                    key={color.value}
+                    type="button"
+                    className={`w-6 h-6 rounded-full border-2 transition-all ${
+                      formData.color === color.value
+                        ? "border-primary scale-110"
+                        : "border-transparent hover:scale-110"
+                    }`}
+                    style={{ backgroundColor: color.value }}
+                    onClick={() =>
+                      setFormData({ ...formData, color: color.value })
+                    }
+                    title={color.name}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="grid grid-cols-5 gap-2">
+            {AVAILABLE_ICONS.map((icon) => {
+              const Icon = icon.icon;
+              return (
+                <Button
+                  key={icon.name}
+                  type="button"
+                  variant={formData.icon === icon.name ? "default" : "outline"}
+                  size="icon"
+                  className="h-8 w-full"
+                  onClick={() => setFormData({ ...formData, icon: icon.name })}
+                  title={icon.label}
+                >
+                  <Icon className="size-4" />
+                </Button>
+              );
+            })}
+          </div>
+        </div>
       </div>
 
       <div className="space-y-2">
