@@ -53,7 +53,7 @@ export function LocateControl() {
             onClick={() => {
               renderButton(container, true);
               map.locate({
-                setView: true,
+                setView: false,
                 enableHighAccuracy: true,
                 maxZoom: 18,
               });
@@ -73,7 +73,11 @@ export function LocateControl() {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         if (container && (container as any)._reactRoot) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          ((container as any)._reactRoot as Root).unmount();
+          const root = (container as any)._reactRoot as Root;
+          // Defer unmount to avoid React warning about synchronous unmount during render
+          setTimeout(() => {
+            root.unmount();
+          }, 0);
         }
       },
     });
@@ -85,6 +89,7 @@ export function LocateControl() {
     const onLocationFound = (e: L.LocationEvent) => {
       setPosition(e.latlng);
       setAccuracy(e.accuracy);
+      map.flyTo(e.latlng, 16);
       renderButton(control.getContainer(), false);
     };
 
@@ -137,7 +142,7 @@ export function LocateControl() {
           onClick={() => {
             renderButton(container, true);
             map.locate({
-              setView: true,
+              setView: false,
               enableHighAccuracy: true,
               maxZoom: 18,
             });
