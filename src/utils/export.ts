@@ -9,7 +9,8 @@ export function exportToCSV(points: MapPoint[]): void {
     Longitude: point.lng,
     Notes: point.notes || '',
     'Street View URL': point.streetViewUrl || '',
-    'Date de création': new Date(point.createdAt).toLocaleString('fr-FR')
+    'Date de création': new Date(point.createdAt).toLocaleString('fr-FR'),
+    'Date de modification': point.updatedAt ? new Date(point.updatedAt).toLocaleString('fr-FR') : new Date(point.createdAt).toLocaleString('fr-FR')
   })));
   
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });

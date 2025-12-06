@@ -90,6 +90,7 @@ export function PointForm({
       return;
     }
 
+    const now = Date.now();
     const newPoint: MapPoint = {
       id: point?.id || generateId(),
       title: formData.title,
@@ -99,7 +100,8 @@ export function PointForm({
       streetViewUrl: formData.streetViewUrl || undefined,
       color: formData.color,
       icon: formData.icon,
-      createdAt: point?.createdAt || Date.now(),
+      createdAt: point?.createdAt || now,
+      updatedAt: now,
     };
 
     if (point) {

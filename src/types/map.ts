@@ -8,4 +8,5 @@ export interface MapPoint {
   color?: string;
   icon?: string;
   createdAt: number;
+  updatedAt: number;
 }
