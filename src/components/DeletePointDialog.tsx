@@ -12,6 +12,7 @@ import {
 import { useGeomarkStore } from "@/store/geomarkStore";
 import { MapPoint } from "@/types/map";
 import { ReactNode } from "react";
+import { toast } from "sonner";
 
 interface DeletePointDialogProps {
   point: MapPoint;
@@ -30,6 +31,7 @@ export function DeletePointDialog({
     e.preventDefault();
     e.stopPropagation();
     removePoint(point.id);
+    toast.success(`Le point "${point.title}" a été supprimé`);
     onDelete?.();
   };
 

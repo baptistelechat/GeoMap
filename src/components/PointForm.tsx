@@ -9,6 +9,7 @@ import { generateId } from "@/lib/utils";
 import { useGeomarkStore } from "@/store/geomarkStore";
 import { MapPoint } from "@/types/map";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { ColorPicker } from "./ColorPicker";
 
 export function PointForm({
@@ -18,7 +19,8 @@ export function PointForm({
   onSuccess?: () => void;
   point?: MapPoint;
 }) {
-  const { addPoint, updatePoint, setFlyToLocation, setHighlightedPointId } = useGeomarkStore();
+  const { addPoint, updatePoint, setFlyToLocation, setHighlightedPointId } =
+    useGeomarkStore();
   const [isManualCoords, setIsManualCoords] = useState(false);
   const [formData, setFormData] = useState({
     title: point?.title || "",
@@ -106,11 +108,13 @@ export function PointForm({
 
     if (point) {
       updatePoint(newPoint);
+      toast.success(`Le point "${newPoint.title}" a été modifié avec succès`);
       // On editing, we want to fly to the point to show the update
       setFlyToLocation({ lat: newPoint.lat, lng: newPoint.lng, zoom: 16 });
       setHighlightedPointId(newPoint.id);
     } else {
       addPoint(newPoint);
+      toast.success(`Le point "${newPoint.title}" a été ajouté avec succès`);
       // On creation, we also want to fly to the new point
       setFlyToLocation({ lat: newPoint.lat, lng: newPoint.lng, zoom: 16 });
       setHighlightedPointId(newPoint.id);
