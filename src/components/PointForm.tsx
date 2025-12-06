@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { TAILWIND_COLORS } from "@/lib/tailwindColors";
 import { generateId } from "@/lib/utils";
 import { useGeomarkStore } from "@/store/geomarkStore";
 import { MapPoint } from "@/types/map";
@@ -17,7 +18,7 @@ export function PointForm({
   onSuccess?: () => void;
   point?: MapPoint;
 }) {
-  const { addPoint, updatePoint, setFlyToLocation } = useGeomarkStore();
+  const { addPoint, updatePoint, setFlyToLocation, setHighlightedPointId } = useGeomarkStore();
   const [isManualCoords, setIsManualCoords] = useState(false);
   const [formData, setFormData] = useState({
     title: point?.title || "",
@@ -25,7 +26,10 @@ export function PointForm({
     lng: point?.lng.toString() || "",
     notes: point?.notes || "",
     streetViewUrl: point?.streetViewUrl || "",
-    color: point?.color || "#22c55e", // Default Green
+    color:
+      point?.color ||
+      TAILWIND_COLORS.find((c) => c.name === "green")?.shades["500"] ||
+      "#22c55e", // Default Green
     icon: point?.icon || AVAILABLE_ICONS[0].name, // Default Pin
   });
 
@@ -38,7 +42,10 @@ export function PointForm({
         lng: point.lng.toString(),
         notes: point.notes || "",
         streetViewUrl: point.streetViewUrl || "",
-        color: point.color || "#22c55e",
+        color:
+          point?.color ||
+          TAILWIND_COLORS.find((c) => c.name === "green")?.shades["500"] ||
+          "#22c55e", // Default Green
         icon: point.icon || AVAILABLE_ICONS[0].name,
       });
     }
@@ -99,10 +106,12 @@ export function PointForm({
       updatePoint(newPoint);
       // On editing, we want to fly to the point to show the update
       setFlyToLocation({ lat: newPoint.lat, lng: newPoint.lng, zoom: 16 });
+      setHighlightedPointId(newPoint.id);
     } else {
       addPoint(newPoint);
       // On creation, we also want to fly to the new point
       setFlyToLocation({ lat: newPoint.lat, lng: newPoint.lng, zoom: 16 });
+      setHighlightedPointId(newPoint.id);
     }
 
     setFormData({

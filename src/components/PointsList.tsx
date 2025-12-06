@@ -19,7 +19,7 @@ interface PointsListProps {
 }
 
 export function PointsList({ onPointClick, limit }: PointsListProps) {
-  const { points, setFlyToLocation } = useGeomarkStore();
+  const { points, setFlyToLocation, setHighlightedPointId } = useGeomarkStore();
   const isMobile = useIsMobile();
 
   // Show newest points first
@@ -52,6 +52,7 @@ export function PointsList({ onPointClick, limit }: PointsListProps) {
               className="flex items-center justify-between p-3 border rounded-lg bg-card shadow-sm cursor-pointer hover:bg-accent transition-colors"
               onClick={() => {
                 setFlyToLocation({ lat: point.lat, lng: point.lng, zoom: 16 });
+                setHighlightedPointId(point.id);
                 onPointClick?.();
               }}
             >

@@ -24,6 +24,10 @@ interface GeomarkStore {
   setFlyToLocation: (
     location: { lat: number; lng: number; zoom?: number } | null
   ) => void;
+
+  // Animation
+  highlightedPointId: string | null;
+  setHighlightedPointId: (id: string | null) => void;
 }
 
 export const useGeomarkStore = create<GeomarkStore>()(
@@ -74,13 +78,17 @@ export const useGeomarkStore = create<GeomarkStore>()(
       // Map Control Implementation
       flyToLocation: null,
       setFlyToLocation: (location) => set({ flyToLocation: location }),
+
+      // Animation Implementation
+      highlightedPointId: null,
+      setHighlightedPointId: (id) => set({ highlightedPointId: id }),
     }),
     {
       name: "geomark-storage", // Unified storage key
       partialize: (state) => ({
         points: state.points,
         features: state.features,
-        // Exclude flyToLocation from persistence
+        // Exclude flyToLocation and highlightedPointId from persistence
       }),
     }
   )

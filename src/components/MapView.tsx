@@ -19,13 +19,13 @@ if (typeof window !== "undefined") {
   (window as any).L = L;
 }
 
-const createCustomIcon = (point: MapPoint) => {
+const createCustomIcon = (point: MapPoint, isHighlighted: boolean) => {
   return L.divIcon({
     html: renderToString(
       <MarkerIcon
         iconName={point.icon}
         color={point.color}
-        className="w-8 h-8"
+        className={`w-8 h-8 ${isHighlighted ? "animate-bounce" : ""}`}
       />
     ),
     className: "bg-transparent",
@@ -36,7 +36,8 @@ const createCustomIcon = (point: MapPoint) => {
 };
 
 export function MapView() {
-  const { points } = useGeomarkStore();
+  const { points, highlightedPointId, setHighlightedPointId } =
+    useGeomarkStore();
 
   return (
     <div className="h-full w-full relative z-0">
@@ -77,7 +78,10 @@ export function MapView() {
             <Marker
               key={point.id}
               position={[point.lat, point.lng]}
-              icon={createCustomIcon(point)}
+              icon={createCustomIcon(point, point.id === highlightedPointId)}
+              eventHandlers={{
+                click: () => setHighlightedPointId(point.id),
+              }}
             >
               <Popup>
                 <MarkerPopup point={point} />
