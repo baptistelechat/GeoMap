@@ -7,6 +7,7 @@ interface GeomarkStore {
   // Points
   points: MapPoint[];
   addPoint: (point: MapPoint) => void;
+  updatePoint: (point: MapPoint) => void;
   removePoint: (id: string) => void;
   clearPoints: () => void;
 
@@ -20,7 +21,13 @@ interface GeomarkStore {
 
   // Map Control
   flyToLocation: { lat: number; lng: number; zoom?: number } | null;
-  setFlyToLocation: (location: { lat: number; lng: number; zoom?: number } | null) => void;
+  setFlyToLocation: (
+    location: { lat: number; lng: number; zoom?: number } | null
+  ) => void;
+
+  // Animation
+  highlightedPointId: string | null;
+  setHighlightedPointId: (id: string | null) => void;
 }
 
 export const useGeomarkStore = create<GeomarkStore>()(
@@ -31,6 +38,12 @@ export const useGeomarkStore = create<GeomarkStore>()(
       addPoint: (point) =>
         set((state) => ({
           points: [...state.points, point],
+        })),
+      updatePoint: (updatedPoint) =>
+        set((state) => ({
+          points: state.points.map((p) =>
+            p.id === updatedPoint.id ? updatedPoint : p
+          ),
         })),
       removePoint: (id) =>
         set((state) => ({
@@ -65,13 +78,17 @@ export const useGeomarkStore = create<GeomarkStore>()(
       // Map Control Implementation
       flyToLocation: null,
       setFlyToLocation: (location) => set({ flyToLocation: location }),
+
+      // Animation Implementation
+      highlightedPointId: null,
+      setHighlightedPointId: (id) => set({ highlightedPointId: id }),
     }),
     {
       name: "geomark-storage", // Unified storage key
       partialize: (state) => ({
         points: state.points,
         features: state.features,
-        // Exclude flyToLocation from persistence
+        // Exclude flyToLocation and highlightedPointId from persistence
       }),
     }
   )

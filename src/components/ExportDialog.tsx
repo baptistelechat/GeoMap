@@ -11,6 +11,7 @@ import { useGeomarkStore } from "@/store/geomarkStore";
 import { exportToCSV, exportToJSON } from "@/utils/export";
 import { Download, FileJson, FileText, ExternalLink } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export function ExportDialog() {
   const { points } = useGeomarkStore();
@@ -20,6 +21,7 @@ export function ExportDialog() {
     setIsExporting(true);
     try {
       exportToCSV(points);
+      toast.success(`${points.length} points exportés en CSV`);
     } finally {
       setIsExporting(false);
     }
@@ -29,6 +31,7 @@ export function ExportDialog() {
     setIsExporting(true);
     try {
       exportToJSON(points);
+      toast.success(`${points.length} points exportés en JSON`);
     } finally {
       setIsExporting(false);
     }

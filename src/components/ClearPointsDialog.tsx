@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 import { useGeomarkStore } from "@/store/geomarkStore";
 import { Trash2 } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 interface ClearPointsDialogProps {
   mode?: "icon" | "text";
@@ -52,7 +53,9 @@ export function ClearPointsDialog({ mode = "icon" }: ClearPointsDialogProps) {
           <AlertDialogCancel>Annuler</AlertDialogCancel>
           <AlertDialogAction
             onClick={() => {
+              const count = points.length;
               clearPoints();
+              toast.success(`${count} points ont été supprimés`);
               setOpen(false);
             }}
             className="bg-destructive hover:bg-destructive/90"

@@ -3,6 +3,8 @@ import { generateId } from "@/lib/utils";
 import { useGeomarkStore } from "@/store/geomarkStore";
 import { MapPoint } from "@/types/map";
 import { Database } from "lucide-react";
+import { toast } from "sonner";
+import { AVAILABLE_ICONS } from "./MarkerIcon";
 
 export function DevTools({
   className,
@@ -36,7 +38,10 @@ export function DevTools({
         streetViewUrl: `https://www.google.com/maps/@${lat.toFixed(
           6
         )},${lng.toFixed(6)},3a,75y,90t/data=!3m6!1e1!3m4!1sTEST_ID_${i}!2e0`,
+        color: "#22c55e", // Green-500
+        icon: AVAILABLE_ICONS[0].name, // Pin
         createdAt: Date.now(),
+        updatedAt: Date.now(),
       });
     }
 
@@ -56,7 +61,10 @@ export function DevTools({
         )},${lng.toFixed(6)},3a,75y,90t/data=!3m6!1e1!3m4!1sTEST_ID_${
           i + 5
         }!2e0`,
+        color: "#22c55e", // Green-500
+        icon: AVAILABLE_ICONS[0].name, // Pin
         createdAt: Date.now(),
+        updatedAt: Date.now(),
       });
     }
 
@@ -76,12 +84,16 @@ export function DevTools({
         )},${lng.toFixed(6)},3a,75y,90t/data=!3m6!1e1!3m4!1sTEST_ID_${
           i + 10
         }!2e0`,
+        color: "#22c55e", // Green-500
+        icon: AVAILABLE_ICONS[0].name, // Pin
         createdAt: Date.now(),
+        updatedAt: Date.now(),
       });
     }
 
     // Ajouter tous les points au store
     points.forEach((point) => addPoint(point));
+    toast.success(`${points.length} points de test générés avec succès`);
   };
 
   return (

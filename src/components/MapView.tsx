@@ -1,7 +1,10 @@
+import { MarkerIcon } from "@/components/MarkerIcon";
 import { useGeomarkStore } from "@/store/geomarkStore";
+import { MapPoint } from "@/types/map";
 import "@/vendor/SmoothWheelZoom.js";
 import * as L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { renderToString } from "react-dom/server";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import { GeomanControl } from "./GeomanControl";
@@ -16,16 +19,25 @@ if (typeof window !== "undefined") {
   (window as any).L = L;
 }
 
-const customIcon = new L.Icon({
-  iconUrl:
-    "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiMxZTQwYWYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMjEgMTBjMCA3LTkgMTMtOSAxM3MtOS02LTktMTNhOSA5IDAgMCAxIDE4IDB6Ii8+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMCIgcj0iMyIvPjwvc3ZnPg==",
-  iconSize: [24, 24],
-  iconAnchor: [12, 24],
-  popupAnchor: [0, -24],
-});
+const createCustomIcon = (point: MapPoint, isHighlighted: boolean) => {
+  return L.divIcon({
+    html: renderToString(
+      <MarkerIcon
+        iconName={point.icon}
+        color={point.color}
+        className={`w-8 h-8 ${isHighlighted ? "animate-bounce" : ""}`}
+      />
+    ),
+    className: "bg-transparent",
+    iconSize: [32, 32],
+    iconAnchor: [16, 16],
+    popupAnchor: [0, -16],
+  });
+};
 
 export function MapView() {
-  const { points } = useGeomarkStore();
+  const { points, highlightedPointId, setHighlightedPointId } =
+    useGeomarkStore();
 
   return (
     <div className="h-full w-full relative z-0">
@@ -66,7 +78,10 @@ export function MapView() {
             <Marker
               key={point.id}
               position={[point.lat, point.lng]}
-              icon={customIcon}
+              icon={createCustomIcon(point, point.id === highlightedPointId)}
+              eventHandlers={{
+                click: () => setHighlightedPointId(point.id),
+              }}
             >
               <Popup>
                 <MarkerPopup point={point} />

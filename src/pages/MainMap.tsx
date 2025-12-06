@@ -1,7 +1,7 @@
-import { AddPointDialog } from "@/components/AddPointDialog";
 import { AppSidebar } from "@/components/AppSidebar";
 import { DevTools } from "@/components/DevTools";
 import { MapView } from "@/components/MapView";
+import { PointDialog } from "@/components/PointDialog";
 import { PointsListDialog } from "@/components/PointsListDialog";
 import { Button } from "@/components/ui/button";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
@@ -17,7 +17,7 @@ export default function MainMap() {
         </div>
 
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex gap-4 md:hidden">
-          <AddPointDialog
+          <PointDialog
             trigger={
               <Button
                 className="rounded-full shadow-lg size-12"

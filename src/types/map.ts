@@ -5,5 +5,8 @@ export interface MapPoint {
   title: string;
   notes?: string;
   streetViewUrl?: string;
+  color?: string;
+  icon?: string;
   createdAt: number;
+  updatedAt: number;
 }

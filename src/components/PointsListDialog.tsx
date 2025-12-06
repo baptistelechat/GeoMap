@@ -11,7 +11,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useGeomarkStore } from "@/store/geomarkStore";
 import { exportToCSV, exportToJSON } from "@/utils/export";
-import { Download, List } from "lucide-react";
+import { FileJson, FileText, List } from "lucide-react";
 import { useState } from "react";
 
 interface PointsListDialogProps {
@@ -72,7 +72,7 @@ export function PointsListDialog({
             disabled={points.length === 0}
             className="flex-1"
           >
-            <Download className="mr-2 size-4" />
+            <FileText className="mr-2 size-4" />
             CSV
           </Button>
           <Button
@@ -82,13 +82,16 @@ export function PointsListDialog({
             disabled={points.length === 0}
             className="flex-1"
           >
-            <Download className="mr-2 size-4" />
+            <FileJson className="mr-2 size-4" />
             JSON
           </Button>
         </div>
 
         <div className="flex-1 overflow-y-auto min-h-0">
-          <PointsList onPointClick={() => setShow(false)} />
+          <PointsList
+            onPointClick={() => setShow(false)}
+            onEditSuccess={() => setShow(false)}
+          />
         </div>
       </DialogContent>
     </Dialog>

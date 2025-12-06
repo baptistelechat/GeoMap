@@ -1,23 +1,57 @@
+import { AVAILABLE_ICONS, MarkerIcon } from "@/components/MarkerIcon";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { TAILWIND_COLORS } from "@/lib/tailwindColors";
 import { generateId } from "@/lib/utils";
 import { useGeomarkStore } from "@/store/geomarkStore";
 import { MapPoint } from "@/types/map";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { ColorPicker } from "./ColorPicker";
 
-export function AddPointForm({ onSuccess }: { onSuccess?: () => void }) {
-  const { addPoint } = useGeomarkStore();
+export function PointForm({
+  onSuccess,
+  point,
+}: {
+  onSuccess?: () => void;
+  point?: MapPoint;
+}) {
+  const { addPoint, updatePoint, setFlyToLocation, setHighlightedPointId } =
+    useGeomarkStore();
   const [isManualCoords, setIsManualCoords] = useState(false);
   const [formData, setFormData] = useState({
-    title: "",
-    lat: "",
-    lng: "",
-    notes: "",
-    streetViewUrl: "",
+    title: point?.title || "",
+    lat: point?.lat.toString() || "",
+    lng: point?.lng.toString() || "",
+    notes: point?.notes || "",
+    streetViewUrl: point?.streetViewUrl || "",
+    color:
+      point?.color ||
+      TAILWIND_COLORS.find((c) => c.name === "green")?.shades["500"] ||
+      "#22c55e", // Default Green
+    icon: point?.icon || AVAILABLE_ICONS[0].name, // Default Pin
   });
+
+  // Update form data if point changes
+  useEffect(() => {
+    if (point) {
+      setFormData({
+        title: point.title,
+        lat: point.lat.toString(),
+        lng: point.lng.toString(),
+        notes: point.notes || "",
+        streetViewUrl: point.streetViewUrl || "",
+        color:
+          point?.color ||
+          TAILWIND_COLORS.find((c) => c.name === "green")?.shades["500"] ||
+          "#22c55e", // Default Green
+        icon: point.icon || AVAILABLE_ICONS[0].name,
+      });
+    }
+  }, [point]);
 
   // Extraction automatique des coordonnées depuis l'URL Google Maps
   useEffect(() => {
@@ -51,17 +85,40 @@ export function AddPointForm({ onSuccess }: { onSuccess?: () => void }) {
       return;
     }
 
+    const lat = parseFloat(formData.lat);
+    const lng = parseFloat(formData.lng);
+
+    if (isNaN(lat) || isNaN(lng)) {
+      return;
+    }
+
+    const now = Date.now();
     const newPoint: MapPoint = {
-      id: generateId(),
+      id: point?.id || generateId(),
       title: formData.title,
-      lat: parseFloat(formData.lat),
-      lng: parseFloat(formData.lng),
+      lat,
+      lng,
       notes: formData.notes || undefined,
       streetViewUrl: formData.streetViewUrl || undefined,
-      createdAt: Date.now(),
+      color: formData.color,
+      icon: formData.icon,
+      createdAt: point?.createdAt || now,
+      updatedAt: now,
     };
 
-    addPoint(newPoint);
+    if (point) {
+      updatePoint(newPoint);
+      toast.success(`Le point "${newPoint.title}" a été modifié avec succès`);
+      // On editing, we want to fly to the point to show the update
+      setFlyToLocation({ lat: newPoint.lat, lng: newPoint.lng, zoom: 16 });
+      setHighlightedPointId(newPoint.id);
+    } else {
+      addPoint(newPoint);
+      toast.success(`Le point "${newPoint.title}" a été ajouté avec succès`);
+      // On creation, we also want to fly to the new point
+      setFlyToLocation({ lat: newPoint.lat, lng: newPoint.lng, zoom: 16 });
+      setHighlightedPointId(newPoint.id);
+    }
 
     setFormData({
       title: "",
@@ -69,6 +126,8 @@ export function AddPointForm({ onSuccess }: { onSuccess?: () => void }) {
       lng: "",
       notes: "",
       streetViewUrl: "",
+      color: "#22c55e",
+      icon: AVAILABLE_ICONS[0].name,
     });
     setIsManualCoords(false);
 
@@ -89,6 +148,45 @@ export function AddPointForm({ onSuccess }: { onSuccess?: () => void }) {
           onChange={(e) => setFormData({ ...formData, title: e.target.value })}
           required
         />
+      </div>
+
+      <div className="space-y-3">
+        <Label>Apparence</Label>
+        <div className="flex flex-col gap-3 p-3 border rounded-lg bg-muted/30">
+          <div className="flex items-center gap-4">
+            <div className="flex flex-col items-center gap-1">
+              <MarkerIcon
+                iconName={formData.icon}
+                color={formData.color}
+                className="w-10 h-10"
+              />
+            </div>
+            <div className="flex-1 space-y-2">
+              <ColorPicker
+                color={formData.color}
+                onChange={(color) => setFormData({ ...formData, color })}
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-5 gap-2">
+            {AVAILABLE_ICONS.map((icon) => {
+              const Icon = icon.icon;
+              return (
+                <Button
+                  key={icon.name}
+                  type="button"
+                  variant={formData.icon === icon.name ? "default" : "outline"}
+                  size="icon"
+                  className="h-8 w-full"
+                  onClick={() => setFormData({ ...formData, icon: icon.name })}
+                  title={icon.label}
+                >
+                  <Icon className="size-4" />
+                </Button>
+              );
+            })}
+          </div>
+        </div>
       </div>
 
       <div className="space-y-2">
@@ -137,9 +235,7 @@ export function AddPointForm({ onSuccess }: { onSuccess?: () => void }) {
           }`}
         >
           <div className="space-y-2">
-            <Label htmlFor="lat">
-              Latitude
-            </Label>
+            <Label htmlFor="lat">Latitude</Label>
             <Input
               id="lat"
               type="number"
@@ -173,7 +269,7 @@ export function AddPointForm({ onSuccess }: { onSuccess?: () => void }) {
 
       <div className="mt-auto pt-4">
         <Button type="submit" className="w-full">
-          Ajouter le point
+          {point ? "Modifier le point" : "Ajouter le point"}
         </Button>
       </div>
     </form>

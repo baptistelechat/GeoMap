@@ -1,14 +1,4 @@
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import { PointDialog } from "@/components/PointDialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,23 +9,33 @@ import {
 } from "@/components/ui/tooltip";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useGeomarkStore } from "@/store/geomarkStore";
-import { MapPinOff, Trash2 } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { MapPinOff, Pencil, Trash2 } from "lucide-react";
+import { DeletePointDialog } from "./DeletePointDialog";
+import { MarkerIcon } from "./MarkerIcon";
 
 interface PointsListProps {
   onPointClick?: () => void;
   limit?: number;
+  onEditSuccess?: () => void;
 }
 
-export function PointsList({ onPointClick, limit }: PointsListProps) {
-  const { points, removePoint, setFlyToLocation } = useGeomarkStore();
+export function PointsList({
+  onPointClick,
+  limit,
+  onEditSuccess,
+}: PointsListProps) {
+  const { points, setFlyToLocation, setHighlightedPointId } = useGeomarkStore();
   const isMobile = useIsMobile();
 
-  // Show newest points first
-  // If limit is set: take last 'limit' points (newest) then reverse
-  // If no limit: take all points and reverse
-  const displayPoints = limit
-    ? points.slice(-limit).reverse()
-    : [...points].reverse();
+  // Show points sorted by last modification date (newest first)
+  const sortedPoints = [...points].sort((a, b) => {
+    const timeA = a.updatedAt || a.createdAt || 0;
+    const timeB = b.updatedAt || b.createdAt || 0;
+    return timeB - timeA;
+  });
+
+  const displayPoints = limit ? sortedPoints.slice(0, limit) : sortedPoints;
 
   if (points.length === 0) {
     return (
@@ -54,66 +54,75 @@ export function PointsList({ onPointClick, limit }: PointsListProps) {
   return (
     <TooltipProvider>
       <div className="w-full px-2 space-y-2">
-        {displayPoints.map((point) => {
-          const ItemContent = (
-            <div
-              className="flex items-center justify-between p-3 border rounded-lg bg-card shadow-sm cursor-pointer hover:bg-accent transition-colors"
-              onClick={() => {
-                setFlyToLocation({ lat: point.lat, lng: point.lng, zoom: 16 });
-                onPointClick?.();
-              }}
-            >
-              <span className="font-medium truncate mr-2 text-sm">
-                {point.title}
-              </span>
-              <div className="flex items-center gap-2 shrink-0">
-                <Badge variant="secondary" className="font-mono text-xs">
-                  {point.lat.toFixed(4)}, {point.lng.toFixed(4)}
-                </Badge>
+        <AnimatePresence mode="popLayout" initial={false}>
+          {displayPoints.map((point) => {
+            const ItemContent = (
+              <div
+                className="flex items-center justify-between p-3 border rounded-lg bg-card shadow-sm cursor-pointer hover:bg-accent transition-colors"
+                onClick={() => {
+                  setFlyToLocation({
+                    lat: point.lat,
+                    lng: point.lng,
+                    zoom: 16,
+                  });
+                  setHighlightedPointId(point.id);
+                  onPointClick?.();
+                }}
+              >
+                <div className="flex items-center gap-3 overflow-hidden">
+                  <MarkerIcon
+                    iconName={point.icon}
+                    color={point.color}
+                    className="w-8 h-8 shrink-0"
+                  />
+                  <span className="font-medium truncate text-sm">
+                    {point.title}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <Badge variant="secondary" className="font-mono text-xs">
+                    {point.lat.toFixed(4)}, {point.lng.toFixed(4)}
+                  </Badge>
 
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="size-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-                      title="Supprimer"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <Trash2 className="size-4" />
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Êtes-vous sûr ?</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        Cette action est irréversible. Cela supprimera
-                        définitivement le point "{point.title}" de votre liste.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel onClick={(e) => e.stopPropagation()}>
-                        Annuler
-                      </AlertDialogCancel>
-                      <AlertDialogAction
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          removePoint(point.id);
-                        }}
-                        className="bg-destructive hover:bg-destructive/90"
-                      >
-                        Supprimer
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
+                  <div onClick={(e) => e.stopPropagation()}>
+                    <PointDialog
+                      point={point}
+                      onSuccess={onEditSuccess}
+                      trigger={
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="size-8 text-muted-foreground hover:text-primary hover:bg-primary/10"
+                          title="Modifier"
+                        >
+                          <Pencil className="size-4" />
+                        </Button>
+                      }
+                    />
+                  </div>
+
+                  <div onClick={(e) => e.stopPropagation()}>
+                    <DeletePointDialog
+                      point={point}
+                      trigger={
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="size-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                          title="Supprimer"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <Trash2 className="size-4" />
+                        </Button>
+                      }
+                    />
+                  </div>
+                </div>
               </div>
-            </div>
-          );
+            );
 
-          if (point.notes) {
-            return (
-              <Tooltip key={point.id} delayDuration={300}>
+            const content = point.notes ? (
+              <Tooltip delayDuration={300}>
                 <TooltipTrigger asChild>{ItemContent}</TooltipTrigger>
                 <TooltipContent
                   side="bottom"
@@ -122,11 +131,24 @@ export function PointsList({ onPointClick, limit }: PointsListProps) {
                   <p className="text-sm line-clamp-6">{point.notes}</p>
                 </TooltipContent>
               </Tooltip>
+            ) : (
+              ItemContent
             );
-          }
 
-          return <div key={point.id}>{ItemContent}</div>;
-        })}
+            return (
+              <motion.div
+                key={point.id}
+                layout
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.2 }}
+              >
+                {content}
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
       </div>
     </TooltipProvider>
   );
