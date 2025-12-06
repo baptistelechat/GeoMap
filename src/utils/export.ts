@@ -9,7 +9,7 @@ export function exportToCSV(points: MapPoint[]): void {
     Latitude: point.lat,
     Longitude: point.lng,
     Notes: point.notes || '',
-    'Street View URL': point.streetViewUrl || '',
+    'URL': point.url || '',
     'Date de création': new Date(point.createdAt).toLocaleString('fr-FR'),
     'Date de modification': point.updatedAt ? new Date(point.updatedAt).toLocaleString('fr-FR') : new Date(point.createdAt).toLocaleString('fr-FR')
   })));

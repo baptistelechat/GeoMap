@@ -118,8 +118,8 @@ export function ExportDialog() {
                 <p>• Titre : {points[0]?.title}</p>
                 <p>• Coordonnées : Latitude, Longitude</p>
                 <p>• Notes : Description du point</p>
-                {points[0]?.streetViewUrl && (
-                  <p>• Street View : URL de visualisation</p>
+                {points[0]?.url && (
+                  <p>• URL : URL de visualisation</p>
                 )}
                 <p>• Date de création : Format français</p>
               </div>
