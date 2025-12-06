@@ -88,7 +88,10 @@ export function PointsListDialog({
         </div>
 
         <div className="flex-1 overflow-y-auto min-h-0">
-          <PointsList onPointClick={() => setShow(false)} />
+          <PointsList
+            onPointClick={() => setShow(false)}
+            onEditSuccess={() => setShow(false)}
+          />
         </div>
       </DialogContent>
     </Dialog>

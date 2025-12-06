@@ -17,6 +17,7 @@ interface PointDialogProps {
   onOpenChange?: (open: boolean) => void;
   className?: string;
   point?: MapPoint;
+  onSuccess?: () => void;
 }
 
 export function PointDialog({
@@ -25,14 +26,23 @@ export function PointDialog({
   onOpenChange,
   className,
   point,
+  onSuccess,
 }: PointDialogProps) {
   const [internalOpen, setInternalOpen] = useState(false);
   const isControlled = open !== undefined;
   const show = isControlled ? open : internalOpen;
-  const setShow = isControlled ? onOpenChange : setInternalOpen;
+
+  const handleOpenChange = (newOpen: boolean) => {
+    if (isControlled) {
+      onOpenChange?.(newOpen);
+    } else {
+      setInternalOpen(newOpen);
+      onOpenChange?.(newOpen);
+    }
+  };
 
   return (
-    <Dialog open={show} onOpenChange={setShow}>
+    <Dialog open={show} onOpenChange={handleOpenChange}>
       {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
       <DialogContent
         className={cn(
@@ -61,7 +71,10 @@ export function PointDialog({
         </DialogHeader>
         <div className="flex-1 overflow-y-auto min-h-0">
           <PointForm
-            onSuccess={() => setShow && setShow(false)}
+            onSuccess={() => {
+              handleOpenChange(false);
+              onSuccess?.();
+            }}
             point={point}
           />
         </div>

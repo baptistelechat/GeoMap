@@ -16,9 +16,14 @@ import { MarkerIcon } from "./MarkerIcon";
 interface PointsListProps {
   onPointClick?: () => void;
   limit?: number;
+  onEditSuccess?: () => void;
 }
 
-export function PointsList({ onPointClick, limit }: PointsListProps) {
+export function PointsList({
+  onPointClick,
+  limit,
+  onEditSuccess,
+}: PointsListProps) {
   const { points, setFlyToLocation, setHighlightedPointId } = useGeomarkStore();
   const isMobile = useIsMobile();
 
@@ -74,6 +79,7 @@ export function PointsList({ onPointClick, limit }: PointsListProps) {
                 <div onClick={(e) => e.stopPropagation()}>
                   <PointDialog
                     point={point}
+                    onSuccess={onEditSuccess}
                     trigger={
                       <Button
                         variant="ghost"
