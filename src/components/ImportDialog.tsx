@@ -73,6 +73,7 @@ export function ImportDialog({ trigger }: ImportDialogProps) {
         </DialogHeader>
         <div className="mt-4">
           <FileUpload
+            className="w-full max-w-full"
             onUploadSuccess={handleUploadSuccess}
             acceptedFileTypes={[".json", ".csv"]}
             maxFileSize={10 * 1024 * 1024} // 10MB

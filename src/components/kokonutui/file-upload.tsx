@@ -11,7 +11,7 @@
  */
 
 import { cn } from "@/lib/utils";
-import { UploadCloud } from "lucide-react";
+import { Earth, UploadCloud } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import {
   useCallback,
@@ -94,7 +94,7 @@ const UploadIllustration = () => (
 
       <path
         d="M30 35H70C75 35 75 40 75 40V65C75 70 70 70 70 70H30C25 70 25 65 25 65V40C25 35 30 35 30 35Z"
-        className="fill-blue-100 dark:fill-blue-900/30 stroke-blue-500 dark:stroke-blue-400"
+        className="fill-green-100 dark:fill-green-900/30 stroke-green-500 dark:stroke-green-400"
         strokeWidth="2"
       >
         <animate
@@ -110,7 +110,7 @@ const UploadIllustration = () => (
 
       <path
         d="M30 35C30 35 35 35 40 35C45 35 45 30 50 30C55 30 55 35 60 35C65 35 70 35 70 35"
-        className="stroke-blue-500 dark:stroke-blue-400"
+        className="stroke-green-500 dark:stroke-green-400"
         strokeWidth="2"
         fill="none"
       />
@@ -121,7 +121,7 @@ const UploadIllustration = () => (
           y1="45"
           x2="50"
           y2="60"
-          className="stroke-blue-500 dark:stroke-blue-400"
+          className="stroke-green-500 dark:stroke-green-400"
           strokeWidth="2"
           strokeLinecap="round"
         >
@@ -134,7 +134,7 @@ const UploadIllustration = () => (
         </line>
         <polyline
           points="42,52 50,45 58,52"
-          className="stroke-blue-500 dark:stroke-blue-400"
+          className="stroke-green-500 dark:stroke-green-400"
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -153,87 +153,9 @@ const UploadIllustration = () => (
 );
 
 const UploadingAnimation = ({ progress }: { progress: number }) => (
-  <div className="relative w-16 h-16">
-    <svg
-      viewBox="0 0 240 240"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className="w-full h-full"
-      aria-label={`Upload progress: ${Math.round(progress)}%`}
-    >
-      <title>Upload Progress Indicator</title>
-
-      <defs>
-        <mask id="progress-mask">
-          <rect width="240" height="240" fill="black" />
-          <circle
-            r="120"
-            cx="120"
-            cy="120"
-            fill="white"
-            strokeDasharray={`${(progress / 100) * 754}, 754`}
-            transform="rotate(-90 120 120)"
-          />
-        </mask>
-      </defs>
-
-      <style>
-        {`
-                    @keyframes rotate-cw {
-                        from { transform: rotate(0deg); }
-                        to { transform: rotate(360deg); }
-                    }
-                    @keyframes rotate-ccw {
-                        from { transform: rotate(360deg); }
-                        to { transform: rotate(0deg); }
-                    }
-                    .g-spin circle {
-                        transform-origin: 120px 120px;
-                    }
-                    .g-spin circle:nth-child(1) { animation: rotate-cw 8s linear infinite; }
-                    .g-spin circle:nth-child(2) { animation: rotate-ccw 8s linear infinite; }
-                    .g-spin circle:nth-child(3) { animation: rotate-cw 8s linear infinite; }
-                    .g-spin circle:nth-child(4) { animation: rotate-ccw 8s linear infinite; }
-                    .g-spin circle:nth-child(5) { animation: rotate-cw 8s linear infinite; }
-                    .g-spin circle:nth-child(6) { animation: rotate-ccw 8s linear infinite; }
-                    .g-spin circle:nth-child(7) { animation: rotate-cw 8s linear infinite; }
-                    .g-spin circle:nth-child(8) { animation: rotate-ccw 8s linear infinite; }
-                    .g-spin circle:nth-child(9) { animation: rotate-cw 8s linear infinite; }
-                    .g-spin circle:nth-child(10) { animation: rotate-ccw 8s linear infinite; }
-                    .g-spin circle:nth-child(11) { animation: rotate-cw 8s linear infinite; }
-                    .g-spin circle:nth-child(12) { animation: rotate-ccw 8s linear infinite; }
-                    .g-spin circle:nth-child(13) { animation: rotate-cw 8s linear infinite; }
-                    .g-spin circle:nth-child(14) { animation: rotate-ccw 8s linear infinite; }
-
-                    .g-spin circle:nth-child(2n) { animation-delay: 0.2s; }
-                    .g-spin circle:nth-child(3n) { animation-delay: 0.3s; }
-                    .g-spin circle:nth-child(5n) { animation-delay: 0.5s; }
-                    .g-spin circle:nth-child(7n) { animation-delay: 0.7s; }
-                `}
-      </style>
-
-      <g
-        className="g-spin"
-        strokeWidth="10"
-        strokeDasharray="18% 40%"
-        mask="url(#progress-mask)"
-      >
-        <circle r="150" cx="120" cy="120" stroke="#FF2E7E" opacity="0.95" />
-        <circle r="140" cx="120" cy="120" stroke="#FFD600" opacity="0.95" />
-        <circle r="130" cx="120" cy="120" stroke="#00E5FF" opacity="0.95" />
-        <circle r="120" cx="120" cy="120" stroke="#FF3D71" opacity="0.95" />
-        <circle r="110" cx="120" cy="120" stroke="#4ADE80" opacity="0.95" />
-        <circle r="100" cx="120" cy="120" stroke="#2196F3" opacity="0.95" />
-        <circle r="90" cx="120" cy="120" stroke="#FFA726" opacity="0.95" />
-        <circle r="80" cx="120" cy="120" stroke="#FF1493" opacity="0.95" />
-        <circle r="70" cx="120" cy="120" stroke="#FFEB3B" opacity="0.95" />
-        <circle r="60" cx="120" cy="120" stroke="#00BCD4" opacity="0.95" />
-        <circle r="50" cx="120" cy="120" stroke="#FF4081" opacity="0.95" />
-        <circle r="40" cx="120" cy="120" stroke="#76FF03" opacity="0.95" />
-        <circle r="30" cx="120" cy="120" stroke="#448AFF" opacity="0.95" />
-        <circle r="20" cx="120" cy="120" stroke="#FF3D00" opacity="0.95" />
-      </g>
-    </svg>
+  <div className="relative w-16 h-16 flex items-center justify-center">
+    <Earth className="w-12 h-12 text-green-500 animate-bounce" />
+    <div className="sr-only">{Math.round(progress)}%</div>
   </div>
 );
 
@@ -445,7 +367,7 @@ export default function FileUpload({
       aria-label="File upload"
     >
       <div className="group relative w-full rounded-xl bg-white dark:bg-black ring-1 ring-gray-200 dark:ring-white/10 p-0.5">
-        <div className="absolute inset-x-0 -top-px h-px w-full bg-gradient-to-r from-transparent via-blue-500/20 to-transparent" />
+        <div className="absolute inset-x-0 -top-px h-px w-full bg-gradient-to-r from-transparent via-green-500/20 to-transparent" />
 
         <div className="relative w-full rounded-[10px] bg-gray-50/50 dark:bg-white/[0.02] p-1.5">
           <div
@@ -460,14 +382,14 @@ export default function FileUpload({
                 status === "dragging" ? "opacity-100" : "opacity-0"
               )}
             >
-              <div className="absolute inset-x-0 top-0 h-[20%] bg-gradient-to-b from-blue-500/10 to-transparent" />
-              <div className="absolute inset-x-0 bottom-0 h-[20%] bg-gradient-to-t from-blue-500/10 to-transparent" />
-              <div className="absolute inset-y-0 left-0 w-[20%] bg-gradient-to-r from-blue-500/10 to-transparent" />
-              <div className="absolute inset-y-0 right-0 w-[20%] bg-gradient-to-l from-blue-500/10 to-transparent" />
-              <div className="absolute inset-[20%] bg-blue-500/5 rounded-lg transition-all duration-300 animate-pulse" />
+              <div className="absolute inset-x-0 top-0 h-[20%] bg-gradient-to-b from-green-500/10 to-transparent" />
+              <div className="absolute inset-x-0 bottom-0 h-[20%] bg-gradient-to-t from-green-500/10 to-transparent" />
+              <div className="absolute inset-y-0 left-0 w-[20%] bg-gradient-to-r from-green-500/10 to-transparent" />
+              <div className="absolute inset-y-0 right-0 w-[20%] bg-gradient-to-l from-green-500/10 to-transparent" />
+              <div className="absolute inset-[20%] bg-green-500/5 rounded-lg transition-all duration-300 animate-pulse" />
             </div>
 
-            <div className="absolute -right-4 -top-4 h-8 w-8 bg-gradient-to-br from-blue-500/20 to-transparent blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="absolute -right-4 -top-4 h-8 w-8 bg-gradient-to-br from-green-500/20 to-transparent blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
             <div className="relative h-[240px]">
               <AnimatePresence mode="wait">
@@ -552,7 +474,7 @@ export default function FileUpload({
                         <span className="text-gray-500 dark:text-gray-400">
                           {formatBytes(file?.size || 0)}
                         </span>
-                        <span className="font-medium text-blue-500">
+                        <span className="font-medium text-green-500">
                           {Math.round(progress)}%
                         </span>
                       </div>
