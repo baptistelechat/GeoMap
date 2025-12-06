@@ -28,6 +28,9 @@ interface GeomarkStore {
   // Animation
   highlightedPointId: string | null;
   setHighlightedPointId: (id: string | null) => void;
+
+  // Import
+  importData: (points: MapPoint[], features: Feature[]) => void;
 }
 
 export const useGeomarkStore = create<GeomarkStore>()(
@@ -39,6 +42,26 @@ export const useGeomarkStore = create<GeomarkStore>()(
         set((state) => ({
           points: [...state.points, point],
         })),
+      importData: (newPoints, newFeatures) =>
+        set((state) => {
+          const newPointIds = new Set(newPoints.map((p) => p.id));
+          const newFeatureIds = new Set(
+            newFeatures.map((f) => f.properties?.id).filter(Boolean)
+          );
+
+          return {
+            points: [
+              ...state.points.filter((p) => !newPointIds.has(p.id)),
+              ...newPoints,
+            ],
+            features: [
+              ...state.features.filter(
+                (f) => !newFeatureIds.has(f.properties?.id)
+              ),
+              ...newFeatures,
+            ],
+          };
+        }),
       updatePoint: (updatedPoint) =>
         set((state) => ({
           points: state.points.map((p) =>

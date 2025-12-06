@@ -41,7 +41,6 @@ export function GeomanControl() {
   const { features, addFeature, updateFeature, removeFeature } =
     useGeomarkStore();
   const isInitialized = useRef(false);
-  const featuresLoaded = useRef(false);
 
   // Function to calculate and show measurement on click
   const handleLayerClick = (e: L.LeafletMouseEvent) => {
@@ -247,81 +246,82 @@ export function GeomanControl() {
     return () => {};
   }, [map, addFeature, removeFeature, handleEdit]);
 
-  // Load features from store
+  // Sync features from store to map
   useEffect(() => {
-    if (featuresLoaded.current) return;
-    featuresLoaded.current = true;
+    const storeIds = new Set(
+      features.map((f) => f.properties?.id).filter(Boolean)
+    );
 
-    const geoJsonLayer = L.geoJSON(features as GeoJsonObject[], {
-      style: () => GEOMAN_STYLE,
-      onEachFeature: (feature, l) => {
-        const layer = l as GeomanLayer;
-
-        // Mark as from store so pm:create doesn't duplicate
-        layer._fromStore = true;
-
-        // Restore text content visually if it's a Text layer
-        if (
-          feature.properties?.shape === "Text" &&
-          feature.properties?.text &&
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (layer as any).pm
-        ) {
-          // Force update the text content in the layer
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (layer as any).pm.setText(feature.properties.text);
-        }
-
-        // Enable editing for this layer (optional, Geoman usually handles it via toolbar)
-        layer.on("pm:edit", handleEdit);
-        layer.on("pm:dragend", handleEdit);
-        layer.on("pm:markerdragend", handleEdit);
-        layer.on("pm:rotateend", handleEdit);
-        layer.on("pm:textchange", handleEdit);
-        layer.on("pm:cut", handleEdit);
-
-        // Add click listener for measurement
-        layer.on("click", handleLayerClick);
-      },
-      pointToLayer: (feature, latlng) => {
-        if (
-          feature.properties?.shape === "Circle" &&
-          feature.properties?.radius
-        ) {
-          return new L.Circle(latlng, { radius: feature.properties.radius });
-        }
-        if (feature.properties?.shape === "CircleMarker") {
-          return new L.CircleMarker(latlng, {});
-        }
-        if (feature.properties?.shape === "Text") {
-          return new L.Marker(latlng, {
-            textMarker: true,
-            text: feature.properties.text,
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          } as any);
-        }
-        return new L.Marker(latlng);
-      },
-    });
-
-    geoJsonLayer.getLayers().forEach((l) => {
-      const layer = l as GeomanLayer;
-      layer._fromStore = true;
-      layer.addTo(map);
-
-      // Restore text content visually if it's a Text layer
-      if (
-        layer.feature?.properties?.shape === "Text" &&
-        layer.feature.properties?.text &&
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (layer as any).pm
-      ) {
-        // Force update the text content in the layer
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (layer as any).pm.setText(layer.feature.properties.text);
+    // Remove layers that are no longer in store
+    map.eachLayer((layer) => {
+      const l = layer as GeomanLayer;
+      const id = l.feature?.properties?.id;
+      if (id && !storeIds.has(id)) {
+        map.removeLayer(layer);
       }
     });
-  }, [map, features, handleEdit]);
+
+    // Add layers from store that are not on map
+    features.forEach((feature) => {
+      const id = feature.properties?.id;
+      if (!id) return;
+
+      let exists = false;
+      map.eachLayer((layer) => {
+        if ((layer as GeomanLayer).feature?.properties?.id === id) {
+          exists = true;
+        }
+      });
+
+      if (exists) return;
+
+      L.geoJSON(feature as GeoJsonObject, {
+        style: () => GEOMAN_STYLE,
+        onEachFeature: (f, l) => {
+          const layer = l as GeomanLayer;
+          layer._fromStore = true;
+          layer.addTo(map);
+
+          if (
+            f.properties?.shape === "Text" &&
+            f.properties?.text &&
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (layer as any).pm
+          ) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (layer as any).pm.setText(f.properties.text);
+          }
+
+          layer.on("pm:edit", handleEdit);
+          layer.on("pm:dragend", handleEdit);
+          layer.on("pm:markerdragend", handleEdit);
+          layer.on("pm:rotateend", handleEdit);
+          layer.on("pm:textchange", handleEdit);
+          layer.on("pm:cut", handleEdit);
+          layer.on("click", handleLayerClick);
+        },
+        pointToLayer: (feature, latlng) => {
+          if (
+            feature.properties?.shape === "Circle" &&
+            feature.properties?.radius
+          ) {
+            return new L.Circle(latlng, { radius: feature.properties.radius });
+          }
+          if (feature.properties?.shape === "CircleMarker") {
+            return new L.CircleMarker(latlng, {});
+          }
+          if (feature.properties?.shape === "Text") {
+            return new L.Marker(latlng, {
+              textMarker: true,
+              text: feature.properties.text,
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            } as any);
+          }
+          return new L.Marker(latlng);
+        },
+      });
+    });
+  }, [features, map, handleEdit]);
 
   return null;
 }

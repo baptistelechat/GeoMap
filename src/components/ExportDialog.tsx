@@ -11,10 +11,9 @@ import { useGeomarkStore } from "@/store/geomarkStore";
 import { exportToCSV, exportToJSON, exportToZIP } from "@/utils/export";
 import {
   Archive,
-  Download,
-  ExternalLink,
   FileJson,
   FileText,
+  Upload,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -60,13 +59,13 @@ export function ExportDialog() {
             (points.length === 0 && features.length === 0) || isExporting
           }
         >
-          <ExternalLink size={20} />
+          <Upload size={20} />
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <ExternalLink className="size-6 text-primary" />
+            <Upload className="size-6 text-primary" />
             Exporter les données
           </DialogTitle>
           <DialogDescription>
@@ -106,7 +105,7 @@ export function ExportDialog() {
                   </p>
                 </div>
               </div>
-              <Download className="text-primary" size={20} />
+              <Upload className="text-primary" size={20} />
             </Button>
 
             <Button
@@ -126,7 +125,7 @@ export function ExportDialog() {
                   </p>
                 </div>
               </div>
-              <Download className="text-primary" size={20} />
+              <Upload className="text-primary" size={20} />
             </Button>
 
             <Button
@@ -146,7 +145,7 @@ export function ExportDialog() {
                   </p>
                 </div>
               </div>
-              <Download className="text-primary" size={20} />
+              <Upload className="text-primary" size={20} />
             </Button>
           </div>
 

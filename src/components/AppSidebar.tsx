@@ -1,6 +1,7 @@
 import { ClearPointsDialog } from "@/components/ClearPointsDialog";
 import { DevTools } from "@/components/DevTools";
 import { ExportDialog } from "@/components/ExportDialog";
+import { ImportDialog } from "@/components/ImportDialog";
 import { PointDialog } from "@/components/PointDialog";
 import { PointForm } from "@/components/PointForm";
 import { PointsList } from "@/components/PointsList";
@@ -20,7 +21,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { useGeomarkStore } from "@/store/geomarkStore";
-import { FlaskConical, List, MapPin, Plus } from "lucide-react";
+import { Download, FlaskConical, List, MapPin, Plus } from "lucide-react";
 import { useState } from "react";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -60,10 +61,23 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent className="overflow-x-hidden pb-8">
         {/* Section Ajouter un point */}
         <SidebarGroup>
-          <SidebarGroupLabel className="group-data-[collapsible=icon]:hidden mb-2">
-            <Plus className="mr-2 size-4 text-primary" />
-            Ajouter un point
-          </SidebarGroupLabel>
+          <div className="flex items-center justify-between px-2 py-1 group-data-[collapsible=icon]:hidden">
+            <SidebarGroupLabel className="group-data-[collapsible=icon]:hidden mb-2 p-0">
+              <Plus className="mr-2 size-4 text-primary" />
+              Ajouter un point
+            </SidebarGroupLabel>
+            <ImportDialog
+              trigger={
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  title="Importer"
+                >
+                  <Download size={20} />
+                </Button>
+              }
+            />
+          </div>
           <SidebarGroupContent>
             {/* Formulaire visible en mode étendu */}
             <div className="group-data-[collapsible=icon]:hidden">

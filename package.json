@@ -39,6 +39,7 @@
     "leaflet-minimap": "^3.6.1",
     "leaflet.markercluster": "^1.5.3",
     "lucide-react": "^0.511.0",
+    "motion": "^12.23.25",
     "next-themes": "^0.4.6",
     "papaparse": "^5.5.3",
     "react": "^18.3.1",
