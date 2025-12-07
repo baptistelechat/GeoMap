@@ -8,6 +8,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import { useGeomarkStore } from "@/store/geomarkStore";
 import { exportToCSV, exportToJSON, exportToZIP } from "@/utils/export";
@@ -32,6 +33,7 @@ export function PointsListDialog({
   const isControlled = open !== undefined;
   const show = isControlled ? open : internalOpen;
   const setShow = isControlled ? onOpenChange : setInternalOpen;
+  const isMobile = useIsMobile();
 
   const handleExportCSV = () => {
     exportToCSV({ points, features });
@@ -62,7 +64,7 @@ export function PointsListDialog({
           <div className="flex items-center justify-between mr-8">
             <DialogTitle className="flex items-center gap-2">
               <List className="size-6 text-primary" />
-              Liste des points ({points.length})
+              {isMobile ? "Points" : "Liste des points"} ({points.length})
             </DialogTitle>
             <ClearPointsDialog mode="text" />
           </div>

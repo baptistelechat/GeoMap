@@ -1,5 +1,6 @@
 "use client";
 
+import { useIsMobile } from "@/hooks/use-mobile";
 /**
  * @author: @dorian_baffier
  * @description: File Upload
@@ -154,7 +155,7 @@ const UploadIllustration = () => (
 
 const UploadingAnimation = ({ progress }: { progress: number }) => (
   <div className="relative w-16 h-16 flex items-center justify-center">
-    <Earth className="w-12 h-12 text-green-500 animate-bounce" />
+    <Earth className="size-12 text-primary animate-bounce" />
     <div className="sr-only">{Math.round(progress)}%</div>
   </div>
 );
@@ -176,6 +177,7 @@ export default function FileUpload({
   const [error, setError] = useState<FileError | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const uploadIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     return () => {
@@ -415,7 +417,7 @@ export default function FileUpload({
 
                     <div className="text-center space-y-1.5 mb-4">
                       <h3 className="text-lg font-semibold text-gray-900 dark:text-white tracking-tight">
-                        Glissez-déposez ou
+                        {isMobile ? "Cherger un fichier" : "Glissez-déposez ou"}
                       </h3>
                       <p className="text-xs text-gray-500 dark:text-gray-400">
                         {acceptedFileTypes?.length
@@ -441,9 +443,11 @@ export default function FileUpload({
                       <UploadCloud className="w-4 h-4 group-hover:scale-110 transition-transform duration-200" />
                     </button>
 
-                    <p className="mt-3 text-xs text-gray-500 dark:text-gray-400">
-                      ou glissez-déposez votre fichier ici
-                    </p>
+                    {!isMobile && (
+                      <p className="mt-3 text-xs text-gray-500 dark:text-gray-400">
+                        ou glissez-déposez votre fichier ici
+                      </p>
+                    )}
 
                     <input
                       ref={fileInputRef}
