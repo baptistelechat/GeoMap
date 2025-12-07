@@ -1,0 +1,102 @@
+import { DeleteFeatureDialog } from "@/components/dialogs/DeleteFeatureDialog";
+import { SidebarList } from "@/components/shared/SidebarList";
+import { Button } from "@/components/ui/button";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { useGeomarkStore } from "@/store/geomarkStore";
+import { motion } from "framer-motion";
+import * as L from "leaflet";
+import { Map, MapPinOff, Trash2 } from "lucide-react";
+
+interface FeaturesListProps {
+  limit?: number;
+  onItemClick?: () => void;
+}
+
+export function FeaturesList({ limit, onItemClick }: FeaturesListProps) {
+  const { features, setFlyToLocation } = useGeomarkStore();
+  const isMobile = useIsMobile();
+
+  // Sort features by last modification (if property exists) or creation
+  const sortedFeatures = [...features].sort((a, b) => {
+    const timeA = a.properties?.updatedAt || a.properties?.createdAt || 0;
+    const timeB = b.properties?.updatedAt || b.properties?.createdAt || 0;
+    return timeB - timeA;
+  });
+
+  const displayFeatures = limit ? sortedFeatures.slice(0, limit) : sortedFeatures;
+
+  const handleFeatureClick = (feature: any) => {
+    // Calculate center of the feature to zoom to it
+    const layer = L.geoJSON(feature);
+    const bounds = layer.getBounds();
+    const center = bounds.getCenter();
+
+    setFlyToLocation({
+      lat: center.lat,
+      lng: center.lng,
+      zoom: 16,
+    });
+    
+    onItemClick?.();
+  };
+
+  const emptyMessage = (
+    <div className="flex flex-col items-center justify-center p-8 text-center text-muted-foreground border-2 border-dashed rounded-lg mx-2">
+      <MapPinOff className="size-10 mb-3 opacity-50" />
+      <h3 className="font-semibold text-lg mb-1">Aucune forme</h3>
+      <p className="text-sm max-w-[200px]">
+        Utilisez les outils de dessin sur la carte pour créer des formes.
+      </p>
+    </div>
+  );
+
+  return (
+    <SidebarList
+      items={displayFeatures}
+      emptyMessage={emptyMessage}
+      renderItem={(feature) => (
+        <motion.div
+          key={feature.properties?.id || Math.random()}
+          layout
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{ duration: 0.2 }}
+          className="flex items-center justify-between p-3 border rounded-lg bg-card shadow-sm cursor-pointer hover:bg-accent transition-colors"
+          onClick={() => handleFeatureClick(feature)}
+        >
+          <div className="flex items-center gap-3 overflow-hidden">
+            <div className="flex items-center justify-center size-8 rounded-full bg-primary/10 text-primary shrink-0">
+              <Map className="size-4" />
+            </div>
+            <div className="flex flex-col overflow-hidden">
+              <span className="font-medium truncate text-sm">
+                {feature.properties?.name || "Forme sans nom"}
+              </span>
+              <span className="text-xs text-muted-foreground truncate">
+                {feature.geometry.type}
+              </span>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <div onClick={(e) => e.stopPropagation()}>
+              <DeleteFeatureDialog
+                feature={feature}
+                trigger={
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="size-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                    title="Supprimer"
+                  >
+                    <Trash2 className="size-4" />
+                  </Button>
+                }
+              />
+            </div>
+          </div>
+        </motion.div>
+      )}
+    />
+  );
+}

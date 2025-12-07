@@ -11,6 +11,7 @@ import {
 import { MapPin } from "lucide-react";
 import { SidebarAddPoint } from "./SidebarAddPoint";
 import { SidebarDevSection } from "./SidebarDevSection";
+import { SidebarFeaturesList } from "./SidebarFeaturesList";
 import { SidebarFooterActions } from "./SidebarFooterActions";
 import { SidebarPointsList } from "./SidebarPointsList";
 
@@ -47,6 +48,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent className="overflow-x-hidden pb-8">
         <SidebarAddPoint />
         <SidebarPointsList />
+        <SidebarFeaturesList />
         <SidebarDevSection />
       </SidebarContent>
       <SidebarFooter className="border-t border-sidebar-border p-4 group-data-[collapsible=icon]:p-2">

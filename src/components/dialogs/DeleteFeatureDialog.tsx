@@ -1,6 +1,5 @@
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -9,36 +8,44 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 import { useGeomarkStore } from "@/store/geomarkStore";
-import { MapPoint } from "@/types/map";
+import { Feature } from "geojson";
 import { Trash2 } from "lucide-react";
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import { toast } from "sonner";
 
-interface DeletePointDialogProps {
-  point: MapPoint;
+interface DeleteFeatureDialogProps {
+  feature: Feature;
   trigger: ReactNode;
   onDelete?: () => void;
 }
 
-export function DeletePointDialog({
-  point,
+export function DeleteFeatureDialog({
+  feature,
   trigger,
   onDelete,
-}: DeletePointDialogProps) {
-  const { removePoint } = useGeomarkStore();
+}: DeleteFeatureDialogProps) {
+  const { removeFeature } = useGeomarkStore();
+  const [open, setOpen] = useState(false);
 
   const handleDelete = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    removePoint(point.id);
-    toast.success(`Le point "${point.title}" a été supprimé`);
-    onDelete?.();
+    const id = feature.properties?.id;
+    if (id) {
+      removeFeature(id);
+      toast.success("La forme a été supprimée");
+      onDelete?.();
+      setOpen(false);
+    }
   };
 
   return (
-    <AlertDialog>
-      <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>
+    <AlertDialog open={open} onOpenChange={setOpen}>
+      <AlertDialogTrigger asChild onClick={(e) => e.stopPropagation()}>
+        {trigger}
+      </AlertDialogTrigger>
       <AlertDialogContent onClick={(e) => e.stopPropagation()}>
         <AlertDialogHeader>
           <AlertDialogTitle className="flex items-center gap-2">
@@ -46,20 +53,17 @@ export function DeletePointDialog({
             Êtes-vous sûr ?
           </AlertDialogTitle>
           <AlertDialogDescription>
-            Cette action est irréversible. Cela supprimera définitivement le
-            point "{point.title}" de votre liste.
+            Cette action est irréversible. Cela supprimera définitivement cette
+            forme de votre carte.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel onClick={(e) => e.stopPropagation()}>
             Annuler
           </AlertDialogCancel>
-          <AlertDialogAction
-            onClick={handleDelete}
-            className="bg-destructive hover:bg-destructive/90"
-          >
+          <Button variant="destructive" onClick={handleDelete}>
             Supprimer
-          </AlertDialogAction>
+          </Button>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

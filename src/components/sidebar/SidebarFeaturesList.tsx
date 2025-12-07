@@ -1,7 +1,7 @@
 import { ClearDataDialog } from "@/components/dialogs/ClearDataDialog";
 import { ExportDialog } from "@/components/dialogs/ExportDialog";
-import { PointsListDialog } from "@/components/dialogs/PointsListDialog";
-import { PointsList } from "@/components/shared/PointsList";
+import { FeaturesListDialog } from "@/components/dialogs/FeaturesListDialog";
+import { FeaturesList } from "@/components/shared/FeaturesList";
 import { Button } from "@/components/ui/button";
 import {
   SidebarGroup,
@@ -9,25 +9,25 @@ import {
   SidebarGroupLabel,
 } from "@/components/ui/sidebar";
 import { useGeomarkStore } from "@/store/geomarkStore";
-import { List } from "lucide-react";
+import { Shapes } from "lucide-react";
 import { useState } from "react";
 
-export function SidebarPointsList() {
-  const { points, clearPoints } = useGeomarkStore();
-  const [listPointsDialogOpen, setListPointsDialogOpen] = useState(false);
+export function SidebarFeaturesList() {
+  const { features, clearFeatures } = useGeomarkStore();
+  const [listFeaturesDialogOpen, setListFeaturesDialogOpen] = useState(false);
 
   return (
     <SidebarGroup className="border-t border-sidebar-border flex-1 group-data-[collapsible=icon]:flex-none">
       <div className="flex items-center justify-between px-2 py-1 group-data-[collapsible=icon]:hidden">
         <SidebarGroupLabel className="group-data-[collapsible=icon]:hidden mb-2">
-          <List className="mr-2 size-4 text-primary" />
-          Points ({points.length})
+          <Shapes className="mr-2 size-4 text-primary" />
+          Formes ({features.length})
         </SidebarGroupLabel>
         <div className="flex items-center gap-1">
           <ClearDataDialog
-            count={points.length}
-            onClear={clearPoints}
-            label="points"
+            count={features.length}
+            onClear={clearFeatures}
+            label="formes"
           />
           <ExportDialog />
         </div>
@@ -36,12 +36,12 @@ export function SidebarPointsList() {
       <SidebarGroupContent>
         {/* Liste visible en mode étendu */}
         <div className="group-data-[collapsible=icon]:hidden">
-          <PointsList limit={5} />
-          {points.length > 5 && (
+          <FeaturesList limit={5} />
+          {features.length > 5 && (
             <Button
               variant="link"
               className="w-full mt-2 text-muted-foreground"
-              onClick={() => setListPointsDialogOpen(true)}
+              onClick={() => setListFeaturesDialogOpen(true)}
             >
               Voir plus
             </Button>
@@ -50,17 +50,17 @@ export function SidebarPointsList() {
 
         {/* Bouton Dialog visible uniquement en mode réduit */}
         <div className="hidden group-data-[collapsible=icon]:flex justify-center py-2">
-          <PointsListDialog
-            open={listPointsDialogOpen}
-            onOpenChange={setListPointsDialogOpen}
+          <FeaturesListDialog
+            open={listFeaturesDialogOpen}
+            onOpenChange={setListFeaturesDialogOpen}
             trigger={
               <Button
                 variant="ghost"
                 size="icon"
                 className="size-8 text-primary"
-                title="Voir la liste des points"
+                title="Voir la liste des formes"
               >
-                <List className="size-5" />
+                <Shapes className="size-5" />
               </Button>
             }
           />
