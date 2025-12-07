@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -17,12 +18,12 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarRail,
-  SidebarSeparator,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { useGeomarkStore } from "@/store/geomarkStore";
 import { FlaskConical, List, MapPin, Plus } from "lucide-react";
 import { useState } from "react";
+import { ButtonGroup } from "./ui/button-group";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { points } = useGeomarkStore();
@@ -47,7 +48,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </div>
               </div>
 
-              <div className="flex items-center gap-1 group-data-[collapsible=icon]:hidden">
+              <div className="flex items-center gap-2 group-data-[collapsible=icon]:hidden">
                 <SidebarTrigger />
               </div>
 
@@ -95,10 +96,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        <SidebarSeparator />
-
         {/* Section Liste des points */}
-        <SidebarGroup className="flex-1 group-data-[collapsible=icon]:flex-none">
+        <SidebarGroup className="border-t border-sidebar-border flex-1 group-data-[collapsible=icon]:flex-none">
           <div className="flex items-center justify-between px-2 py-1 group-data-[collapsible=icon]:hidden">
             <SidebarGroupLabel className="group-data-[collapsible=icon]:hidden mb-2">
               <List className="mr-2 size-4 text-primary" />
@@ -145,11 +144,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        <SidebarSeparator />
-
         {/* Section Développement - Uniquement en DEV */}
         {import.meta.env.DEV && (
-          <SidebarGroup>
+          <SidebarGroup className="border-t border-sidebar-border">
             <SidebarGroupLabel className="group-data-[collapsible=icon]:hidden mb-2">
               <FlaskConical className="mr-2 size-4 text-primary" />
               Développement
@@ -172,6 +169,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarGroup>
         )}
       </SidebarContent>
+      <SidebarFooter className="border-t border-sidebar-border p-4 group-data-[collapsible=icon]:p-2">
+        <div className="flex w-full justify-center group-data-[collapsible=icon]:hidden">
+          <ButtonGroup className="w-full">
+            <ImportDialog variant="outline" mode="text" className="flex-1" />
+            <ExportDialog variant="outline" mode="text" className="flex-1" />
+          </ButtonGroup>
+        </div>
+        <div className="hidden group-data-[collapsible=icon]:flex flex-col gap-2 items-center">
+          <ImportDialog variant="ghost" mode="icon" className="size-8" />
+          <ExportDialog variant="ghost" mode="icon" className="size-8" />
+        </div>
+      </SidebarFooter>
       <SidebarRail />
     </Sidebar>
   );

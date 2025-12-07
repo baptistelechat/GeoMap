@@ -15,9 +15,15 @@ import { useState } from "react";
 
 interface ExportDialogProps {
   mode?: "icon" | "text";
+  variant?: React.ComponentProps<typeof Button>["variant"];
+  className?: string;
 }
 
-export function ExportDialog({ mode = "icon" }: ExportDialogProps) {
+export function ExportDialog({
+  mode = "icon",
+  variant = "ghost",
+  className,
+}: ExportDialogProps) {
   const { points, features } = useGeomarkStore();
   const [isExporting, setIsExporting] = useState(false);
 
@@ -52,11 +58,12 @@ export function ExportDialog({ mode = "icon" }: ExportDialogProps) {
     <Dialog>
       <DialogTrigger asChild>
         <Button
-          variant="ghost"
+          variant={variant}
           size={mode === "icon" ? "icon" : "sm"}
           className={cn(
             "text-muted-foreground",
-            mode === "icon" ? "size-8" : ""
+            mode === "icon" ? "size-8" : "",
+            className
           )}
           title="Exporter les données"
           disabled={

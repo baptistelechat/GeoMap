@@ -32,7 +32,9 @@ import { cn } from "@/lib/utils";
 
 interface ImportDialogProps {
   mode?: "icon" | "text";
+  variant?: React.ComponentProps<typeof Button>["variant"];
   onSuccess?: () => void;
+  className?: string;
 }
 
 interface ImportResult {
@@ -40,7 +42,12 @@ interface ImportResult {
   features: Feature[];
 }
 
-export function ImportDialog({ mode = "icon", onSuccess }: ImportDialogProps) {
+export function ImportDialog({
+  mode = "icon",
+  variant = "ghost",
+  onSuccess,
+  className,
+}: ImportDialogProps) {
   const [open, setOpen] = useState(false);
   const [showConflictDialog, setShowConflictDialog] = useState(false);
   const [showReplaceWarning, setShowReplaceWarning] = useState(false);
@@ -166,12 +173,13 @@ export function ImportDialog({ mode = "icon", onSuccess }: ImportDialogProps) {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           <Button
-            variant="ghost"
+            variant={variant}
             size={mode === "icon" ? "icon" : "sm"}
             title="Importer des données"
             className={cn(
               "text-muted-foreground",
-              mode === "icon" ? "size-8" : ""
+              mode === "icon" ? "size-8" : "",
+              className
             )}
           >
             <Download size={20} className={cn(mode === "text" && "mr-2")} />
