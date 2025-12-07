@@ -1,5 +1,4 @@
-import { PointForm } from "@/components/PointForm";
-import { ImportDialog } from "@/components/ImportDialog";
+import { PointForm } from "@/components/shared/PointForm";
 import {
   Dialog,
   DialogContent,
@@ -11,8 +10,9 @@ import { cn } from "@/lib/utils";
 import { MapPoint } from "@/types/map";
 import { Pencil, Plus } from "lucide-react";
 import { useState } from "react";
+import { ImportDialog } from "./ImportDialog";
 
-interface PointDialogProps {
+interface PointActionDialogProps {
   trigger?: React.ReactNode;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -21,14 +21,14 @@ interface PointDialogProps {
   onSuccess?: () => void;
 }
 
-export function PointDialog({
+export function PointActionDialog({
   trigger,
   open,
   onOpenChange,
   className,
   point,
   onSuccess,
-}: PointDialogProps) {
+}: PointActionDialogProps) {
   const [internalOpen, setInternalOpen] = useState(false);
   const isControlled = open !== undefined;
   const show = isControlled ? open : internalOpen;

@@ -1,5 +1,5 @@
-import { ClearPointsDialog } from "@/components/ClearPointsDialog";
-import { PointsList } from "@/components/PointsList";
+import { ClearPointsDialog } from "./ClearPointsDialog";
+import { PointsList } from "@/components/shared/PointsList";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,

@@ -4,7 +4,7 @@ import { useGeomarkStore } from "@/store/geomarkStore";
 import { MapPoint } from "@/types/map";
 import { Database } from "lucide-react";
 import { toast } from "sonner";
-import { AVAILABLE_ICONS } from "./MarkerIcon";
+import { AVAILABLE_ICONS } from "@/components/map/MarkerIcon";
 
 export function DevTools({
   className,

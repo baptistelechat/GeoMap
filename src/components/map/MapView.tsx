@@ -1,4 +1,4 @@
-import { MarkerIcon } from "@/components/MarkerIcon";
+import { MarkerIcon } from "./MarkerIcon";
 import { useGeomarkStore } from "@/store/geomarkStore";
 import { MapPoint } from "@/types/map";
 import "@/vendor/SmoothWheelZoom.js";

@@ -1,6 +1,6 @@
-import { DeletePointDialog } from "@/components/DeletePointDialog";
-import { MarkerIcon } from "@/components/MarkerIcon";
-import { PointDialog } from "@/components/PointDialog";
+import { DeletePointDialog } from "@/components/dialogs/DeletePointDialog";
+import { MarkerIcon } from "./MarkerIcon";
+import { PointActionDialog } from "@/components/dialogs/PointActionDialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { MapPoint } from "@/types/map";
@@ -47,7 +47,7 @@ export function MarkerPopup({ point }: MarkerPopupProps) {
         )}
 
         <div className="flex items-center gap-1">
-          <PointDialog
+          <PointActionDialog
             point={point}
             trigger={
               <Button

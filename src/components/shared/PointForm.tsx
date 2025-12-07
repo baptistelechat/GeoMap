@@ -1,4 +1,4 @@
-import { AVAILABLE_ICONS, MarkerIcon } from "@/components/MarkerIcon";
+import { AVAILABLE_ICONS, MarkerIcon } from "@/components/map/MarkerIcon";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";

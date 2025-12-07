@@ -1,8 +1,8 @@
-import { AppSidebar } from "@/components/AppSidebar";
-import { DevTools } from "@/components/DevTools";
-import { MapView } from "@/components/MapView";
-import { PointDialog } from "@/components/PointDialog";
-import { PointsListDialog } from "@/components/PointsListDialog";
+import { PointActionDialog } from "@/components/dialogs/PointActionDialog";
+import { PointsListDialog } from "@/components/dialogs/PointsListDialog";
+import { MapView } from "@/components/map/MapView";
+import { DevTools } from "@/components/shared/DevTools";
+import { AppSidebar } from "@/components/sidebar/AppSidebar";
 import { Button } from "@/components/ui/button";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { FlaskConical, List, Plus } from "lucide-react";
@@ -17,7 +17,7 @@ export default function MainMap() {
         </div>
 
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex gap-4 md:hidden">
-          <PointDialog
+          <PointActionDialog
             trigger={
               <Button
                 className="rounded-full shadow-lg size-12"

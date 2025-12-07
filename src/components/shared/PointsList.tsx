@@ -1,4 +1,6 @@
-import { PointDialog } from "@/components/PointDialog";
+import { DeletePointDialog } from "@/components/dialogs/DeletePointDialog";
+import { PointActionDialog } from "@/components/dialogs/PointActionDialog";
+import { MarkerIcon } from "@/components/map/MarkerIcon";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,8 +13,6 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useGeomarkStore } from "@/store/geomarkStore";
 import { AnimatePresence, motion } from "framer-motion";
 import { MapPinOff, Pencil, Trash2 } from "lucide-react";
-import { DeletePointDialog } from "./DeletePointDialog";
-import { MarkerIcon } from "./MarkerIcon";
 
 interface PointsListProps {
   onPointClick?: () => void;
@@ -85,7 +85,7 @@ export function PointsList({
                   </Badge>
 
                   <div onClick={(e) => e.stopPropagation()}>
-                    <PointDialog
+                    <PointActionDialog
                       point={point}
                       onSuccess={onEditSuccess}
                       trigger={
