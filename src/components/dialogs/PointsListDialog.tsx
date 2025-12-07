@@ -28,24 +28,12 @@ export function PointsListDialog({
   onOpenChange,
   className,
 }: PointsListDialogProps) {
-  const { points, clearPoints, features } = useGeomarkStore();
+  const { points, clearPoints } = useGeomarkStore();
   const [internalOpen, setInternalOpen] = useState(false);
   const isControlled = open !== undefined;
   const show = isControlled ? open : internalOpen;
   const setShow = isControlled ? onOpenChange : setInternalOpen;
   const isMobile = useIsMobile();
-
-  const handleExportCSV = () => {
-    exportToCSV({ points, features });
-  };
-
-  const handleExportJSON = () => {
-    exportToJSON({ points, features });
-  };
-
-  const handleExportZIP = () => {
-    exportToZIP({ points, features });
-  };
 
   return (
     <Dialog open={show} onOpenChange={setShow}>
@@ -79,7 +67,7 @@ export function PointsListDialog({
           <Button
             variant="outline"
             size="sm"
-            onClick={handleExportCSV}
+            onClick={() => exportToCSV()}
             disabled={points.length === 0}
             className="flex-1"
           >
@@ -89,7 +77,7 @@ export function PointsListDialog({
           <Button
             variant="outline"
             size="sm"
-            onClick={handleExportJSON}
+            onClick={() => exportToJSON()}
             disabled={points.length === 0}
             className="flex-1"
           >
@@ -99,7 +87,7 @@ export function PointsListDialog({
           <Button
             variant="outline"
             size="sm"
-            onClick={handleExportZIP}
+            onClick={() => exportToZIP()}
             disabled={points.length === 0}
             className="flex-1"
           >

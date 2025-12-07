@@ -28,20 +28,8 @@ export function FeaturesListDialog({
   onOpenChange,
   className,
 }: FeaturesListDialogProps) {
-  const { points, features, clearFeatures } = useGeomarkStore();
+  const { features, clearFeatures } = useGeomarkStore();
   const isMobile = useIsMobile();
-
-  const handleExportCSV = () => {
-    exportToCSV({ points, features });
-  };
-
-  const handleExportJSON = () => {
-    exportToJSON({ points, features });
-  };
-
-  const handleExportZIP = () => {
-    exportToZIP({ points, features });
-  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -75,8 +63,8 @@ export function FeaturesListDialog({
           <Button
             variant="outline"
             size="sm"
-            onClick={handleExportCSV}
-            disabled={points.length === 0}
+            onClick={() => exportToCSV()}
+            disabled={features.length === 0}
             className="flex-1"
           >
             <FileText className="mr-2 size-4 text-green-600" />
@@ -85,8 +73,8 @@ export function FeaturesListDialog({
           <Button
             variant="outline"
             size="sm"
-            onClick={handleExportJSON}
-            disabled={points.length === 0}
+            onClick={() => exportToJSON()}
+            disabled={features.length === 0}
             className="flex-1"
           >
             <FileJson className="mr-2 size-4 text-primary" />
@@ -95,8 +83,8 @@ export function FeaturesListDialog({
           <Button
             variant="outline"
             size="sm"
-            onClick={handleExportZIP}
-            disabled={points.length === 0}
+            onClick={() => exportToZIP()}
+            disabled={features.length === 0}
             className="flex-1"
           >
             <Archive className="mr-2 size-4 text-amber-500" />
