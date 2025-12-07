@@ -7,17 +7,17 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
 import { useGeomarkStore } from "@/store/geomarkStore";
 import { exportToCSV, exportToJSON, exportToZIP } from "@/utils/export";
-import {
-  Archive,
-  FileJson,
-  FileText,
-  Upload,
-} from "lucide-react";
+import { Archive, FileJson, FileText, Upload } from "lucide-react";
 import { useState } from "react";
 
-export function ExportDialog() {
+interface ExportDialogProps {
+  mode?: "icon" | "text";
+}
+
+export function ExportDialog({ mode = "icon" }: ExportDialogProps) {
   const { points, features } = useGeomarkStore();
   const [isExporting, setIsExporting] = useState(false);
 
@@ -53,13 +53,18 @@ export function ExportDialog() {
       <DialogTrigger asChild>
         <Button
           variant="ghost"
-          size="icon"
+          size={mode === "icon" ? "icon" : "sm"}
+          className={cn(
+            "text-muted-foreground",
+            mode === "icon" ? "size-8" : ""
+          )}
           title="Exporter les données"
           disabled={
             (points.length === 0 && features.length === 0) || isExporting
           }
         >
-          <Upload size={20} />
+          <Upload size={20} className={cn(mode === "text" && "mr-2")} />
+          {mode === "text" && "Exporter"}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
