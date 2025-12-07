@@ -40,10 +40,7 @@ interface ImportResult {
   features: Feature[];
 }
 
-export function ImportDialog({
-  mode = "icon",
-  onSuccess,
-}: ImportDialogProps) {
+export function ImportDialog({ mode = "icon", onSuccess }: ImportDialogProps) {
   const [open, setOpen] = useState(false);
   const [showConflictDialog, setShowConflictDialog] = useState(false);
   const [showReplaceWarning, setShowReplaceWarning] = useState(false);

@@ -417,7 +417,7 @@ export default function FileUpload({
 
                     <div className="text-center space-y-1.5 mb-4">
                       <h3 className="text-lg font-semibold text-gray-900 dark:text-white tracking-tight">
-                        {isMobile ? "Cherger un fichier" : "Glissez-déposez ou"}
+                        {isMobile ? "Charger un fichier" : "Glissez-déposez ou"}
                       </h3>
                       <p className="text-xs text-gray-500 dark:text-gray-400">
                         {acceptedFileTypes?.length

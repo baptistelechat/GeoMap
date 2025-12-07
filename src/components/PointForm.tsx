@@ -57,23 +57,22 @@ export function PointForm({
   useEffect(() => {
     if (!isManualCoords && formData.url) {
       // Patterns courants pour les URLs Google Maps
-      // 1. @lat,lng
-      // 2. !3dlat!4dlng (pour les embeds ou certaines URLs)
-      const atMatch = formData.url.match(
-        /@(-?\d+\.\d+),(-?\d+\.\d+)/
-      );
-      const dataMatch = formData.url.match(
-        /!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/
-      );
+      // 1. !3dlat!4dlng (coordonnées spécifiques du lieu/marqueur - plus précis pour les lieux)
+      const dataMatch = formData.url.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/);
 
-      if (atMatch) {
-        setFormData((prev) => ({ ...prev, lat: atMatch[1], lng: atMatch[2] }));
-      } else if (dataMatch) {
+      // 2. @lat,lng (centre de la vue caméra - courant pour StreetView ou vue générale)
+      const atMatch = formData.url.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+
+      if (dataMatch) {
+        // Priorité aux données précises du lieu si disponibles
         setFormData((prev) => ({
           ...prev,
           lat: dataMatch[1],
           lng: dataMatch[2],
         }));
+      } else if (atMatch) {
+        // Fallback sur le centre de la vue
+        setFormData((prev) => ({ ...prev, lat: atMatch[1], lng: atMatch[2] }));
       }
     }
   }, [formData.url, isManualCoords]);
