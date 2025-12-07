@@ -1,10 +1,11 @@
-import { DevTools } from "@/components/shared/DevTools";
+import { StressTestButton } from "@/components/shared/devtools/StressTestButton";
+import { TestPointsButton } from "@/components/shared/devtools/TestPointsButton";
 import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
 } from "@/components/ui/sidebar";
-import { FlaskConical } from "lucide-react";
+import { Dices, FlaskConical, Zap } from "lucide-react";
 
 export function SidebarDevSection() {
   if (!import.meta.env.DEV) return null;
@@ -16,18 +17,33 @@ export function SidebarDevSection() {
         Développement
       </SidebarGroupLabel>
       <SidebarGroupContent>
-        <div className="group-data-[collapsible=icon]:hidden">
-          <DevTools />
+        <div className="group-data-[collapsible=icon]:hidden flex flex-col gap-2 p-2">
+          <TestPointsButton className="w-full justify-start gap-2">
+            <Dices className="size-4" />
+            Test Standard (15)
+          </TestPointsButton>
+          <StressTestButton className="w-full justify-start gap-2">
+            <Zap className="size-4" />
+            Stress Test (2000)
+          </StressTestButton>
         </div>
-        <div className="hidden group-data-[collapsible=icon]:flex justify-center py-2">
-          <DevTools
+        <div className="hidden group-data-[collapsible=icon]:flex flex-col gap-2 items-center justify-center py-2">
+          <TestPointsButton
             variant="ghost"
             size="icon"
-            className="size-8 text-primary"
-            title="Générer des points"
+            className="size-8 text-amber-500"
+            title="Générer 15 points"
           >
-            <FlaskConical className="size-5" />
-          </DevTools>
+            <Dices className="size-5" />
+          </TestPointsButton>
+          <StressTestButton
+            variant="ghost"
+            size="icon"
+            className="size-8 text-destructive"
+            title="Stress Test (2000 points)"
+          >
+            <Zap className="size-5" />
+          </StressTestButton>
         </div>
       </SidebarGroupContent>
     </SidebarGroup>

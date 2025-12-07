@@ -1,12 +1,11 @@
+import { AVAILABLE_ICONS } from "@/components/map/MarkerIcon";
 import { Button } from "@/components/ui/button";
 import { generateId } from "@/lib/utils";
 import { useGeomarkStore } from "@/store/geomarkStore";
 import { MapPoint } from "@/types/map";
-import { Database } from "lucide-react";
 import { toast } from "sonner";
-import { AVAILABLE_ICONS } from "@/components/map/MarkerIcon";
 
-export function DevTools({
+export function TestPointsButton({
   className,
   variant = "outline",
   children,
@@ -35,10 +34,10 @@ export function DevTools({
         lat,
         lng,
         notes: "Point de test généré automatiquement - Cluster Nantes",
-        url: `https://www.google.com/maps/@${lat.toFixed(
+        url: `https://www.google.com/maps/@${lat.toFixed(6)},${lng.toFixed(
           6
-        )},${lng.toFixed(6)},3a,75y,90t/data=!3m6!1e1!3m4!1sTEST_ID_${i}!2e0`,
-        color: "#22c55e", // Green-500
+        )},3a,75y,90t/data=!3m6!1e1!3m4!1sTEST_ID_${i}!2e0`,
+        color: "#f59e0b", // Amber-500
         icon: AVAILABLE_ICONS[0].name, // Pin
         createdAt: Date.now(),
         updatedAt: Date.now(),
@@ -56,12 +55,10 @@ export function DevTools({
         lat,
         lng,
         notes: "Point de test généré automatiquement - Cluster Le Mans",
-        url: `https://www.google.com/maps/@${lat.toFixed(
+        url: `https://www.google.com/maps/@${lat.toFixed(6)},${lng.toFixed(
           6
-        )},${lng.toFixed(6)},3a,75y,90t/data=!3m6!1e1!3m4!1sTEST_ID_${
-          i + 5
-        }!2e0`,
-        color: "#22c55e", // Green-500
+        )},3a,75y,90t/data=!3m6!1e1!3m4!1sTEST_ID_${i + 5}!2e0`,
+        color: "#f59e0b", // Amber-500
         icon: AVAILABLE_ICONS[0].name, // Pin
         createdAt: Date.now(),
         updatedAt: Date.now(),
@@ -79,12 +76,10 @@ export function DevTools({
         lat,
         lng,
         notes: "Point de test généré automatiquement - Cluster Tours",
-        url: `https://www.google.com/maps/@${lat.toFixed(
+        url: `https://www.google.com/maps/@${lat.toFixed(6)},${lng.toFixed(
           6
-        )},${lng.toFixed(6)},3a,75y,90t/data=!3m6!1e1!3m4!1sTEST_ID_${
-          i + 10
-        }!2e0`,
-        color: "#22c55e", // Green-500
+        )},3a,75y,90t/data=!3m6!1e1!3m4!1sTEST_ID_${i + 10}!2e0`,
+        color: "#f59e0b", // Amber-500
         icon: AVAILABLE_ICONS[0].name, // Pin
         createdAt: Date.now(),
         updatedAt: Date.now(),
@@ -104,12 +99,7 @@ export function DevTools({
       title="Générer 15 points de test (Nantes, Le Mans & Tours)"
       {...props}
     >
-      {children ?? (
-        <>
-          <Database className="size-4" />
-          Générer Données Test
-        </>
-      )}
+      {children}
     </Button>
   );
 }
