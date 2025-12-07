@@ -113,8 +113,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarGroupContent>
             {/* Liste visible en mode étendu */}
             <div className="group-data-[collapsible=icon]:hidden">
-              <PointsList limit={10} />
-              {points.length > 10 && (
+              <PointsList limit={5} />
+              {points.length > 5 && (
                 <Button
                   variant="link"
                   className="w-full mt-2 text-muted-foreground"
