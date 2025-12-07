@@ -24,12 +24,15 @@ import { MapPoint } from "@/types/map";
 import { exportToCSV, exportToJSON, exportToZIP } from "@/utils/export";
 import { parseCSV, parseJSON } from "@/utils/import";
 import { Feature } from "geojson";
-import { Upload } from "lucide-react";
+import { Download } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { cn } from "@/lib/utils";
+
 interface ImportDialogProps {
-  trigger?: React.ReactNode;
+  mode?: "icon" | "text";
+  onSuccess?: () => void;
 }
 
 interface ImportResult {
@@ -37,7 +40,10 @@ interface ImportResult {
   features: Feature[];
 }
 
-export function ImportDialog({ trigger }: ImportDialogProps) {
+export function ImportDialog({
+  mode = "icon",
+  onSuccess,
+}: ImportDialogProps) {
   const [open, setOpen] = useState(false);
   const [showConflictDialog, setShowConflictDialog] = useState(false);
   const [showReplaceWarning, setShowReplaceWarning] = useState(false);
@@ -76,6 +82,7 @@ export function ImportDialog({ trigger }: ImportDialogProps) {
           `Import terminé : ${result.points.length} points et ${result.features.length} dessins ajoutés`
         );
         setOpen(false);
+        onSuccess?.();
       }
     } catch (error) {
       console.error(error);
@@ -108,6 +115,7 @@ export function ImportDialog({ trigger }: ImportDialogProps) {
     setPendingImport(null);
     setShowConflictDialog(false);
     setOpen(false);
+    onSuccess?.();
   };
 
   const handleReplaceRequest = () => {
@@ -153,22 +161,30 @@ export function ImportDialog({ trigger }: ImportDialogProps) {
     setPendingImport(null);
     setShowReplaceWarning(false);
     setOpen(false);
+    onSuccess?.();
   };
 
   return (
     <>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
-          {trigger || (
-            <Button variant="ghost" size="icon" title="Importer des données">
-              <Upload size={20} />
-            </Button>
-          )}
+          <Button
+            variant="ghost"
+            size={mode === "icon" ? "icon" : "sm"}
+            title="Importer des données"
+            className={cn(
+              "text-muted-foreground",
+              mode === "icon" ? "size-8" : ""
+            )}
+          >
+            <Download size={20} className={cn(mode === "text" && "mr-2")} />
+            {mode === "text" && "Importer"}
+          </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-xl">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Upload className="size-6 text-primary" />
+              <Download className="size-6 text-primary" />
               Importer des données
             </DialogTitle>
             <DialogDescription>

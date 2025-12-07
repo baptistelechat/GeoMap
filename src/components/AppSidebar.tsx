@@ -21,7 +21,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { useGeomarkStore } from "@/store/geomarkStore";
-import { Download, FlaskConical, List, MapPin, Plus } from "lucide-react";
+import { FlaskConical, List, MapPin, Plus } from "lucide-react";
 import { useState } from "react";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -67,15 +67,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               Ajouter un point
             </SidebarGroupLabel>
             <ImportDialog
-              trigger={
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  title="Importer"
-                >
-                  <Download size={20} />
-                </Button>
-              }
             />
           </div>
           <SidebarGroupContent>
