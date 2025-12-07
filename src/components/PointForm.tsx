@@ -27,7 +27,7 @@ export function PointForm({
     lat: point?.lat.toString() || "",
     lng: point?.lng.toString() || "",
     notes: point?.notes || "",
-    streetViewUrl: point?.streetViewUrl || "",
+    url: point?.url || "",
     color:
       point?.color ||
       TAILWIND_COLORS.find((c) => c.name === "green")?.shades["500"] ||
@@ -43,7 +43,7 @@ export function PointForm({
         lat: point.lat.toString(),
         lng: point.lng.toString(),
         notes: point.notes || "",
-        streetViewUrl: point.streetViewUrl || "",
+        url: point.url || "",
         color:
           point?.color ||
           TAILWIND_COLORS.find((c) => c.name === "green")?.shades["500"] ||
@@ -55,28 +55,27 @@ export function PointForm({
 
   // Extraction automatique des coordonnées depuis l'URL Google Maps
   useEffect(() => {
-    if (!isManualCoords && formData.streetViewUrl) {
+    if (!isManualCoords && formData.url) {
       // Patterns courants pour les URLs Google Maps
-      // 1. @lat,lng
-      // 2. !3dlat!4dlng (pour les embeds ou certaines URLs)
-      const atMatch = formData.streetViewUrl.match(
-        /@(-?\d+\.\d+),(-?\d+\.\d+)/
-      );
-      const dataMatch = formData.streetViewUrl.match(
-        /!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/
-      );
+      // 1. !3dlat!4dlng (coordonnées spécifiques du lieu/marqueur - plus précis pour les lieux)
+      const dataMatch = formData.url.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/);
 
-      if (atMatch) {
-        setFormData((prev) => ({ ...prev, lat: atMatch[1], lng: atMatch[2] }));
-      } else if (dataMatch) {
+      // 2. @lat,lng (centre de la vue caméra - courant pour StreetView ou vue générale)
+      const atMatch = formData.url.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+
+      if (dataMatch) {
+        // Priorité aux données précises du lieu si disponibles
         setFormData((prev) => ({
           ...prev,
           lat: dataMatch[1],
           lng: dataMatch[2],
         }));
+      } else if (atMatch) {
+        // Fallback sur le centre de la vue
+        setFormData((prev) => ({ ...prev, lat: atMatch[1], lng: atMatch[2] }));
       }
     }
-  }, [formData.streetViewUrl, isManualCoords]);
+  }, [formData.url, isManualCoords]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -99,7 +98,7 @@ export function PointForm({
       lat,
       lng,
       notes: formData.notes || undefined,
-      streetViewUrl: formData.streetViewUrl || undefined,
+      url: formData.url || undefined,
       color: formData.color,
       icon: formData.icon,
       createdAt: point?.createdAt || now,
@@ -125,7 +124,7 @@ export function PointForm({
       lat: "",
       lng: "",
       notes: "",
-      streetViewUrl: "",
+      url: "",
       color: "#22c55e",
       icon: AVAILABLE_ICONS[0].name,
     });
@@ -201,14 +200,14 @@ export function PointForm({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="streetViewUrl">URL Street View</Label>
+        <Label htmlFor="url">URL Google Maps / Street View</Label>
         <Input
-          id="streetViewUrl"
+          id="url"
           type="url"
           placeholder="https://www.google.com/maps/..."
-          value={formData.streetViewUrl}
+          value={formData.url}
           onChange={(e) =>
-            setFormData({ ...formData, streetViewUrl: e.target.value })
+            setFormData({ ...formData, url: e.target.value })
           }
         />
         <p className="text-xs text-muted-foreground">

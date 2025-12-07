@@ -1,4 +1,5 @@
 import { PointForm } from "@/components/PointForm";
+import { ImportDialog } from "@/components/ImportDialog";
 import {
   Dialog,
   DialogContent,
@@ -55,19 +56,27 @@ export function PointDialog({
         )}
       >
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            {point ? (
-              <>
-                <Pencil className="size-6 text-primary" />
-                Modifier le point
-              </>
-            ) : (
-              <>
-                <Plus className="size-6 text-primary" />
-                Ajouter un point
-              </>
+          <div className="flex items-center justify-between mr-8">
+            <DialogTitle className="flex items-center gap-2">
+              {point ? (
+                <>
+                  <Pencil className="size-6 text-primary" />
+                  Modifier le point
+                </>
+              ) : (
+                <>
+                  <Plus className="size-6 text-primary" />
+                  Ajouter un point
+                </>
+              )}
+            </DialogTitle>
+            {!point && (
+              <ImportDialog
+                mode="text"
+                onSuccess={() => handleOpenChange(false)}
+              />
             )}
-          </DialogTitle>
+          </div>
         </DialogHeader>
         <div className="flex-1 overflow-y-auto min-h-0">
           <PointForm

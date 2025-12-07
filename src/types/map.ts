@@ -4,7 +4,7 @@ export interface MapPoint {
   lng: number;
   title: string;
   notes?: string;
-  streetViewUrl?: string;
+  url?: string;
   color?: string;
   icon?: string;
   createdAt: number;

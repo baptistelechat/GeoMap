@@ -35,7 +35,7 @@ export function DevTools({
         lat,
         lng,
         notes: "Point de test généré automatiquement - Cluster Nantes",
-        streetViewUrl: `https://www.google.com/maps/@${lat.toFixed(
+        url: `https://www.google.com/maps/@${lat.toFixed(
           6
         )},${lng.toFixed(6)},3a,75y,90t/data=!3m6!1e1!3m4!1sTEST_ID_${i}!2e0`,
         color: "#22c55e", // Green-500
@@ -56,7 +56,7 @@ export function DevTools({
         lat,
         lng,
         notes: "Point de test généré automatiquement - Cluster Le Mans",
-        streetViewUrl: `https://www.google.com/maps/@${lat.toFixed(
+        url: `https://www.google.com/maps/@${lat.toFixed(
           6
         )},${lng.toFixed(6)},3a,75y,90t/data=!3m6!1e1!3m4!1sTEST_ID_${
           i + 5
@@ -79,7 +79,7 @@ export function DevTools({
         lat,
         lng,
         notes: "Point de test généré automatiquement - Cluster Tours",
-        streetViewUrl: `https://www.google.com/maps/@${lat.toFixed(
+        url: `https://www.google.com/maps/@${lat.toFixed(
           6
         )},${lng.toFixed(6)},3a,75y,90t/data=!3m6!1e1!3m4!1sTEST_ID_${
           i + 10

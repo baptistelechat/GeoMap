@@ -32,15 +32,15 @@ export function MarkerPopup({ point }: MarkerPopupProps) {
         <p className="m-0 text-sm text-gray-600 break-words">{point.notes}</p>
       )}
       <div className="flex items-center justify-between pt-2 mt-1 border-t gap-2">
-        {point.streetViewUrl ? (
+        {point.url ? (
           <a
-            href={point.streetViewUrl}
+            href={point.url}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1 text-sm text-primary hover:text-primary/80 transition-colors"
           >
             <ExternalLink size={14} />
-            Street View
+            Voir sur Maps
           </a>
         ) : (
           <div /> /* Spacer if no link */

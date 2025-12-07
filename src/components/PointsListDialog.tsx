@@ -8,10 +8,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import { useGeomarkStore } from "@/store/geomarkStore";
-import { exportToCSV, exportToJSON } from "@/utils/export";
-import { FileJson, FileText, List } from "lucide-react";
+import { exportToCSV, exportToJSON, exportToZIP } from "@/utils/export";
+import { Archive, FileJson, FileText, List } from "lucide-react";
 import { useState } from "react";
 
 interface PointsListDialogProps {
@@ -27,18 +28,23 @@ export function PointsListDialog({
   onOpenChange,
   className,
 }: PointsListDialogProps) {
-  const { points } = useGeomarkStore();
+  const { points, features } = useGeomarkStore();
   const [internalOpen, setInternalOpen] = useState(false);
   const isControlled = open !== undefined;
   const show = isControlled ? open : internalOpen;
   const setShow = isControlled ? onOpenChange : setInternalOpen;
+  const isMobile = useIsMobile();
 
   const handleExportCSV = () => {
-    exportToCSV(points);
+    exportToCSV({ points, features });
   };
 
   const handleExportJSON = () => {
-    exportToJSON(points);
+    exportToJSON({ points, features });
+  };
+
+  const handleExportZIP = () => {
+    exportToZIP({ points, features });
   };
 
   return (
@@ -58,7 +64,7 @@ export function PointsListDialog({
           <div className="flex items-center justify-between mr-8">
             <DialogTitle className="flex items-center gap-2">
               <List className="size-6 text-primary" />
-              Liste des points ({points.length})
+              {isMobile ? "Points" : "Liste des points"} ({points.length})
             </DialogTitle>
             <ClearPointsDialog mode="text" />
           </div>
@@ -72,7 +78,7 @@ export function PointsListDialog({
             disabled={points.length === 0}
             className="flex-1"
           >
-            <FileText className="mr-2 size-4" />
+            <FileText className="mr-2 size-4 text-green-600" />
             CSV
           </Button>
           <Button
@@ -82,8 +88,18 @@ export function PointsListDialog({
             disabled={points.length === 0}
             className="flex-1"
           >
-            <FileJson className="mr-2 size-4" />
+            <FileJson className="mr-2 size-4 text-primary" />
             JSON
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleExportZIP}
+            disabled={points.length === 0}
+            className="flex-1"
+          >
+            <Archive className="mr-2 size-4 text-amber-500" />
+            ZIP
           </Button>
         </div>
 
