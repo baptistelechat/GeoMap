@@ -2,12 +2,12 @@ import { generateId } from "@/lib/utils";
 import { useGeomarkStore } from "@/store/geomarkStore";
 import "@geoman-io/leaflet-geoman-free";
 import "@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css";
-import { area as turfArea } from "@turf/area";
-import { length as turfLength } from "@turf/length";
 import type { Feature, GeoJsonObject } from "geojson";
 import * as L from "leaflet";
 import { useCallback, useEffect, useRef } from "react";
+import { createRoot } from "react-dom/client";
 import { useMap } from "react-leaflet";
+import { FeaturePopup } from "./FeaturePopup";
 
 // Define custom types to avoid 'any'
 interface GeomanLayer extends L.Layer {
@@ -66,58 +66,27 @@ export function GeomanControl() {
         setHighlightedId(id === highlightedId ? null : id);
       }
 
-      const title = "Mesures";
-      let content = "";
-
-      if (geoJson.geometry.type === "LineString") {
-        const len = turfLength(geoJson, { units: "meters" });
-        const lenKm = turfLength(geoJson, { units: "kilometers" });
-        content = `
-        <div class="text-sm font-semibold">${title}</div>
-        <div>Longueur: ${
-          len < 1000 ? `${len.toFixed(2)} m` : `${lenKm.toFixed(2)} km`
-        }</div>
-      `;
-      } else if (
-        geoJson.geometry.type === "Polygon" ||
-        geoJson.geometry.type === "MultiPolygon"
-      ) {
-        const a = turfArea(geoJson); // m²
-        const aHectare = a / 10000;
-
-        const perim = turfLength(geoJson, { units: "meters" });
-        const perimKm = turfLength(geoJson, { units: "kilometers" });
-
-        content = `
-        <div class="text-sm font-semibold">${title}</div>
-        <div>Surface: ${
-          a < 10000 ? `${a.toFixed(2)} m²` : `${aHectare.toFixed(2)} ha`
-        }</div>
-        <div>Périmètre: ${
-          perim < 1000 ? `${perim.toFixed(2)} m` : `${perimKm.toFixed(2)} km`
-        }</div>
-      `;
-      } else if (layer instanceof L.Circle) {
-        const radius = layer.getRadius();
-        const areaCircle = Math.PI * radius * radius;
-        const perimeterCircle = 2 * Math.PI * radius;
-        const areaHectare = areaCircle / 10000;
-
-        content = `
-        <div class="text-sm font-semibold">${title}</div>
-        <div>Rayon: ${radius.toFixed(2)} m</div>
-        <div>Surface: ${
-          areaCircle < 10000
-            ? `${areaCircle.toFixed(2)} m²`
-            : `${areaHectare.toFixed(2)} ha`
-        }</div>
-        <div>Circonférence: ${perimeterCircle.toFixed(2)} m</div>
-      `;
+      // Update properties for popup (e.g. radius for Circles)
+      if (layer instanceof L.Circle) {
+        if (!geoJson.properties) geoJson.properties = {};
+        geoJson.properties.radius = layer.getRadius();
+        geoJson.properties.shape = "Circle";
       }
 
-      if (content) {
-        L.popup().setLatLng(e.latlng).setContent(content).openOn(e.target._map);
-      }
+      // Use a React component for the popup content
+      const container = document.createElement("div");
+      const root = createRoot(container);
+      root.render(<FeaturePopup feature={geoJson} layer={layer} />);
+
+      const popup = L.popup({ maxWidth: 500, minWidth: 200 })
+        .setLatLng(e.latlng)
+        .setContent(container)
+        .openOn(e.target._map);
+
+      // Clean up React root when popup is closed
+      popup.on("remove", () => {
+        setTimeout(() => root.unmount(), 0);
+      });
     },
     [highlightedId, setHighlightedId]
   );
@@ -253,16 +222,8 @@ export function GeomanControl() {
 
       addFeature(geoJson);
 
-      // Add event listeners to this new layer for edit
-      layer.on("pm:edit", handleEdit);
-      layer.on("pm:dragend", handleEdit);
-      layer.on("pm:markerdragend", handleEdit);
-      layer.on("pm:rotateend", handleEdit);
-      layer.on("pm:textchange", handleEdit);
-      layer.on("pm:cut", handleEdit);
-
-      // Add click listener for measurement
-      layer.on("click", handleLayerClick);
+      // Remove the layer created by Geoman, so it can be recreated by the store sync with correct options (renderer)
+      map.removeLayer(layer);
     });
 
     map.on("pm:remove", (e) => {
@@ -306,15 +267,15 @@ export function GeomanControl() {
 
       if (exists) return;
 
-      const svgRenderer = L.svg();
+      // Force SVG renderer to allow CSS animations on elements
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const svgRenderer = L.svg() as any;
 
       L.geoJSON(
         feature as GeoJsonObject,
         {
           style: () => GEOMAN_STYLE,
-          // Force SVG renderer to allow CSS animations on elements
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          renderer: svgRenderer as any,
+          renderer: svgRenderer,
           onEachFeature: (f, l) => {
             const layer = l as GeomanLayer;
             layer._fromStore = true;
@@ -349,9 +310,7 @@ export function GeomanControl() {
               });
             }
             if (feature.properties?.shape === "CircleMarker") {
-              return new L.CircleMarker(latlng, {
-                renderer: svgRenderer,
-              });
+              return new L.CircleMarker(latlng, { renderer: svgRenderer });
             }
             if (feature.properties?.shape === "Text") {
               return new L.Marker(latlng, {
