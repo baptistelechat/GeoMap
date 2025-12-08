@@ -95,7 +95,7 @@ const UploadIllustration = () => (
 
       <path
         d="M30 35H70C75 35 75 40 75 40V65C75 70 70 70 70 70H30C25 70 25 65 25 65V40C25 35 30 35 30 35Z"
-        className="fill-green-100 dark:fill-green-900/30 stroke-green-500 dark:stroke-green-400"
+        className="fill-lime-100 dark:fill-lime-900/30 stroke-lime-500 dark:stroke-lime-400"
         strokeWidth="2"
       >
         <animate
@@ -111,7 +111,7 @@ const UploadIllustration = () => (
 
       <path
         d="M30 35C30 35 35 35 40 35C45 35 45 30 50 30C55 30 55 35 60 35C65 35 70 35 70 35"
-        className="stroke-green-500 dark:stroke-green-400"
+        className="stroke-lime-500 dark:stroke-lime-400"
         strokeWidth="2"
         fill="none"
       />
@@ -122,7 +122,7 @@ const UploadIllustration = () => (
           y1="45"
           x2="50"
           y2="60"
-          className="stroke-green-500 dark:stroke-green-400"
+          className="stroke-lime-500 dark:stroke-lime-400"
           strokeWidth="2"
           strokeLinecap="round"
         >
@@ -135,7 +135,7 @@ const UploadIllustration = () => (
         </line>
         <polyline
           points="42,52 50,45 58,52"
-          className="stroke-green-500 dark:stroke-green-400"
+          className="stroke-lime-500 dark:stroke-lime-400"
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -369,7 +369,7 @@ export default function FileUpload({
       aria-label="File upload"
     >
       <div className="group relative w-full rounded-xl bg-white dark:bg-black ring-1 ring-gray-200 dark:ring-white/10 p-0.5">
-        <div className="absolute inset-x-0 -top-px h-px w-full bg-gradient-to-r from-transparent via-green-500/20 to-transparent" />
+        <div className="absolute inset-x-0 -top-px h-px w-full bg-gradient-to-r from-transparent via-lime-500/20 to-transparent" />
 
         <div className="relative w-full rounded-[10px] bg-gray-50/50 dark:bg-white/[0.02] p-1.5">
           <div
@@ -384,14 +384,14 @@ export default function FileUpload({
                 status === "dragging" ? "opacity-100" : "opacity-0"
               )}
             >
-              <div className="absolute inset-x-0 top-0 h-[20%] bg-gradient-to-b from-green-500/10 to-transparent" />
-              <div className="absolute inset-x-0 bottom-0 h-[20%] bg-gradient-to-t from-green-500/10 to-transparent" />
-              <div className="absolute inset-y-0 left-0 w-[20%] bg-gradient-to-r from-green-500/10 to-transparent" />
-              <div className="absolute inset-y-0 right-0 w-[20%] bg-gradient-to-l from-green-500/10 to-transparent" />
-              <div className="absolute inset-[20%] bg-green-500/5 rounded-lg transition-all duration-300 animate-pulse" />
+              <div className="absolute inset-x-0 top-0 h-[20%] bg-gradient-to-b from-lime-500/10 to-transparent" />
+              <div className="absolute inset-x-0 bottom-0 h-[20%] bg-gradient-to-t from-lime-500/10 to-transparent" />
+              <div className="absolute inset-y-0 left-0 w-[20%] bg-gradient-to-r from-lime-500/10 to-transparent" />
+              <div className="absolute inset-y-0 right-0 w-[20%] bg-gradient-to-l from-lime-500/10 to-transparent" />
+              <div className="absolute inset-[20%] bg-lime-500/5 rounded-lg transition-all duration-300 animate-pulse" />
             </div>
 
-            <div className="absolute -right-4 -top-4 h-8 w-8 bg-gradient-to-br from-green-500/20 to-transparent blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="absolute -right-4 -top-4 h-8 w-8 bg-gradient-to-br from-lime-500/20 to-transparent blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
             <div className="relative h-[240px]">
               <AnimatePresence mode="wait">
@@ -478,7 +478,7 @@ export default function FileUpload({
                         <span className="text-gray-500 dark:text-gray-400">
                           {formatBytes(file?.size || 0)}
                         </span>
-                        <span className="font-medium text-green-500">
+                        <span className="font-medium text-lime-600">
                           {Math.round(progress)}%
                         </span>
                       </div>

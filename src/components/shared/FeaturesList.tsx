@@ -1,11 +1,12 @@
 import { DeleteFeatureDialog } from "@/components/dialogs/DeleteFeatureDialog";
 import { SidebarList } from "@/components/shared/SidebarList";
 import { Button } from "@/components/ui/button";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { Spinner } from "@/components/ui/spinner";
 import { useGeomarkStore } from "@/store/geomarkStore";
-import { motion } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import * as L from "leaflet";
 import { Map, MapPinOff, Trash2 } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 interface FeaturesListProps {
   limit?: number;
@@ -14,17 +15,34 @@ interface FeaturesListProps {
 
 export function FeaturesList({ limit, onItemClick }: FeaturesListProps) {
   const { features, setFlyToLocation } = useGeomarkStore();
-  const isMobile = useIsMobile();
 
   // Sort features by last modification (if property exists) or creation
-  const sortedFeatures = [...features].sort((a, b) => {
-    const timeA = a.properties?.updatedAt || a.properties?.createdAt || 0;
-    const timeB = b.properties?.updatedAt || b.properties?.createdAt || 0;
-    return timeB - timeA;
-  });
+  const sortedFeatures = useMemo(() => {
+    return [...features].sort((a, b) => {
+      const timeA = a.properties?.updatedAt || a.properties?.createdAt || 0;
+      const timeB = b.properties?.updatedAt || b.properties?.createdAt || 0;
+      return timeB - timeA;
+    });
+  }, [features]);
 
-  const displayFeatures = limit ? sortedFeatures.slice(0, limit) : sortedFeatures;
+  const [displayedCount, setDisplayedCount] = useState(limit || 20);
+  const loadMoreRef = useRef(null);
+  const isInView = useInView(loadMoreRef);
 
+  useEffect(() => {
+    if (isInView && !limit && displayedCount < sortedFeatures.length) {
+      const timeout = setTimeout(() => {
+        setDisplayedCount((prev) => Math.min(prev + 20, sortedFeatures.length));
+      }, 100);
+      return () => clearTimeout(timeout);
+    }
+  }, [isInView, limit, displayedCount, sortedFeatures.length]);
+
+  const displayFeatures = limit
+    ? sortedFeatures.slice(0, limit)
+    : sortedFeatures.slice(0, displayedCount);
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleFeatureClick = (feature: any) => {
     // Calculate center of the feature to zoom to it
     const layer = L.geoJSON(feature);
@@ -36,7 +54,7 @@ export function FeaturesList({ limit, onItemClick }: FeaturesListProps) {
       lng: center.lng,
       zoom: 16,
     });
-    
+
     onItemClick?.();
   };
 
@@ -51,52 +69,63 @@ export function FeaturesList({ limit, onItemClick }: FeaturesListProps) {
   );
 
   return (
-    <SidebarList
-      items={displayFeatures}
-      emptyMessage={emptyMessage}
-      renderItem={(feature) => (
-        <motion.div
-          key={feature.properties?.id || Math.random()}
-          layout
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          transition={{ duration: 0.2 }}
-          className="flex items-center justify-between p-3 border rounded-lg bg-card shadow-sm cursor-pointer hover:bg-accent transition-colors"
-          onClick={() => handleFeatureClick(feature)}
+    <div className="flex flex-col w-full">
+      <SidebarList
+        items={displayFeatures}
+        emptyMessage={emptyMessage}
+        renderItem={(feature) => (
+          <motion.div
+            key={feature.properties?.id || Math.random()}
+            layout
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.2 }}
+            className="flex items-center justify-between p-3 border rounded-lg bg-card shadow-sm cursor-pointer hover:bg-accent transition-colors"
+            onClick={() => handleFeatureClick(feature)}
+          >
+            <div className="flex items-center gap-3 overflow-hidden">
+              <div className="flex items-center justify-center size-8 rounded-full bg-primary/10 text-primary shrink-0">
+                <Map className="size-4" />
+              </div>
+              <div className="flex flex-col overflow-hidden">
+                <span className="font-medium truncate text-sm">
+                  {feature.properties?.name || "Forme sans nom"}
+                </span>
+                <span className="text-xs text-muted-foreground truncate">
+                  {feature.geometry.type}
+                </span>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <div onClick={(e) => e.stopPropagation()}>
+                <DeleteFeatureDialog
+                  feature={feature}
+                  trigger={
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="size-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                      title="Supprimer"
+                    >
+                      <Trash2 className="size-4" />
+                    </Button>
+                  }
+                />
+              </div>
+            </div>
+          </motion.div>
+        )}
+      />
+      {!limit && displayedCount < sortedFeatures.length && (
+        <div
+          ref={loadMoreRef}
+          className="w-full py-4 flex justify-center text-sm text-muted-foreground items-center gap-2"
         >
-          <div className="flex items-center gap-3 overflow-hidden">
-            <div className="flex items-center justify-center size-8 rounded-full bg-primary/10 text-primary shrink-0">
-              <Map className="size-4" />
-            </div>
-            <div className="flex flex-col overflow-hidden">
-              <span className="font-medium truncate text-sm">
-                {feature.properties?.name || "Forme sans nom"}
-              </span>
-              <span className="text-xs text-muted-foreground truncate">
-                {feature.geometry.type}
-              </span>
-            </div>
-          </div>
-          <div className="flex items-center gap-2 shrink-0">
-            <div onClick={(e) => e.stopPropagation()}>
-              <DeleteFeatureDialog
-                feature={feature}
-                trigger={
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="size-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-                    title="Supprimer"
-                  >
-                    <Trash2 className="size-4" />
-                  </Button>
-                }
-              />
-            </div>
-          </div>
-        </motion.div>
+          <Spinner />
+          Chargement...
+        </div>
       )}
-    />
+    </div>
   );
 }

@@ -1,7 +1,7 @@
+import { generateId } from "@/lib/utils";
 import { useGeomarkStore } from "@/store/geomarkStore";
 import "@geoman-io/leaflet-geoman-free";
 import "@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css";
-import { generateId } from "@/lib/utils";
 import { area as turfArea } from "@turf/area";
 import { length as turfLength } from "@turf/length";
 import type { Feature, GeoJsonObject } from "geojson";
@@ -27,7 +27,7 @@ interface PmEvent extends L.LeafletEvent {
   shape?: string;
 }
 
-const themeColor = "var(--primary)";
+const themeColor = "#65a30d"; // lime-600
 
 const GEOMAN_STYLE = {
   color: themeColor,

@@ -1,15 +1,16 @@
-import { MarkerIcon } from "./MarkerIcon";
 import { useGeomarkStore } from "@/store/geomarkStore";
 import { MapPoint } from "@/types/map";
 import "@/vendor/SmoothWheelZoom.js";
 import * as L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { memo } from "react";
 import { renderToString } from "react-dom/server";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import { GeomanControl } from "./GeomanControl";
 import { LocateControl } from "./LocateControl";
 import MapController from "./MapController";
+import { MarkerIcon } from "./MarkerIcon";
 import { MarkerPopup } from "./MarkerPopup";
 import { MiniMapControl } from "./MiniMapControl";
 
@@ -19,12 +20,19 @@ if (typeof window !== "undefined") {
   (window as any).L = L;
 }
 
-const createCustomIcon = (point: MapPoint, isHighlighted: boolean) => {
-  return L.divIcon({
+const iconCache = new Map<string, L.DivIcon>();
+
+const getIcon = (iconName: string, color: string, isHighlighted: boolean) => {
+  const key = `${iconName}-${color}-${isHighlighted}`;
+  if (iconCache.has(key)) {
+    return iconCache.get(key)!;
+  }
+
+  const icon = L.divIcon({
     html: renderToString(
       <MarkerIcon
-        iconName={point.icon}
-        color={point.color}
+        iconName={iconName}
+        color={color}
         className={`w-8 h-8 ${isHighlighted ? "animate-bounce" : ""}`}
       />
     ),
@@ -33,7 +41,52 @@ const createCustomIcon = (point: MapPoint, isHighlighted: boolean) => {
     iconAnchor: [16, 16],
     popupAnchor: [0, -16],
   });
+
+  iconCache.set(key, icon);
+  return icon;
 };
+
+const MapMarker = memo(
+  ({
+    point,
+    isHighlighted,
+    onClick,
+  }: {
+    point: MapPoint;
+    isHighlighted: boolean;
+    onClick: (id: string) => void;
+  }) => {
+    const icon = getIcon(point.icon, point.color, isHighlighted);
+
+    return (
+      <Marker
+        position={[point.lat, point.lng]}
+        icon={icon}
+        eventHandlers={{
+          click: () => onClick(point.id),
+        }}
+      >
+        <Popup>
+          <MarkerPopup point={point} />
+        </Popup>
+      </Marker>
+    );
+  },
+  (prev, next) => {
+    return (
+      prev.isHighlighted === next.isHighlighted &&
+      prev.point.id === next.point.id &&
+      prev.point.lat === next.point.lat &&
+      prev.point.lng === next.point.lng &&
+      prev.point.icon === next.point.icon &&
+      prev.point.color === next.point.color &&
+      prev.point.title === next.point.title &&
+      prev.point.notes === next.point.notes
+    );
+  }
+);
+
+MapMarker.displayName = "MapMarker";
 
 export function MapView() {
   const { points, highlightedPointId, setHighlightedPointId } =
@@ -48,6 +101,7 @@ export function MapView() {
         scrollWheelZoom={false} // Disable default scroll wheel zoom
         smoothWheelZoom={true} // Enable smooth scroll wheel zoom
         smoothSensitivity={1} // Adjust sensitivity if needed
+        preferCanvas={true} // Use Canvas renderer for better performance with many markers
       >
         <MapController />
         <GeomanControl />
@@ -58,8 +112,8 @@ export function MapView() {
         <MarkerClusterGroup
           chunkedLoading
           polygonOptions={{
-            fillColor: "var(--primary)",
-            color: "var(--primary)",
+            fillColor: "#65a30d", // lime-600
+            color: "#65a30d", // lime-600
             weight: 2,
             opacity: 1,
             fillOpacity: 0.3,
@@ -75,18 +129,12 @@ export function MapView() {
           }}
         >
           {points.map((point) => (
-            <Marker
+            <MapMarker
               key={point.id}
-              position={[point.lat, point.lng]}
-              icon={createCustomIcon(point, point.id === highlightedPointId)}
-              eventHandlers={{
-                click: () => setHighlightedPointId(point.id),
-              }}
-            >
-              <Popup>
-                <MarkerPopup point={point} />
-              </Popup>
-            </Marker>
+              point={point}
+              isHighlighted={point.id === highlightedPointId}
+              onClick={setHighlightedPointId}
+            />
           ))}
         </MarkerClusterGroup>
         <MiniMapControl />

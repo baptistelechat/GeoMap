@@ -4,16 +4,13 @@ import { MarkerIcon } from "@/components/map/MarkerIcon";
 import { SidebarList } from "@/components/shared/SidebarList";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useGeomarkStore } from "@/store/geomarkStore";
-import { motion } from "framer-motion";
+import { MapPoint } from "@/types/map";
+import { motion, useInView } from "framer-motion";
 import { MapPinOff, Pencil, Trash2 } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Spinner } from "../ui/spinner";
 
 interface PointsListProps {
   onPointClick?: () => void;
@@ -21,22 +18,108 @@ interface PointsListProps {
   onEditSuccess?: () => void;
 }
 
+interface PointItemProps {
+  point: MapPoint;
+  onPointClick?: () => void;
+  onEditSuccess?: () => void;
+}
+
+const PointItem = ({ point, onPointClick, onEditSuccess }: PointItemProps) => {
+  const { setFlyToLocation, setHighlightedPointId } = useGeomarkStore();
+
+  return (
+    <div className="px-2 py-1">
+      <div
+        className="flex items-center justify-between p-3 border rounded-lg bg-card shadow-sm cursor-pointer hover:bg-accent transition-colors h-full"
+        onClick={() => {
+          setFlyToLocation({
+            lat: point.lat,
+            lng: point.lng,
+            zoom: 16,
+          });
+          setHighlightedPointId(point.id);
+          onPointClick?.();
+        }}
+      >
+        <div className="flex items-center gap-3 overflow-hidden">
+          <MarkerIcon
+            iconName={point.icon}
+            color={point.color}
+            className="w-8 h-8 shrink-0"
+          />
+          <span className="font-medium truncate text-sm">{point.title}</span>
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <Badge variant="secondary" className="font-mono text-xs">
+            {point.lat.toFixed(4)}, {point.lng.toFixed(4)}
+          </Badge>
+
+          <div onClick={(e) => e.stopPropagation()}>
+            <PointActionDialog
+              point={point}
+              onSuccess={onEditSuccess}
+              trigger={
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="size-8 text-muted-foreground hover:text-primary hover:bg-primary/10"
+                >
+                  <Pencil className="size-4" />
+                </Button>
+              }
+            />
+            <DeletePointDialog
+              point={point}
+              trigger={
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="size-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                >
+                  <Trash2 className="size-4" />
+                </Button>
+              }
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export function PointsList({
   onPointClick,
   limit,
   onEditSuccess,
 }: PointsListProps) {
-  const { points, setFlyToLocation, setHighlightedPointId } = useGeomarkStore();
+  const { points } = useGeomarkStore();
   const isMobile = useIsMobile();
 
   // Show points sorted by last modification date (newest first)
-  const sortedPoints = [...points].sort((a, b) => {
-    const timeA = a.updatedAt || a.createdAt || 0;
-    const timeB = b.updatedAt || b.createdAt || 0;
-    return timeB - timeA;
-  });
+  const sortedPoints = useMemo(() => {
+    return [...points].sort((a, b) => {
+      const timeA = a.updatedAt || a.createdAt || 0;
+      const timeB = b.updatedAt || b.createdAt || 0;
+      return timeB - timeA;
+    });
+  }, [points]);
 
-  const displayPoints = limit ? sortedPoints.slice(0, limit) : sortedPoints;
+  const [displayedCount, setDisplayedCount] = useState(limit || 20);
+  const loadMoreRef = useRef(null);
+  const isInView = useInView(loadMoreRef);
+
+  useEffect(() => {
+    if (isInView && !limit && displayedCount < sortedPoints.length) {
+      const timeout = setTimeout(() => {
+        setDisplayedCount((prev) => Math.min(prev + 20, sortedPoints.length));
+      }, 100);
+      return () => clearTimeout(timeout);
+    }
+  }, [isInView, limit, displayedCount, sortedPoints.length]);
+
+  const displayPoints = limit
+    ? sortedPoints.slice(0, limit)
+    : sortedPoints.slice(0, displayedCount);
 
   const emptyMessage = (
     <div className="flex flex-col items-center justify-center p-8 text-center text-muted-foreground border-2 border-dashed rounded-lg mx-2">
@@ -50,105 +133,41 @@ export function PointsList({
     </div>
   );
 
+  if (displayPoints.length === 0) {
+    return emptyMessage;
+  }
+
   return (
-    <TooltipProvider>
+    <div className="w-full">
       <SidebarList
         items={displayPoints}
         emptyMessage={emptyMessage}
-        renderItem={(point) => {
-          const ItemContent = (
-            <div
-              className="flex items-center justify-between p-3 border rounded-lg bg-card shadow-sm cursor-pointer hover:bg-accent transition-colors"
-              onClick={() => {
-                setFlyToLocation({
-                  lat: point.lat,
-                  lng: point.lng,
-                  zoom: 16,
-                });
-                setHighlightedPointId(point.id);
-                onPointClick?.();
-              }}
-            >
-              <div className="flex items-center gap-3 overflow-hidden">
-                <MarkerIcon
-                  iconName={point.icon}
-                  color={point.color}
-                  className="w-8 h-8 shrink-0"
-                />
-                <span className="font-medium truncate text-sm">
-                  {point.title}
-                </span>
-              </div>
-              <div className="flex items-center gap-2 shrink-0">
-                <Badge variant="secondary" className="font-mono text-xs">
-                  {point.lat.toFixed(4)}, {point.lng.toFixed(4)}
-                </Badge>
-
-                <div onClick={(e) => e.stopPropagation()}>
-                  <PointActionDialog
-                    point={point}
-                    onSuccess={onEditSuccess}
-                    trigger={
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="size-8 text-muted-foreground hover:text-primary hover:bg-primary/10"
-                        title="Modifier"
-                      >
-                        <Pencil className="size-4" />
-                      </Button>
-                    }
-                  />
-                </div>
-
-                <div onClick={(e) => e.stopPropagation()}>
-                  <DeletePointDialog
-                    point={point}
-                    trigger={
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="size-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-                        title="Supprimer"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <Trash2 className="size-4" />
-                      </Button>
-                    }
-                  />
-                </div>
-              </div>
-            </div>
-          );
-
-          const content = point.notes ? (
-            <Tooltip delayDuration={300}>
-              <TooltipTrigger asChild>{ItemContent}</TooltipTrigger>
-              <TooltipContent
-                side="bottom"
-                className="max-w-[300px] break-words"
-              >
-                <p className="text-sm line-clamp-6">{point.notes}</p>
-              </TooltipContent>
-            </Tooltip>
-          ) : (
-            ItemContent
-          );
-
-          return (
-            <motion.div
-              key={point.id}
-              layout
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.2 }}
-            >
-              {content}
-            </motion.div>
-          );
-        }}
+        renderItem={(point) => (
+          <motion.div
+            key={point.id}
+            layout
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.2 }}
+          >
+            <PointItem
+              point={point}
+              onPointClick={onPointClick}
+              onEditSuccess={onEditSuccess}
+            />
+          </motion.div>
+        )}
       />
-    </TooltipProvider>
+      {!limit && displayedCount < sortedPoints.length && (
+        <div
+          ref={loadMoreRef}
+          className="w-full py-4 flex justify-center text-sm text-muted-foreground items-center gap-2"
+        >
+          <Spinner />
+          Chargement...
+        </div>
+      )}
+    </div>
   );
 }

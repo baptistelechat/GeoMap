@@ -30,8 +30,8 @@ export function PointForm({
     url: point?.url || "",
     color:
       point?.color ||
-      TAILWIND_COLORS.find((c) => c.name === "green")?.shades["500"] ||
-      "#22c55e", // Default Green
+      TAILWIND_COLORS.find((c) => c.name === "lime")?.shades["600"] ||
+      "#65a30d", // Default Lime-600
     icon: point?.icon || AVAILABLE_ICONS[0].name, // Default Pin
   });
 
@@ -46,8 +46,8 @@ export function PointForm({
         url: point.url || "",
         color:
           point?.color ||
-          TAILWIND_COLORS.find((c) => c.name === "green")?.shades["500"] ||
-          "#22c55e", // Default Green
+          TAILWIND_COLORS.find((c) => c.name === "lime")?.shades["600"] ||
+          "#65a30d", // Default Lime-600
         icon: point.icon || AVAILABLE_ICONS[0].name,
       });
     }
@@ -125,7 +125,7 @@ export function PointForm({
       lng: "",
       notes: "",
       url: "",
-      color: "#22c55e",
+      color: "#65a30d", // Default Lime-600
       icon: AVAILABLE_ICONS[0].name,
     });
     setIsManualCoords(false);

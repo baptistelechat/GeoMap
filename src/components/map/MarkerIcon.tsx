@@ -33,7 +33,7 @@ interface MarkerIconProps {
 
 export function MarkerIcon({
   iconName = "pin",
-  color = "#22c55e", // Green-500
+  color = "#65a30d", // lime-600
   className = "",
 }: MarkerIconProps) {
   const iconEntry =
