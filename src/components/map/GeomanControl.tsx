@@ -6,7 +6,7 @@ import { area as turfArea } from "@turf/area";
 import { length as turfLength } from "@turf/length";
 import type { Feature, GeoJsonObject } from "geojson";
 import * as L from "leaflet";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useMap } from "react-leaflet";
 
 // Define custom types to avoid 'any'
@@ -15,6 +15,7 @@ interface GeomanLayer extends L.Layer {
   feature?: Feature;
   _fromStore?: boolean;
   getRadius?: () => number;
+  getElement?: () => HTMLElement | undefined;
   options: L.LayerOptions & {
     text?: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -34,42 +35,60 @@ const GEOMAN_STYLE = {
   fillColor: themeColor,
   fillOpacity: 0.3,
   weight: 2,
+  dashArray: undefined,
+};
+
+const HIGHLIGHT_STYLE = {
+  ...GEOMAN_STYLE,
+  dashArray: "10, 10",
 };
 
 export function GeomanControl() {
   const map = useMap();
-  const { features, addFeature, updateFeature, removeFeature } =
-    useGeomarkStore();
+  const {
+    features,
+    addFeature,
+    updateFeature,
+    removeFeature,
+    highlightedId,
+    setHighlightedId,
+  } = useGeomarkStore();
   const isInitialized = useRef(false);
 
   // Function to calculate and show measurement on click
-  const handleLayerClick = (e: L.LeafletMouseEvent) => {
-    const layer = e.target as GeomanLayer;
-    const geoJson = layer.toGeoJSON();
+  const handleLayerClick = useCallback(
+    (e: L.LeafletMouseEvent) => {
+      const layer = e.target as GeomanLayer;
+      const geoJson = layer.toGeoJSON();
+      const id = layer.feature?.properties?.id;
 
-    const title = "Mesures";
-    let content = "";
+      if (id) {
+        setHighlightedId(id === highlightedId ? null : id);
+      }
 
-    if (geoJson.geometry.type === "LineString") {
-      const len = turfLength(geoJson, { units: "meters" });
-      const lenKm = turfLength(geoJson, { units: "kilometers" });
-      content = `
+      const title = "Mesures";
+      let content = "";
+
+      if (geoJson.geometry.type === "LineString") {
+        const len = turfLength(geoJson, { units: "meters" });
+        const lenKm = turfLength(geoJson, { units: "kilometers" });
+        content = `
         <div class="text-sm font-semibold">${title}</div>
         <div>Longueur: ${
           len < 1000 ? `${len.toFixed(2)} m` : `${lenKm.toFixed(2)} km`
         }</div>
       `;
-    } else if (
-      geoJson.geometry.type === "Polygon" ||
-      geoJson.geometry.type === "MultiPolygon"
-    ) {
-      const a = turfArea(geoJson); // m²
-      const aHectare = a / 10000;
+      } else if (
+        geoJson.geometry.type === "Polygon" ||
+        geoJson.geometry.type === "MultiPolygon"
+      ) {
+        const a = turfArea(geoJson); // m²
+        const aHectare = a / 10000;
 
-      const perim = turfLength(geoJson, { units: "meters" });
-      const perimKm = turfLength(geoJson, { units: "kilometers" });
+        const perim = turfLength(geoJson, { units: "meters" });
+        const perimKm = turfLength(geoJson, { units: "kilometers" });
 
-      content = `
+        content = `
         <div class="text-sm font-semibold">${title}</div>
         <div>Surface: ${
           a < 10000 ? `${a.toFixed(2)} m²` : `${aHectare.toFixed(2)} ha`
@@ -78,13 +97,13 @@ export function GeomanControl() {
           perim < 1000 ? `${perim.toFixed(2)} m` : `${perimKm.toFixed(2)} km`
         }</div>
       `;
-    } else if (layer instanceof L.Circle) {
-      const radius = layer.getRadius();
-      const areaCircle = Math.PI * radius * radius;
-      const perimeterCircle = 2 * Math.PI * radius;
-      const areaHectare = areaCircle / 10000;
+      } else if (layer instanceof L.Circle) {
+        const radius = layer.getRadius();
+        const areaCircle = Math.PI * radius * radius;
+        const perimeterCircle = 2 * Math.PI * radius;
+        const areaHectare = areaCircle / 10000;
 
-      content = `
+        content = `
         <div class="text-sm font-semibold">${title}</div>
         <div>Rayon: ${radius.toFixed(2)} m</div>
         <div>Surface: ${
@@ -94,48 +113,53 @@ export function GeomanControl() {
         }</div>
         <div>Circonférence: ${perimeterCircle.toFixed(2)} m</div>
       `;
-    }
+      }
 
-    if (content) {
-      L.popup().setLatLng(e.latlng).setContent(content).openOn(e.target._map);
-    }
-  };
+      if (content) {
+        L.popup().setLatLng(e.latlng).setContent(content).openOn(e.target._map);
+      }
+    },
+    [highlightedId, setHighlightedId]
+  );
 
   // Handle Edit Events
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const handleEdit = (e: L.LeafletEvent) => {
-    const event = e as PmEvent;
-    const layer = event.layer || (event.target as GeomanLayer);
-    if (!layer || !layer.feature?.properties?.id) return;
 
-    const geoJson = layer.toGeoJSON();
-    geoJson.properties = {
-      ...layer.feature.properties,
-      ...geoJson.properties,
-      updatedAt: Date.now(),
-    };
+  const handleEdit = useCallback(
+    (e: L.LeafletEvent) => {
+      const event = e as PmEvent;
+      const layer = event.layer || (event.target as GeomanLayer);
+      if (!layer || !layer.feature?.properties?.id) return;
 
-    // Update radius for circles
-    if (typeof layer.getRadius === "function") {
-      geoJson.properties.radius = layer.getRadius();
-    }
+      const geoJson = layer.toGeoJSON();
+      geoJson.properties = {
+        ...layer.feature.properties,
+        ...geoJson.properties,
+        updatedAt: Date.now(),
+      };
 
-    // Update text for Text layers
-    if (layer.feature?.properties?.shape === "Text") {
-      const text =
-        layer.options?.text ||
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ((layer as any).pm && (layer as any).pm.getText
-          ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            (layer as any).pm.getText()
-          : "");
-      if (text) {
-        geoJson.properties.text = text;
+      // Update radius for circles
+      if (typeof layer.getRadius === "function") {
+        geoJson.properties.radius = layer.getRadius();
       }
-    }
 
-    updateFeature(geoJson);
-  };
+      // Update text for Text layers
+      if (layer.feature?.properties?.shape === "Text") {
+        const text =
+          layer.options?.text ||
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          ((layer as any).pm && (layer as any).pm.getText
+            ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              (layer as any).pm.getText()
+            : "");
+        if (text) {
+          geoJson.properties.text = text;
+        }
+      }
+
+      updateFeature(geoJson);
+    },
+    [updateFeature]
+  );
 
   // Initialize Geoman and setup listeners
   useEffect(() => {
@@ -193,7 +217,7 @@ export function GeomanControl() {
 
       const geoJson = layer.toGeoJSON();
       if (!geoJson.properties) geoJson.properties = {};
-      
+
       const now = Date.now();
       geoJson.properties.id = id;
       geoJson.properties.shape = shape;
@@ -251,7 +275,7 @@ export function GeomanControl() {
     });
 
     return () => {};
-  }, [map, addFeature, removeFeature, handleEdit]);
+  }, [map, addFeature, removeFeature, handleEdit, handleLayerClick]);
 
   // Sync features from store to map
   useEffect(() => {
@@ -282,53 +306,103 @@ export function GeomanControl() {
 
       if (exists) return;
 
-      L.geoJSON(feature as GeoJsonObject, {
-        style: () => GEOMAN_STYLE,
-        onEachFeature: (f, l) => {
-          const layer = l as GeomanLayer;
-          layer._fromStore = true;
-          layer.addTo(map);
+      const svgRenderer = L.svg();
 
-          if (
-            f.properties?.shape === "Text" &&
-            f.properties?.text &&
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            (layer as any).pm
-          ) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            (layer as any).pm.setText(f.properties.text);
-          }
+      L.geoJSON(
+        feature as GeoJsonObject,
+        {
+          style: () => GEOMAN_STYLE,
+          // Force SVG renderer to allow CSS animations on elements
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          renderer: svgRenderer as any,
+          onEachFeature: (f, l) => {
+            const layer = l as GeomanLayer;
+            layer._fromStore = true;
+            layer.addTo(map);
 
-          layer.on("pm:edit", handleEdit);
-          layer.on("pm:dragend", handleEdit);
-          layer.on("pm:markerdragend", handleEdit);
-          layer.on("pm:rotateend", handleEdit);
-          layer.on("pm:textchange", handleEdit);
-          layer.on("pm:cut", handleEdit);
-          layer.on("click", handleLayerClick);
-        },
-        pointToLayer: (feature, latlng) => {
-          if (
-            feature.properties?.shape === "Circle" &&
-            feature.properties?.radius
-          ) {
-            return new L.Circle(latlng, { radius: feature.properties.radius });
-          }
-          if (feature.properties?.shape === "CircleMarker") {
-            return new L.CircleMarker(latlng, {});
-          }
-          if (feature.properties?.shape === "Text") {
-            return new L.Marker(latlng, {
-              textMarker: true,
-              text: feature.properties.text,
+            if (
+              f.properties?.shape === "Text" &&
+              f.properties?.text &&
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            } as any);
-          }
-          return new L.Marker(latlng);
-        },
-      });
+              (layer as any).pm
+            ) {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              (layer as any).pm.setText(f.properties.text);
+            }
+
+            layer.on("pm:edit", handleEdit);
+            layer.on("pm:dragend", handleEdit);
+            layer.on("pm:markerdragend", handleEdit);
+            layer.on("pm:rotateend", handleEdit);
+            layer.on("pm:textchange", handleEdit);
+            layer.on("pm:cut", handleEdit);
+            layer.on("click", handleLayerClick);
+          },
+          pointToLayer: (feature, latlng) => {
+            if (
+              feature.properties?.shape === "Circle" &&
+              feature.properties?.radius
+            ) {
+              return new L.Circle(latlng, {
+                radius: feature.properties.radius,
+                renderer: svgRenderer,
+              });
+            }
+            if (feature.properties?.shape === "CircleMarker") {
+              return new L.CircleMarker(latlng, {
+                renderer: svgRenderer,
+              });
+            }
+            if (feature.properties?.shape === "Text") {
+              return new L.Marker(latlng, {
+                textMarker: true,
+                text: feature.properties.text,
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              } as any);
+            }
+            return new L.Marker(latlng);
+          },
+        } as L.GeoJSONOptions & { renderer: unknown }
+      );
     });
-  }, [features, map, handleEdit]);
+  }, [features, map, handleEdit, handleLayerClick]);
+
+  // Update styles based on highlighted feature
+  useEffect(() => {
+    map.eachLayer((l) => {
+      const layer = l as GeomanLayer;
+      const id = layer.feature?.properties?.id;
+      if (!id) return;
+
+      const isHighlighted = id === highlightedId;
+
+      // Handle Style (Path)
+      if (layer instanceof L.Path) {
+        if (isHighlighted) {
+          layer.setStyle(HIGHLIGHT_STYLE);
+        } else {
+          layer.setStyle(GEOMAN_STYLE);
+        }
+      }
+
+      // Handle Class (Animation)
+      const isText = layer.feature?.properties?.shape === "Text";
+      const el = layer.getElement ? layer.getElement() : undefined;
+      if (el) {
+        // Reset classes
+        el.classList.remove("geomark-bounce");
+        el.classList.remove("geomark-pulse");
+
+        if (isHighlighted) {
+          if (isText) {
+            el.classList.add("geomark-bounce");
+          } else {
+            el.classList.add("geomark-pulse");
+          }
+        }
+      }
+    });
+  }, [highlightedId, map]);
 
   return null;
 }

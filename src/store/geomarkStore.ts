@@ -36,8 +36,8 @@ interface GeomarkStore {
   ) => void;
 
   // Animation
-  highlightedPointId: string | null;
-  setHighlightedPointId: (id: string | null) => void;
+  highlightedId: string | null;
+  setHighlightedId: (id: string | null) => void;
 
   // Import
   importData: (points: MapPoint[], features: Feature[]) => void;
@@ -115,8 +115,8 @@ export const useGeomarkStore = create<GeomarkStore>()(
       setFlyToBounds: (data) => set({ flyToBounds: data }),
 
       // Animation Implementation
-      highlightedPointId: null,
-      setHighlightedPointId: (id) => set({ highlightedPointId: id }),
+      highlightedId: null,
+      setHighlightedId: (id) => set({ highlightedId: id }),
     }),
     {
       name: "geomark-storage", // Unified storage key

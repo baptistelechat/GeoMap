@@ -25,7 +25,7 @@ interface PointItemProps {
 }
 
 const PointItem = ({ point, onPointClick, onEditSuccess }: PointItemProps) => {
-  const { setFlyToLocation, setHighlightedPointId } = useGeomarkStore();
+  const { setFlyToLocation, setHighlightedId } = useGeomarkStore();
 
   return (
     <div className="px-2 py-1">
@@ -37,7 +37,7 @@ const PointItem = ({ point, onPointClick, onEditSuccess }: PointItemProps) => {
             lng: point.lng,
             zoom: 16,
           });
-          setHighlightedPointId(point.id);
+          setHighlightedId(point.id);
           onPointClick?.();
         }}
       >

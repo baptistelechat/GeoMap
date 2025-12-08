@@ -14,7 +14,7 @@ interface FeaturesListProps {
 }
 
 export function FeaturesList({ limit, onItemClick }: FeaturesListProps) {
-  const { features, setFlyToBounds } = useGeomarkStore();
+  const { features, setFlyToBounds, setHighlightedId } = useGeomarkStore();
 
   // Sort features by last modification (if property exists) or creation
   const sortedFeatures = useMemo(() => {
@@ -97,6 +97,10 @@ export function FeaturesList({ limit, onItemClick }: FeaturesListProps) {
         ],
         options: { maxZoom },
       });
+    }
+
+    if (feature.properties?.id) {
+      setHighlightedId(feature.properties.id);
     }
 
     onItemClick?.();

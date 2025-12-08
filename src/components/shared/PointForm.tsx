@@ -19,7 +19,7 @@ export function PointForm({
   onSuccess?: () => void;
   point?: MapPoint;
 }) {
-  const { addPoint, updatePoint, setFlyToLocation, setHighlightedPointId } =
+  const { addPoint, updatePoint, setFlyToLocation, setHighlightedId } =
     useGeomarkStore();
   const [isManualCoords, setIsManualCoords] = useState(false);
   const [formData, setFormData] = useState({
@@ -110,13 +110,13 @@ export function PointForm({
       toast.success(`Le point "${newPoint.title}" a été modifié avec succès`);
       // On editing, we want to fly to the point to show the update
       setFlyToLocation({ lat: newPoint.lat, lng: newPoint.lng, zoom: 16 });
-      setHighlightedPointId(newPoint.id);
+      setHighlightedId(newPoint.id);
     } else {
       addPoint(newPoint);
       toast.success(`Le point "${newPoint.title}" a été ajouté avec succès`);
       // On creation, we also want to fly to the new point
       setFlyToLocation({ lat: newPoint.lat, lng: newPoint.lng, zoom: 16 });
-      setHighlightedPointId(newPoint.id);
+      setHighlightedId(newPoint.id);
     }
 
     setFormData({

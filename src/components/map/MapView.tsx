@@ -89,8 +89,7 @@ const MapMarker = memo(
 MapMarker.displayName = "MapMarker";
 
 export function MapView() {
-  const { points, highlightedPointId, setHighlightedPointId } =
-    useGeomarkStore();
+  const { points, highlightedId, setHighlightedId } = useGeomarkStore();
 
   return (
     <div className="h-full w-full relative z-0">
@@ -132,8 +131,8 @@ export function MapView() {
             <MapMarker
               key={point.id}
               point={point}
-              isHighlighted={point.id === highlightedPointId}
-              onClick={setHighlightedPointId}
+              isHighlighted={point.id === highlightedId}
+              onClick={setHighlightedId}
             />
           ))}
         </MarkerClusterGroup>
