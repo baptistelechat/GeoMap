@@ -19,8 +19,13 @@ export function FeaturesList({ limit, onItemClick }: FeaturesListProps) {
   // Sort features by last modification (if property exists) or creation
   const sortedFeatures = useMemo(() => {
     return [...features].sort((a, b) => {
-      const timeA = a.properties?.updatedAt || a.properties?.createdAt || 0;
-      const timeB = b.properties?.updatedAt || b.properties?.createdAt || 0;
+      const getTime = (val: string | number | undefined) => {
+        if (!val) return 0;
+        return typeof val === "string" ? new Date(val).getTime() : val;
+      };
+
+      const timeA = getTime(a.properties?.updatedAt || a.properties?.createdAt);
+      const timeB = getTime(b.properties?.updatedAt || b.properties?.createdAt);
       return timeB - timeA;
     });
   }, [features]);

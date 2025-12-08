@@ -112,6 +112,7 @@ export function GeomanControl() {
     geoJson.properties = {
       ...layer.feature.properties,
       ...geoJson.properties,
+      updatedAt: Date.now(),
     };
 
     // Update radius for circles
@@ -192,8 +193,12 @@ export function GeomanControl() {
 
       const geoJson = layer.toGeoJSON();
       if (!geoJson.properties) geoJson.properties = {};
+      
+      const now = Date.now();
       geoJson.properties.id = id;
       geoJson.properties.shape = shape;
+      geoJson.properties.createdAt = now;
+      geoJson.properties.updatedAt = now;
 
       // For circles, store radius
       if (shape === "Circle" && typeof layer.getRadius === "function") {
@@ -218,7 +223,9 @@ export function GeomanControl() {
       layer.feature = layer.feature || geoJson;
       layer.feature.properties = layer.feature.properties || {};
       layer.feature.properties.id = id;
-      layer.feature.properties.shape = shape; // Ensure shape is preserved
+      layer.feature.properties.shape = shape;
+      layer.feature.properties.createdAt = now;
+      layer.feature.properties.updatedAt = now;
 
       addFeature(geoJson);
 
