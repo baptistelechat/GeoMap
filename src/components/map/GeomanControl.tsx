@@ -55,15 +55,25 @@ export function GeomanControl() {
   } = useGeomarkStore();
   const isInitialized = useRef(false);
 
+  // Keep track of highlightedId in a ref to avoid stale closures in event listeners
+  const highlightedIdRef = useRef(highlightedId);
+  useEffect(() => {
+    highlightedIdRef.current = highlightedId;
+  }, [highlightedId]);
+
   // Function to calculate and show measurement on click
   const handleLayerClick = useCallback(
     (e: L.LeafletMouseEvent) => {
+      L.DomEvent.stopPropagation(e.originalEvent);
+      // Also prevent default to be safe against some browser behaviors
+      L.DomEvent.preventDefault(e.originalEvent);
+
       const layer = e.target as GeomanLayer;
       const geoJson = layer.toGeoJSON();
       const id = layer.feature?.properties?.id;
 
       if (id) {
-        setHighlightedId(id === highlightedId ? null : id);
+        setHighlightedId(id);
       }
 
       // Update properties for popup (e.g. radius for Circles)
@@ -88,7 +98,7 @@ export function GeomanControl() {
         setTimeout(() => root.unmount(), 0);
       });
     },
-    [highlightedId, setHighlightedId]
+    [setHighlightedId]
   );
 
   // Handle Edit Events

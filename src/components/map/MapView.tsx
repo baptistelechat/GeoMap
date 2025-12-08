@@ -5,7 +5,13 @@ import * as L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { memo } from "react";
 import { renderToString } from "react-dom/server";
-import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
+import {
+  MapContainer,
+  Marker,
+  Popup,
+  TileLayer,
+  useMapEvents,
+} from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import { GeomanControl } from "./GeomanControl";
 import { LocateControl } from "./LocateControl";
@@ -19,6 +25,17 @@ if (typeof window !== "undefined") {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (window as any).L = L;
 }
+
+const MapEvents = () => {
+  const { setHighlightedId } = useGeomarkStore();
+  useMapEvents({
+    click: (e) => {
+      if (e.originalEvent.defaultPrevented) return;
+      setHighlightedId(null);
+    },
+  });
+  return null;
+};
 
 const iconCache = new Map<string, L.DivIcon>();
 
@@ -63,7 +80,10 @@ const MapMarker = memo(
         position={[point.lat, point.lng]}
         icon={icon}
         eventHandlers={{
-          click: () => onClick(point.id),
+          click: (e) => {
+            L.DomEvent.stopPropagation(e.originalEvent);
+            onClick(point.id);
+          },
         }}
       >
         <Popup>
@@ -103,6 +123,7 @@ export function MapView() {
         preferCanvas={true} // Use Canvas renderer for better performance with many markers
       >
         <MapController />
+        <MapEvents />
         <GeomanControl />
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
