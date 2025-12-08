@@ -1,11 +1,12 @@
 import { PointActionDialog } from "@/components/dialogs/PointActionDialog";
 import { PointsListDialog } from "@/components/dialogs/PointsListDialog";
 import { MapView } from "@/components/map/MapView";
-import { DevTools } from "@/components/shared/DevTools";
+import { StressTestButton } from "@/components/shared/devtools/StressTestButton";
+import { TestPointsButton } from "@/components/shared/devtools/TestPointsButton";
 import { AppSidebar } from "@/components/sidebar/AppSidebar";
 import { Button } from "@/components/ui/button";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import { FlaskConical, List, Plus } from "lucide-react";
+import { Dices, List, Plus, Zap } from "lucide-react";
 
 export default function MainMap() {
   return (
@@ -41,14 +42,24 @@ export default function MainMap() {
             }
           />
           {import.meta.env.DEV && (
-            <DevTools
-              className="rounded-full shadow-lg size-12"
-              variant="outline"
-              size="icon"
-              title="Générer des points"
-            >
-              <FlaskConical className="size-6" />
-            </DevTools>
+            <>
+              <TestPointsButton
+                className="rounded-full shadow-lg size-12"
+                variant="outline"
+                size="icon"
+                title="Générer 15 points"
+              >
+                <Dices className="size-6 text-amber-500" />
+              </TestPointsButton>
+              <StressTestButton
+                className="rounded-full shadow-lg size-12"
+                variant="outline"
+                size="icon"
+                title="Stress Test (2000 points)"
+              >
+                <Zap className="size-6 text-destructive" />
+              </StressTestButton>
+            </>
           )}
         </div>
       </SidebarInset>
