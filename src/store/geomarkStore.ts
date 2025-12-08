@@ -24,6 +24,16 @@ interface GeomarkStore {
   setFlyToLocation: (
     location: { lat: number; lng: number; zoom?: number } | null
   ) => void;
+  flyToBounds: {
+    bounds: [[number, number], [number, number]];
+    options?: { maxZoom?: number };
+  } | null;
+  setFlyToBounds: (
+    data: {
+      bounds: [[number, number], [number, number]];
+      options?: { maxZoom?: number };
+    } | null
+  ) => void;
 
   // Animation
   highlightedPointId: string | null;
@@ -101,6 +111,8 @@ export const useGeomarkStore = create<GeomarkStore>()(
       // Map Control Implementation
       flyToLocation: null,
       setFlyToLocation: (location) => set({ flyToLocation: location }),
+      flyToBounds: null,
+      setFlyToBounds: (data) => set({ flyToBounds: data }),
 
       // Animation Implementation
       highlightedPointId: null,

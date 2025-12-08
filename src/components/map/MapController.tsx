@@ -8,7 +8,8 @@ const SIDEBAR_WIDTH = 384; // 24rem from sidebar.tsx
 // Component to handle map actions from store (like flying to a location)
 const MapController = () => {
   const map = useMap();
-  const { flyToLocation, setFlyToLocation } = useGeomarkStore();
+  const { flyToLocation, setFlyToLocation, flyToBounds, setFlyToBounds } =
+    useGeomarkStore();
   const { state, isMobile } = useSidebar();
 
   // Handle map resize when sidebar toggles
@@ -18,6 +19,31 @@ const MapController = () => {
     }, 300); // Wait for transition
     return () => clearTimeout(timer);
   }, [state, map]);
+
+  useEffect(() => {
+    if (flyToBounds) {
+      let paddingLeft = 0;
+
+      // Adjust for sidebar if expanded and not mobile
+      if (!isMobile && state === "expanded") {
+        const containerWidth = map.getContainer().clientWidth;
+        const windowWidth = window.innerWidth;
+
+        // Only apply offset if map hasn't resized to fit (meaning it's full width)
+        if (containerWidth > windowWidth - 100) {
+          paddingLeft = SIDEBAR_WIDTH;
+        }
+      }
+
+      map.flyToBounds(flyToBounds.bounds, {
+        paddingTopLeft: [paddingLeft, 0],
+        animate: true,
+        duration: 1.5,
+        maxZoom: flyToBounds.options?.maxZoom,
+      });
+      setFlyToBounds(null);
+    }
+  }, [flyToBounds, map, setFlyToBounds, state, isMobile]);
 
   useEffect(() => {
     if (flyToLocation) {
