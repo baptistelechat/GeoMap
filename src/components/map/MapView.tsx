@@ -3,7 +3,7 @@ import { MapPoint } from "@/types/map";
 import "@/vendor/SmoothWheelZoom.js";
 import * as L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { memo } from "react";
+import { memo, useEffect, useRef } from "react";
 import { renderToString } from "react-dom/server";
 import {
   MapContainer,
@@ -74,9 +74,24 @@ const MapMarker = memo(
     onClick: (id: string) => void;
   }) => {
     const icon = getIcon(point.icon, point.color, isHighlighted);
+    const markerRef = useRef<L.Marker>(null);
+
+    useEffect(() => {
+      if (markerRef.current) {
+        // Attach point data to the marker for Geoman to access
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (markerRef.current as any).pointData = point;
+
+        // Disable Geoman dragging for this marker
+        if (markerRef.current.pm) {
+          markerRef.current.pm.setOptions({ draggable: false });
+        }
+      }
+    }, [point]);
 
     return (
       <Marker
+        ref={markerRef}
         position={[point.lat, point.lng]}
         icon={icon}
         eventHandlers={{

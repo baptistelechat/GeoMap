@@ -1,12 +1,15 @@
 import { generateId } from "@/lib/utils";
 import { useGeomarkStore } from "@/store/geomarkStore";
+import { MapPoint } from "@/types/map";
 import "@geoman-io/leaflet-geoman-free";
 import "@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css";
 import type { Feature, GeoJsonObject } from "geojson";
 import * as L from "leaflet";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { useMap } from "react-leaflet";
+import { DeleteFeatureDialog } from "../dialogs/DeleteFeatureDialog";
+import { DeletePointDialog } from "../dialogs/DeletePointDialog";
 import { FeaturePopup } from "./FeaturePopup";
 
 // Define custom types to avoid 'any'
@@ -54,6 +57,8 @@ export function GeomanControl() {
     setHighlightedId,
   } = useGeomarkStore();
   const isInitialized = useRef(false);
+  const [pointToDelete, setPointToDelete] = useState<MapPoint | null>(null);
+  const [featureToDelete, setFeatureToDelete] = useState<Feature | null>(null);
 
   // Keep track of highlightedId in a ref to avoid stale closures in event listeners
   const highlightedIdRef = useRef(highlightedId);
@@ -239,6 +244,29 @@ export function GeomanControl() {
     map.on("pm:remove", (e) => {
       const event = e as PmEvent;
       const layer = event.layer;
+
+      // Intercept removal if global removal mode is active
+      if (map.pm.globalRemovalModeEnabled()) {
+        // Cancel removal by re-adding the layer
+        layer.addTo(map);
+
+        // Check if it is a Point (Marker)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const pointData = (layer as any).pointData as MapPoint;
+        if (pointData) {
+          setPointToDelete(pointData);
+          return;
+        }
+
+        // Check if it is a Feature
+        const id = layer.feature?.properties?.id;
+        if (id) {
+          // Ensure feature has all properties
+          setFeatureToDelete(layer.feature!);
+          return;
+        }
+      }
+
       const id = layer.feature?.properties?.id;
       if (id) {
         removeFeature(id);
@@ -373,5 +401,24 @@ export function GeomanControl() {
     });
   }, [highlightedId, map]);
 
-  return null;
+  return (
+    <>
+      {pointToDelete && (
+        <DeletePointDialog
+          point={pointToDelete}
+          trigger={<span className="hidden" />}
+          open={!!pointToDelete}
+          onOpenChange={(open) => !open && setPointToDelete(null)}
+        />
+      )}
+      {featureToDelete && (
+        <DeleteFeatureDialog
+          feature={featureToDelete}
+          trigger={<span className="hidden" />}
+          open={!!featureToDelete}
+          onOpenChange={(open) => !open && setFeatureToDelete(null)}
+        />
+      )}
+    </>
+  );
 }

@@ -25,9 +25,18 @@ export function DeleteFeatureDialog({
   feature,
   trigger,
   onDelete,
-}: DeleteFeatureDialogProps) {
+  open: controlledOpen,
+  onOpenChange: controlledOnOpenChange,
+}: DeleteFeatureDialogProps & {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}) {
   const { removeFeature } = useGeomarkStore();
-  const [open, setOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
+
+  const isControlled = controlledOpen !== undefined;
+  const open = isControlled ? controlledOpen : internalOpen;
+  const setOpen = isControlled ? controlledOnOpenChange! : setInternalOpen;
 
   const handleDelete = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -43,9 +52,11 @@ export function DeleteFeatureDialog({
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
-      <AlertDialogTrigger asChild onClick={(e) => e.stopPropagation()}>
-        {trigger}
-      </AlertDialogTrigger>
+      {trigger && (
+        <AlertDialogTrigger asChild onClick={(e) => e.stopPropagation()}>
+          {trigger}
+        </AlertDialogTrigger>
+      )}
       <AlertDialogContent onClick={(e) => e.stopPropagation()}>
         <AlertDialogHeader>
           <AlertDialogTitle className="flex items-center gap-2">

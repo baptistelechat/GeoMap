@@ -25,7 +25,12 @@ export function DeletePointDialog({
   point,
   trigger,
   onDelete,
-}: DeletePointDialogProps) {
+  open,
+  onOpenChange,
+}: DeletePointDialogProps & {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}) {
   const { removePoint } = useGeomarkStore();
 
   const handleDelete = (e: React.MouseEvent) => {
@@ -34,11 +39,12 @@ export function DeletePointDialog({
     removePoint(point.id);
     toast.success(`Le point "${point.title}" a été supprimé`);
     onDelete?.();
+    onOpenChange?.(false);
   };
 
   return (
-    <AlertDialog>
-      <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
+      {trigger && <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>}
       <AlertDialogContent onClick={(e) => e.stopPropagation()}>
         <AlertDialogHeader>
           <AlertDialogTitle className="flex items-center gap-2">
