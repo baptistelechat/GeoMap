@@ -12,13 +12,13 @@ import { cn } from "@/lib/utils";
 import { useGeomarkStore } from "@/store/geomarkStore";
 import { exportToCSV, exportToJSON, exportToZIP } from "@/utils/export";
 import { Archive, FileJson, FileText, Shapes } from "lucide-react";
-import { Dispatch, SetStateAction } from "react";
+import { useState } from "react";
 import { ClearDataDialog } from "./ClearDataDialog";
 
 interface FeaturesListDialogProps {
   trigger?: React.ReactNode;
   open?: boolean;
-  onOpenChange?: Dispatch<SetStateAction<boolean>>;
+  onOpenChange?: (open: boolean) => void;
   className?: string;
 }
 
@@ -29,10 +29,14 @@ export function FeaturesListDialog({
   className,
 }: FeaturesListDialogProps) {
   const { features, clearFeatures } = useGeomarkStore();
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isControlled = open !== undefined;
+  const show = isControlled ? open : internalOpen;
+  const setShow = isControlled ? onOpenChange : setInternalOpen;
   const isMobile = useIsMobile();
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={show} onOpenChange={setShow}>
       {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
       <DialogContent
         className={cn(
@@ -93,13 +97,7 @@ export function FeaturesListDialog({
         </div>
 
         <div className="flex-1 overflow-y-auto -mx-6 px-6">
-          <FeaturesList onItemClick={() => onOpenChange?.(false)} />
-        </div>
-
-        <div className="flex justify-end gap-2 pt-4 border-t mt-auto">
-          <Button variant="outline" onClick={() => onOpenChange?.(false)}>
-            Fermer
-          </Button>
+          <FeaturesList onItemClick={() => setShow?.(false)} />
         </div>
       </DialogContent>
     </Dialog>

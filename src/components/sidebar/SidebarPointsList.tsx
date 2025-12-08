@@ -9,7 +9,7 @@ import {
   SidebarGroupLabel,
 } from "@/components/ui/sidebar";
 import { useGeomarkStore } from "@/store/geomarkStore";
-import { List } from "lucide-react";
+import { MapPin } from "lucide-react";
 import { useState } from "react";
 
 export function SidebarPointsList() {
@@ -20,7 +20,7 @@ export function SidebarPointsList() {
     <SidebarGroup className="border-t border-sidebar-border flex-1 group-data-[collapsible=icon]:flex-none">
       <div className="flex items-center justify-between px-2 py-1 group-data-[collapsible=icon]:hidden">
         <SidebarGroupLabel className="group-data-[collapsible=icon]:hidden mb-2">
-          <List className="mr-2 size-4 text-primary" />
+          <MapPin className="mr-2 size-4 text-primary" />
           Points ({points.length})
         </SidebarGroupLabel>
         <div className="flex items-center gap-1">
@@ -60,7 +60,7 @@ export function SidebarPointsList() {
                 className="size-8 text-primary"
                 title="Voir la liste des points"
               >
-                <List className="size-5" />
+                <MapPin className="size-5" />
               </Button>
             }
           />

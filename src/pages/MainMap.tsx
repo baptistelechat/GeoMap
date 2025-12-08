@@ -1,3 +1,4 @@
+import { FeaturesListDialog } from "@/components/dialogs/FeaturesListDialog";
 import { PointActionDialog } from "@/components/dialogs/PointActionDialog";
 import { PointsListDialog } from "@/components/dialogs/PointsListDialog";
 import { MapView } from "@/components/map/MapView";
@@ -6,7 +7,7 @@ import { TestPointsButton } from "@/components/shared/devtools/TestPointsButton"
 import { AppSidebar } from "@/components/sidebar/AppSidebar";
 import { Button } from "@/components/ui/button";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import { Dices, List, Plus, Zap } from "lucide-react";
+import { Dices, MapPin, Plus, Shapes, Zap } from "lucide-react";
 
 export default function MainMap() {
   return (
@@ -37,7 +38,19 @@ export default function MainMap() {
                 size="icon"
                 title="Liste des points"
               >
-                <List className="size-6" />
+                <MapPin className="size-6" />
+              </Button>
+            }
+          />
+          <FeaturesListDialog
+            trigger={
+              <Button
+                className="rounded-full shadow-lg size-12"
+                variant="secondary"
+                size="icon"
+                title="Liste des formes"
+              >
+                <Shapes className="size-6" />
               </Button>
             }
           />

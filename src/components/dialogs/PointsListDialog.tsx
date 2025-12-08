@@ -11,7 +11,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import { useGeomarkStore } from "@/store/geomarkStore";
 import { exportToCSV, exportToJSON, exportToZIP } from "@/utils/export";
-import { Archive, FileJson, FileText, List } from "lucide-react";
+import { Archive, FileJson, FileText, MapPin } from "lucide-react";
 import { useState } from "react";
 import { ClearDataDialog } from "./ClearDataDialog";
 
@@ -51,7 +51,7 @@ export function PointsListDialog({
         <DialogHeader>
           <div className="flex items-center justify-between mr-8">
             <DialogTitle className="flex items-center gap-2">
-              <List className="size-6 text-primary" />
+              <MapPin className="size-6 text-primary" />
               {isMobile ? "Points" : "Liste des points"} ({points.length})
             </DialogTitle>
             <ClearDataDialog
