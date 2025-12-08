@@ -4,7 +4,6 @@ import { Separator } from "@/components/ui/separator";
 import { area as turfArea } from "@turf/area";
 import { length as turfLength } from "@turf/length";
 import { Feature } from "geojson";
-import { Move, Pencil, RotateCw, Scissors, Trash2 } from "lucide-react";
 
 interface FeaturePopupProps {
   feature: Feature;
@@ -129,7 +128,7 @@ export function FeaturePopup({ feature, layer }: FeaturePopupProps) {
 
       {content && <Separator />}
 
-      <div className="flex items-center justify-end gap-1">
+      <div className="flex items-center justify-end gap-1 leaflet-pm-toolbar">
         {/* Edit Action */}
         <Button
           variant="ghost"
@@ -138,7 +137,7 @@ export function FeaturePopup({ feature, layer }: FeaturePopupProps) {
           title="Éditer"
           onClick={() => handleAction("edit")}
         >
-          <Pencil className="size-3.5" />
+          <div className="leaflet-pm-icon-edit control-icon w-4 h-4 bg-contain" />
         </Button>
 
         {/* Drag Action */}
@@ -149,7 +148,7 @@ export function FeaturePopup({ feature, layer }: FeaturePopupProps) {
           title="Déplacer"
           onClick={() => handleAction("drag")}
         >
-          <Move className="size-3.5" />
+          <div className="leaflet-pm-icon-drag control-icon w-4 h-4 bg-contain" />
         </Button>
 
         {/* Cut Action (only for relevant shapes) */}
@@ -162,7 +161,7 @@ export function FeaturePopup({ feature, layer }: FeaturePopupProps) {
             title="Découper"
             onClick={() => handleAction("cut")}
           >
-            <Scissors className="size-3.5" />
+            <div className="leaflet-pm-icon-cut control-icon w-4 h-4 bg-contain" />
           </Button>
         )}
 
@@ -176,7 +175,7 @@ export function FeaturePopup({ feature, layer }: FeaturePopupProps) {
               className="size-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
               title="Supprimer"
             >
-              <Trash2 className="size-3.5" />
+              <div className="leaflet-pm-icon-delete control-icon w-4 h-4 bg-contain" />
             </Button>
           }
         />
@@ -190,7 +189,7 @@ export function FeaturePopup({ feature, layer }: FeaturePopupProps) {
             title="Rotation"
             onClick={() => handleAction("rotate")}
           >
-            <RotateCw className="size-3.5" />
+            <div className="leaflet-pm-icon-rotate control-icon w-4 h-4 bg-contain" />
           </Button>
         )}
       </div>
