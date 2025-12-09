@@ -1,19 +1,25 @@
 import { DeleteFeatureDialog } from "@/components/dialogs/DeleteFeatureDialog";
+import { FeaturesActionDialog } from "@/components/dialogs/FeaturesActionDialog";
 import { SidebarList } from "@/components/shared/SidebarList";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
+import { getFeatureBounds } from "@/lib/map";
 import { useGeomarkStore } from "@/store/geomarkStore";
 import { motion, useInView } from "framer-motion";
-import * as L from "leaflet";
-import { Map, MapPinOff, Trash2 } from "lucide-react";
+import { Map, MapPinOff, Pencil, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 interface FeaturesListProps {
   limit?: number;
   onItemClick?: () => void;
+  onEditSuccess?: () => void;
 }
 
-export function FeaturesList({ limit, onItemClick }: FeaturesListProps) {
+export function FeaturesList({
+  limit,
+  onItemClick,
+  onEditSuccess,
+}: FeaturesListProps) {
   const { features, setFlyToBounds, setHighlightedId } = useGeomarkStore();
 
   // Sort features by last modification (if property exists) or creation
@@ -49,54 +55,9 @@ export function FeaturesList({ limit, onItemClick }: FeaturesListProps) {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleFeatureClick = (feature: any) => {
-    // Calculate center of the feature to zoom to it
-    let layer: L.Layer | null = null;
-    let maxZoom: number | undefined;
-    let bounds: L.LatLngBounds | undefined;
-
-    // Handle Circles specially to get correct bounds based on radius
-    if (feature.properties?.shape === "Circle" && feature.properties?.radius) {
-      const latlng = L.GeoJSON.coordsToLatLng(feature.geometry.coordinates);
-      const radius = feature.properties.radius;
-
-      // Manual bounds calculation to avoid adding layer to map (which causes "layerPointToLatLng" error)
-      const earthRadius = 6378137;
-      const latRadius = (radius / earthRadius) * (180 / Math.PI);
-      const lngRadius = latRadius / Math.cos((latlng.lat * Math.PI) / 180);
-
-      const south = latlng.lat - latRadius;
-      const north = latlng.lat + latRadius;
-      const west = latlng.lng - lngRadius;
-      const east = latlng.lng + lngRadius;
-
-      bounds = L.latLngBounds([
-        [south, west],
-        [north, east],
-      ]);
-    } else if (
-      feature.properties?.shape === "Text" ||
-      feature.properties?.shape === "CircleMarker"
-    ) {
-      // Text and CircleMarker behave like a point, limit zoom to avoid being too close
-      layer = L.geoJSON(feature);
-      maxZoom = 16;
-    } else {
-      layer = L.geoJSON(feature);
-    }
-
-    if (!bounds && layer) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      bounds = (layer as any).getBounds();
-    }
-
-    if (bounds) {
-      setFlyToBounds({
-        bounds: [
-          [bounds.getSouth(), bounds.getWest()],
-          [bounds.getNorth(), bounds.getEast()],
-        ],
-        options: { maxZoom },
-      });
+    const boundsData = getFeatureBounds(feature);
+    if (boundsData) {
+      setFlyToBounds(boundsData);
     }
 
     if (feature.properties?.id) {
@@ -147,6 +108,20 @@ export function FeaturesList({ limit, onItemClick }: FeaturesListProps) {
             </div>
             <div className="flex items-center gap-2 shrink-0">
               <div onClick={(e) => e.stopPropagation()}>
+                <FeaturesActionDialog
+                  feature={feature}
+                  onSuccess={onEditSuccess}
+                  trigger={
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="size-8 text-muted-foreground hover:text-primary hover:bg-primary/10"
+                      title="Modifier"
+                    >
+                      <Pencil className="size-4" />
+                    </Button>
+                  }
+                />
                 <DeleteFeatureDialog
                   feature={feature}
                   trigger={

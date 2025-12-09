@@ -97,7 +97,10 @@ export function FeaturesListDialog({
         </div>
 
         <div className="flex-1 overflow-y-auto -mx-6 px-6">
-          <FeaturesList onItemClick={() => setShow?.(false)} />
+          <FeaturesList
+            onItemClick={() => setShow(false)}
+            onEditSuccess={() => setShow(false)}
+          />
         </div>
       </DialogContent>
     </Dialog>

@@ -1,3 +1,4 @@
+import { SHAPE_NAMES } from "@/lib/map";
 import { generateId } from "@/lib/utils";
 import { useGeomarkStore } from "@/store/geomarkStore";
 import { MapPoint } from "@/types/map";
@@ -47,24 +48,13 @@ const HIGHLIGHT_STYLE = {
   dashArray: "10, 10",
 };
 
-// Map Geoman shapes to French names
-const SHAPE_NAMES: Record<string, string> = {
-  Marker: "Point",
-  Circle: "Cercle",
-  Polygon: "Polygone",
-  Rectangle: "Rectangle",
-  Line: "Ligne",
-  Text: "Texte",
-  CircleMarker: "Point (Cercle)",
-};
-
 export function GeomanControl() {
   const map = useMap();
   const {
     features,
-    addFeature,
     updateFeature,
     removeFeature,
+    addFeature,
     highlightedId,
     setHighlightedId,
   } = useGeomarkStore();
@@ -84,6 +74,11 @@ export function GeomanControl() {
   useEffect(() => {
     highlightedIdRef.current = highlightedId;
   }, [highlightedId]);
+
+  const featuresRef = useRef(features);
+  useEffect(() => {
+    featuresRef.current = features;
+  }, [features]);
 
   // Function to calculate and show measurement on click
   const handleLayerClick = useCallback(
@@ -165,33 +160,6 @@ export function GeomanControl() {
     [updateFeature]
   );
 
-  // Handle creation confirmation
-  const handleCreationConfirm = useCallback(
-    (name: string, color: string) => {
-      if (!pendingFeature || !pendingLayer) return;
-
-      const updatedFeature = {
-        ...pendingFeature,
-        properties: {
-          ...pendingFeature.properties,
-          name,
-          color,
-        },
-      };
-
-      addFeature(updatedFeature);
-
-      // Remove the layer created by Geoman, so it can be recreated by the store sync with correct options (renderer)
-      map.removeLayer(pendingLayer);
-
-      // Reset state
-      setPendingFeature(null);
-      setPendingLayer(null);
-      setPendingShapeType("");
-    },
-    [pendingFeature, pendingLayer, addFeature, map]
-  );
-
   // Initialize Geoman and setup listeners
   useEffect(() => {
     if (isInitialized.current) return;
@@ -232,6 +200,8 @@ export function GeomanControl() {
         color: themeColor,
         dashArray: [5, 5],
       },
+      // Keep drawing mode enabled after creation
+      continueDrawing: true,
     });
 
     // Listeners
@@ -241,7 +211,7 @@ export function GeomanControl() {
       // If the layer already has an ID (from our loading logic), don't recreate it
       if (layer._fromStore) return;
 
-      const shape = event.shape; // e.g. 'Marker', 'Circle'
+      const shape = event.shape || "Marker"; // e.g. 'Marker', 'Circle'
 
       // Create a unique ID
       const id = generateId();
@@ -254,6 +224,7 @@ export function GeomanControl() {
       geoJson.properties.shape = shape;
       geoJson.properties.createdAt = now;
       geoJson.properties.updatedAt = now;
+      geoJson.properties.color = themeColor;
 
       // For circles, store radius
       if (shape === "Circle" && typeof layer.getRadius === "function") {
@@ -271,48 +242,46 @@ export function GeomanControl() {
             : "");
         if (text) {
           geoJson.properties.text = text;
-          // For Text, the name is the text content
-          geoJson.properties.name = text;
+        }
+      }
+
+      // Generate Name
+      const usedNames = featuresRef.current
+        .map((f) => f.properties?.name)
+        .filter(Boolean);
+      const baseName = SHAPE_NAMES[shape] || shape;
+      let counter = 1;
+      let name = `${baseName} ${counter}`;
+
+      // Case insensitive check
+      while (usedNames.some((n) => n.toLowerCase() === name.toLowerCase())) {
+        counter++;
+        name = `${baseName} ${counter}`;
+      }
+      geoJson.properties.name = name;
+
+      // Ensure Text has text property if it was empty
+      if (shape === "Text" && !geoJson.properties.text) {
+        geoJson.properties.text = name;
+        // Also update the layer text if possible
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        if ((layer as any).pm && (layer as any).pm.setText) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (layer as any).pm.setText(name);
         }
       }
 
       // Attach ID to layer for future reference
-      layer.feature = layer.feature || geoJson;
-      layer.feature.properties = layer.feature.properties || {};
-      layer.feature.properties.id = id;
-      layer.feature.properties.shape = shape;
-      layer.feature.properties.createdAt = now;
-      layer.feature.properties.updatedAt = now;
-
-      // For Text, skip dialog and save immediately
-      if (shape === "Text") {
-        addFeature(geoJson);
-        // Do NOT remove the layer created by Geoman for Text
-        // because it's tricky to recreate it perfectly with L.geoJSON immediately
-        // while preserving the exact DOM state Geoman expects.
-        // Instead, mark it as from store so the sync effect doesn't delete it.
-        layer._fromStore = true;
-
-        // Also ensure the sync effect knows about it by adding the ID to the layer
-        // (which we already did above via layer.feature.properties.id)
-
-        // IMPORTANT: Since we don't recreate the layer, we MUST attach event listeners here
-        // matching those in the sync effect
-        layer.on("pm:edit", handleEdit);
-        layer.on("pm:dragend", handleEdit);
-        layer.on("pm:markerdragend", handleEdit);
-        layer.on("pm:rotateend", handleEdit);
-        layer.on("pm:textchange", handleEdit);
-        layer.on("pm:cut", handleEdit);
-        layer.on("click", handleLayerClick);
-
-        return;
-      }
+      layer.feature = geoJson;
+      // We don't mark it as _fromStore yet because it's not in the store.
+      // But we need to identify it so we don't double-process it?
+      // Actually, if we open dialog, we haven't added it to store.
+      // So layer._fromStore should be false or undefined.
 
       // Store pending data and open dialog
       setPendingFeature(geoJson);
       setPendingLayer(layer);
-      setPendingShapeType(SHAPE_NAMES[shape || ""] || shape || "Forme");
+      setPendingShapeType(shape || "Forme");
       setCreationDialogOpen(true);
     });
 
@@ -349,7 +318,7 @@ export function GeomanControl() {
     });
 
     return () => {};
-  }, [map, addFeature, removeFeature, handleEdit, handleLayerClick]);
+  }, [map, removeFeature, addFeature, handleEdit, handleLayerClick]);
 
   // Sync features from store to map
   useEffect(() => {
@@ -446,15 +415,24 @@ export function GeomanControl() {
     });
   }, [features, map, handleEdit, handleLayerClick]);
 
-  // Update styles based on highlighted feature
+  // Update styles and properties based on store changes and highlighted feature
   useEffect(() => {
     map.eachLayer((l) => {
       const layer = l as GeomanLayer;
       const id = layer.feature?.properties?.id;
       if (!id) return;
 
+      // Get up-to-date feature from store
+      const feature = features.find((f) => f.properties?.id === id);
+      if (!feature) return;
+
+      // Update layer.feature reference
+      if (layer.feature !== feature) {
+        layer.feature = feature;
+      }
+
       const isHighlighted = id === highlightedId;
-      const color = layer.feature?.properties?.color || themeColor;
+      const color = feature.properties?.color || themeColor;
 
       const style = {
         ...GEOMAN_STYLE,
@@ -477,8 +455,19 @@ export function GeomanControl() {
         }
       }
 
+      // Handle Text Content Update
+      const isText = feature.properties?.shape === "Text";
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      if (isText && (layer as any).pm) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const pm = (layer as any).pm;
+        const text = feature.properties?.text || feature.properties?.name;
+        if (text && pm.getText && pm.getText() !== text) {
+          pm.setText(text);
+        }
+      }
+
       // Handle Class (Animation)
-      const isText = layer.feature?.properties?.shape === "Text";
       const el = layer.getElement ? layer.getElement() : undefined;
       if (el) {
         // Reset classes
@@ -494,7 +483,7 @@ export function GeomanControl() {
         }
       }
     });
-  }, [highlightedId, map]);
+  }, [highlightedId, map, features]);
 
   return (
     <>
@@ -518,8 +507,7 @@ export function GeomanControl() {
         open={creationDialogOpen}
         onOpenChange={(open) => {
           setCreationDialogOpen(open);
-          // If closed without saving, we might want to remove the pending layer or just leave it?
-          // Usually, if user cancels, we should probably remove the layer.
+          // If closed without saving (cancelled), remove the pending layer
           if (!open) {
             if (pendingLayer) {
               map.removeLayer(pendingLayer);
@@ -529,10 +517,14 @@ export function GeomanControl() {
           }
         }}
         shapeType={pendingShapeType}
-        existingNames={features
-          .map((f) => f.properties?.name)
-          .filter((n): n is string => !!n)}
-        onConfirm={handleCreationConfirm}
+        feature={pendingFeature || undefined}
+        isNew={true}
+        onSuccess={() => {
+          // Saved successfully, clear pending state so onOpenChange doesn't remove the layer
+          setPendingFeature(null);
+          setPendingLayer(null);
+          setCreationDialogOpen(false);
+        }}
       />
     </>
   );
