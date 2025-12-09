@@ -4,7 +4,7 @@ import { Separator } from "@/components/ui/separator";
 import { area as turfArea } from "@turf/area";
 import { length as turfLength } from "@turf/length";
 import { Feature } from "geojson";
-import { Move, Pencil, RotateCw, Scissors, SplinePointer, Trash2 } from "lucide-react";
+import { Move, Pencil, RotateCw, SplinePointer, Trash2 } from "lucide-react";
 import { FeaturesActionDialog } from "../dialogs/FeaturesActionDialog";
 
 interface FeaturePopupProps {
@@ -107,11 +107,6 @@ export function FeaturePopup({ feature, layer }: FeaturePopupProps) {
       case "rotate":
         map.pm.enableGlobalRotateMode();
         break;
-      case "cut":
-        map.pm.enableGlobalCutMode({
-          allowSelfIntersection: false,
-        });
-        break;
     }
   };
 
@@ -165,17 +160,16 @@ export function FeaturePopup({ feature, layer }: FeaturePopupProps) {
           <Move className="size-4" />
         </Button>
 
-        {/* Cut Action (only for relevant shapes) */}
-        {(feature.geometry.type === "Polygon" ||
-          feature.geometry.type === "MultiPolygon") && (
+        {/* Rotate Action (only for relevant shapes) */}
+        {feature.geometry.type !== "Point" && (
           <Button
             variant="ghost"
             size="icon"
             className="size-7 text-muted-foreground"
-            title="Découper"
-            onClick={() => handleAction("cut")}
+            title="Rotation"
+            onClick={() => handleAction("rotate")}
           >
-            <Scissors className="size-4" />
+            <RotateCw className="size-4" />
           </Button>
         )}
 
@@ -193,19 +187,6 @@ export function FeaturePopup({ feature, layer }: FeaturePopupProps) {
             </Button>
           }
         />
-
-        {/* Rotate Action (only for relevant shapes) */}
-        {feature.geometry.type !== "Point" && (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="size-7 text-muted-foreground"
-            title="Rotation"
-            onClick={() => handleAction("rotate")}
-          >
-            <RotateCw className="size-4" />
-          </Button>
-        )}
       </div>
     </div>
   );

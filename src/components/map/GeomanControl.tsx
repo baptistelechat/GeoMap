@@ -87,8 +87,7 @@ export function GeomanControl() {
         map.pm.globalEditModeEnabled() ||
         map.pm.globalDragModeEnabled() ||
         map.pm.globalRemovalModeEnabled() ||
-        map.pm.globalRotateModeEnabled() ||
-        map.pm.globalCutModeEnabled()
+        map.pm.globalRotateModeEnabled()
       ) {
         return;
       }
@@ -179,6 +178,7 @@ export function GeomanControl() {
     map.pm.addControls({
       position: "topleft",
       drawMarker: false,
+      cutPolygon: false,
     });
 
     // Initialize language
@@ -395,7 +395,6 @@ export function GeomanControl() {
             layer.on("pm:markerdragend", handleEdit);
             layer.on("pm:rotateend", handleEdit);
             layer.on("pm:textchange", handleEdit);
-            layer.on("pm:cut", handleEdit);
             layer.on("click", handleLayerClick);
           },
           pointToLayer: (feature, latlng) => {
