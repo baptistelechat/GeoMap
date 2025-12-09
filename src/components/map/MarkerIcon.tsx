@@ -1,3 +1,4 @@
+import { primaryColor } from "@/constants/tailwindThemeColor";
 import { getContrastingTextColor } from "@/lib/utils";
 import {
   Building,
@@ -33,7 +34,7 @@ interface MarkerIconProps {
 
 export function MarkerIcon({
   iconName = "pin",
-  color = "#65a30d", // lime-600
+  color = primaryColor,
   className = "",
 }: MarkerIconProps) {
   const iconEntry =

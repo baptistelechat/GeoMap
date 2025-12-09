@@ -1,3 +1,4 @@
+import { primaryColor } from "@/constants/tailwindThemeColor";
 import { SHAPE_NAMES } from "@/lib/map";
 import { generateId } from "@/lib/utils";
 import { useGeomarkStore } from "@/store/geomarkStore";
@@ -33,11 +34,9 @@ interface PmEvent extends L.LeafletEvent {
   shape?: string;
 }
 
-const themeColor = "#65a30d"; // lime-600
-
 const GEOMAN_STYLE = {
-  color: themeColor,
-  fillColor: themeColor,
+  color: primaryColor,
+  fillColor: primaryColor,
   fillOpacity: 0.3,
   weight: 2,
   dashArray: undefined,
@@ -193,11 +192,11 @@ export function GeomanControl() {
       pathOptions: GEOMAN_STYLE,
       // Style for the lines while drawing (templine)
       templineStyle: {
-        color: themeColor,
+        color: primaryColor,
       },
       // Style for the dashed line to the mouse cursor (hintline)
       hintlineStyle: {
-        color: themeColor,
+        color: primaryColor,
         dashArray: [5, 5],
       },
       // Keep drawing mode enabled after creation
@@ -224,7 +223,7 @@ export function GeomanControl() {
       geoJson.properties.shape = shape;
       geoJson.properties.createdAt = now;
       geoJson.properties.updatedAt = now;
-      geoJson.properties.color = themeColor;
+      geoJson.properties.color = primaryColor;
 
       // For circles, store radius
       if (shape === "Circle" && typeof layer.getRadius === "function") {
@@ -357,7 +356,7 @@ export function GeomanControl() {
         feature as GeoJsonObject,
         {
           style: (feature) => {
-            const color = feature?.properties?.color || themeColor;
+            const color = feature?.properties?.color || primaryColor;
             return {
               ...GEOMAN_STYLE,
               color,
@@ -432,7 +431,7 @@ export function GeomanControl() {
       }
 
       const isHighlighted = id === highlightedId;
-      const color = feature.properties?.color || themeColor;
+      const color = feature.properties?.color || primaryColor;
 
       const style = {
         ...GEOMAN_STYLE,

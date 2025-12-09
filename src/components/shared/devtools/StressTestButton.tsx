@@ -1,5 +1,6 @@
 import { AVAILABLE_ICONS } from "@/components/map/MarkerIcon";
 import { Button } from "@/components/ui/button";
+import { stressPointColor } from "@/constants/tailwindThemeColor";
 import { generateId } from "@/lib/utils";
 import { useGeomarkStore } from "@/store/geomarkStore";
 import { MapPoint } from "@/types/map";
@@ -16,7 +17,7 @@ export function StressTestButton({
   const generateStressPoints = () => {
     const pointsCount = 2000;
     const points: MapPoint[] = [];
-    
+
     // Bounding box France Métropolitaine (approx)
     const bounds = {
       minLat: 41.3,
@@ -28,8 +29,10 @@ export function StressTestButton({
     const startTime = performance.now();
 
     for (let i = 0; i < pointsCount; i++) {
-      const lat = bounds.minLat + Math.random() * (bounds.maxLat - bounds.minLat);
-      const lng = bounds.minLng + Math.random() * (bounds.maxLng - bounds.minLng);
+      const lat =
+        bounds.minLat + Math.random() * (bounds.maxLat - bounds.minLat);
+      const lng =
+        bounds.minLng + Math.random() * (bounds.maxLng - bounds.minLng);
 
       points.push({
         id: generateId(),
@@ -38,7 +41,7 @@ export function StressTestButton({
         lng,
         notes: "Point de stress test généré aléatoirement",
         url: "",
-        color: "#ef4444", // Red-500 for stress points
+        color: stressPointColor,
         icon: AVAILABLE_ICONS[0].name, // Pin
         createdAt: Date.now(),
         updatedAt: Date.now(),
@@ -47,7 +50,7 @@ export function StressTestButton({
 
     // Use importData for batch update to avoid performance issues
     importData(points, []);
-    
+
     const duration = (performance.now() - startTime).toFixed(0);
     toast.success(`${pointsCount} points générés en ${duration}ms`);
   };

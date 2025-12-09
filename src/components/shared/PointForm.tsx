@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { primaryColor } from "@/constants/tailwindThemeColor";
 import { TAILWIND_COLORS } from "@/lib/tailwindColors";
 import { generateId } from "@/lib/utils";
 import { useGeomarkStore } from "@/store/geomarkStore";
@@ -31,7 +32,7 @@ export function PointForm({
     color:
       point?.color ||
       TAILWIND_COLORS.find((c) => c.name === "lime")?.shades["600"] ||
-      "#65a30d", // Default Lime-600
+      primaryColor,
     icon: point?.icon || AVAILABLE_ICONS[0].name, // Default Pin
   });
 
@@ -47,7 +48,7 @@ export function PointForm({
         color:
           point?.color ||
           TAILWIND_COLORS.find((c) => c.name === "lime")?.shades["600"] ||
-          "#65a30d", // Default Lime-600
+          primaryColor,
         icon: point.icon || AVAILABLE_ICONS[0].name,
       });
     }
@@ -125,7 +126,7 @@ export function PointForm({
       lng: "",
       notes: "",
       url: "",
-      color: "#65a30d", // Default Lime-600
+      color: primaryColor,
       icon: AVAILABLE_ICONS[0].name,
     });
     setIsManualCoords(false);
@@ -206,9 +207,7 @@ export function PointForm({
           type="url"
           placeholder="https://www.google.com/maps/..."
           value={formData.url}
-          onChange={(e) =>
-            setFormData({ ...formData, url: e.target.value })
-          }
+          onChange={(e) => setFormData({ ...formData, url: e.target.value })}
         />
         <p className="text-xs text-muted-foreground">
           Collez une URL Google Maps pour remplir automatiquement les

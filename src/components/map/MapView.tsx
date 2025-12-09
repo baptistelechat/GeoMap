@@ -1,3 +1,4 @@
+import { primaryColor } from "@/constants/tailwindThemeColor";
 import { useGeomarkStore } from "@/store/geomarkStore";
 import { MapPoint } from "@/types/map";
 import "@/vendor/SmoothWheelZoom.js";
@@ -147,8 +148,8 @@ export function MapView() {
         <MarkerClusterGroup
           chunkedLoading
           polygonOptions={{
-            fillColor: "#65a30d", // lime-600
-            color: "#65a30d", // lime-600
+            fillColor: primaryColor,
+            color: primaryColor,
             weight: 2,
             opacity: 1,
             fillOpacity: 0.3,
