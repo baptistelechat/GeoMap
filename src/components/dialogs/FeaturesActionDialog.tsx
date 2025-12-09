@@ -48,7 +48,8 @@ export function FeaturesActionDialog({
 
   // Determine effective shape type for title
   const effectiveShapeType = shapeType || feature?.properties?.shape || "Forme";
-  const displayShapeType = SHAPE_NAMES[effectiveShapeType] || effectiveShapeType;
+  const displayShapeType =
+    SHAPE_NAMES[effectiveShapeType] || effectiveShapeType;
 
   return (
     <Dialog open={show} onOpenChange={handleOpenChange}>
@@ -66,7 +67,7 @@ export function FeaturesActionDialog({
       >
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            {feature ? (
+            {!isNew && feature ? (
               <>
                 <Pencil className="size-5 text-primary" />
                 Modifier la forme
