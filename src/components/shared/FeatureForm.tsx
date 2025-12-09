@@ -101,12 +101,11 @@ export function FeatureForm({
       addFeature(updatedFeature);
     } else {
       updateFeature(updatedFeature);
-    }
-
-    // Fly to the feature
-    const boundsData = getFeatureBounds(updatedFeature);
-    if (boundsData) {
-      setFlyToBounds(boundsData);
+      // Fly to the feature only on edit
+      const boundsData = getFeatureBounds(updatedFeature);
+      if (boundsData) {
+        setFlyToBounds(boundsData);
+      }
     }
 
     // Highlight
