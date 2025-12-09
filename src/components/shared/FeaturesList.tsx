@@ -3,10 +3,24 @@ import { FeaturesActionDialog } from "@/components/dialogs/FeaturesActionDialog"
 import { SidebarList } from "@/components/shared/SidebarList";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
-import { getFeatureBounds } from "@/lib/map";
+import { getFeatureBounds, SHAPE_NAMES } from "@/lib/map";
+import { getContrastColorStyles } from "@/lib/tailwindColors";
+import { cn } from "@/lib/utils";
 import { useGeomarkStore } from "@/store/geomarkStore";
 import { motion, useInView } from "framer-motion";
-import { Map, MapPinOff, Pencil, Trash2 } from "lucide-react";
+import {
+  Circle,
+  CircleDot,
+  Map,
+  MapPin,
+  MapPinOff,
+  Pencil,
+  Pentagon,
+  RectangleHorizontal,
+  Route,
+  Trash2,
+  Type,
+} from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 interface FeaturesListProps {
@@ -14,6 +28,27 @@ interface FeaturesListProps {
   onItemClick?: () => void;
   onEditSuccess?: () => void;
 }
+
+const getFeatureIcon = (shapeType: string | undefined) => {
+  switch (shapeType) {
+    case "Marker":
+      return MapPin;
+    case "Circle":
+      return Circle;
+    case "Polygon":
+      return Pentagon;
+    case "Rectangle":
+      return RectangleHorizontal;
+    case "Line":
+      return Route;
+    case "Text":
+      return Type;
+    case "CircleMarker":
+      return CircleDot;
+    default:
+      return Map;
+  }
+};
 
 export function FeaturesList({
   limit,
@@ -82,63 +117,83 @@ export function FeaturesList({
       <SidebarList
         items={displayFeatures}
         emptyMessage={emptyMessage}
-        renderItem={(feature) => (
-          <motion.div
-            key={feature.properties?.id || Math.random()}
-            layout
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.2 }}
-            className="flex items-center justify-between p-3 border rounded-lg bg-card shadow-sm cursor-pointer hover:bg-accent transition-colors"
-            onClick={() => handleFeatureClick(feature)}
-          >
-            <div className="flex items-center gap-3 overflow-hidden">
-              <div className="flex items-center justify-center size-8 rounded-full bg-primary/10 text-primary shrink-0">
-                <Map className="size-4" />
-              </div>
-              <div className="flex flex-col overflow-hidden">
-                <span className="font-medium truncate text-sm">
-                  {feature.properties?.name || "Forme sans nom"}
-                </span>
-                <span className="text-xs text-muted-foreground truncate">
-                  {feature.geometry.type}
-                </span>
-              </div>
-            </div>
-            <div className="flex items-center gap-2 shrink-0">
-              <div onClick={(e) => e.stopPropagation()}>
-                <FeaturesActionDialog
-                  feature={feature}
-                  onSuccess={onEditSuccess}
-                  trigger={
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="size-8 text-muted-foreground hover:text-primary hover:bg-primary/10"
-                      title="Modifier"
-                    >
-                      <Pencil className="size-4" />
-                    </Button>
+        renderItem={(feature) => {
+          const ShapeIcon = getFeatureIcon(feature.properties?.shape);
+          const colorStyles = getContrastColorStyles(feature.properties?.color);
+
+          return (
+            <motion.div
+              key={feature.properties?.id || Math.random()}
+              layout
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.2 }}
+              className="flex items-center justify-between p-3 border rounded-lg bg-card shadow-sm cursor-pointer hover:bg-accent transition-colors"
+              onClick={() => handleFeatureClick(feature)}
+            >
+              <div className="flex items-center gap-3 overflow-hidden">
+                <div
+                  className={cn(
+                    "flex items-center justify-center size-8 rounded-full shrink-0",
+                    "bg-[var(--bg-color)] text-[var(--icon-color)]",
+                    "dark:bg-[var(--dark-bg-color)] dark:text-[var(--dark-icon-color)]"
+                  )}
+                  style={
+                    {
+                      "--bg-color": colorStyles.backgroundColor,
+                      "--icon-color": colorStyles.iconColor,
+                      "--dark-bg-color": colorStyles.darkBackgroundColor,
+                      "--dark-icon-color": colorStyles.darkIconColor,
+                    } as React.CSSProperties
                   }
-                />
-                <DeleteFeatureDialog
-                  feature={feature}
-                  trigger={
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="size-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-                      title="Supprimer"
-                    >
-                      <Trash2 className="size-4" />
-                    </Button>
-                  }
-                />
+                >
+                  <ShapeIcon className="size-4" />
+                </div>
+                <div className="flex flex-col overflow-hidden">
+                  <span className="font-medium truncate text-sm">
+                    {feature.properties?.name || "Forme sans nom"}
+                  </span>
+                  <span className="text-xs text-muted-foreground truncate">
+                    {SHAPE_NAMES[feature.properties?.shape as string] ||
+                      feature.geometry.type}
+                  </span>
+                </div>
               </div>
-            </div>
-          </motion.div>
-        )}
+              <div className="flex items-center gap-2 shrink-0">
+                <div onClick={(e) => e.stopPropagation()}>
+                  <FeaturesActionDialog
+                    feature={feature}
+                    onSuccess={onEditSuccess}
+                    trigger={
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="size-8 text-muted-foreground hover:text-primary hover:bg-primary/10"
+                        title="Modifier"
+                      >
+                        <Pencil className="size-4" />
+                      </Button>
+                    }
+                  />
+                  <DeleteFeatureDialog
+                    feature={feature}
+                    trigger={
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="size-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                        title="Supprimer"
+                      >
+                        <Trash2 className="size-4" />
+                      </Button>
+                    }
+                  />
+                </div>
+              </div>
+            </motion.div>
+          );
+        }}
       />
       {!limit && displayedCount < sortedFeatures.length && (
         <div

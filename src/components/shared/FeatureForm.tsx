@@ -142,16 +142,6 @@ export function FeatureForm({
         </div>
       )}
       <div className="flex justify-end gap-2 mt-2">
-        {/* We don't render Cancel button here as it's usually in DialogFooter. 
-            But PointForm includes the submit button. 
-            FeaturesActionDialog renders footer. 
-            PointActionDialog renders PointForm inside content, but PointForm HAS a submit button.
-            PointActionDialog does NOT have a DialogFooter.
-            
-            To match PointActionDialog logic:
-            FeaturesActionDialog should NOT have DialogFooter, 
-            and FeatureForm should have the buttons.
-        */}
         <Button onClick={handleSave} className="w-full">
           {isNew ? "Créer" : "Sauvegarder"}
         </Button>
