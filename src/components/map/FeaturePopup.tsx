@@ -4,7 +4,8 @@ import { Separator } from "@/components/ui/separator";
 import { area as turfArea } from "@turf/area";
 import { length as turfLength } from "@turf/length";
 import { Feature } from "geojson";
-import { Move, RotateCw, Scissors, SplinePointer, Trash2 } from "lucide-react";
+import { Move, Pencil, RotateCw, Scissors, SplinePointer, Trash2 } from "lucide-react";
+import { FeaturesActionDialog } from "../dialogs/FeaturesActionDialog";
 
 interface FeaturePopupProps {
   feature: Feature;
@@ -127,6 +128,21 @@ export function FeaturePopup({ feature, layer }: FeaturePopupProps) {
       {content && <Separator />}
 
       <div className="flex items-center justify-end gap-1 leaflet-pm-toolbar">
+        {/* Edit Properties Action */}
+        <FeaturesActionDialog
+          feature={feature}
+          trigger={
+            <Button
+              variant="ghost"
+              size="icon"
+              className="size-7 text-muted-foreground hover:text-primary hover:bg-primary/10"
+              title="Modifier"
+            >
+              <Pencil className="size-3.5" />
+            </Button>
+          }
+        />
+
         {/* Edit Action */}
         <Button
           variant="ghost"
