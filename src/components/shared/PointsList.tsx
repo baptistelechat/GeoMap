@@ -2,7 +2,6 @@ import { DeletePointDialog } from "@/components/dialogs/DeletePointDialog";
 import { PointActionDialog } from "@/components/dialogs/PointActionDialog";
 import { MarkerIcon } from "@/components/map/MarkerIcon";
 import { SidebarList } from "@/components/shared/SidebarList";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useGeomarkStore } from "@/store/geomarkStore";
@@ -47,13 +46,14 @@ const PointItem = ({ point, onPointClick, onEditSuccess }: PointItemProps) => {
             color={point.color}
             className="w-8 h-8 shrink-0"
           />
-          <span className="font-medium truncate text-sm">{point.title}</span>
+          <div className="flex flex-col overflow-hidden">
+            <span className="font-medium truncate text-sm">{point.title}</span>
+            <span className="text-xs text-muted-foreground truncate">
+              {point.lat.toFixed(4)}, {point.lng.toFixed(4)}
+            </span>
+          </div>
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          <Badge variant="secondary" className="font-mono text-xs">
-            {point.lat.toFixed(4)}, {point.lng.toFixed(4)}
-          </Badge>
-
           <div onClick={(e) => e.stopPropagation()}>
             <PointActionDialog
               point={point}
