@@ -10,6 +10,7 @@ import { createRoot } from "react-dom/client";
 import { useMap } from "react-leaflet";
 import { DeleteFeatureDialog } from "../dialogs/DeleteFeatureDialog";
 import { DeletePointDialog } from "../dialogs/DeletePointDialog";
+import { FeaturesActionDialog } from "../dialogs/FeaturesActionDialog";
 import { FeaturePopup } from "./FeaturePopup";
 
 // Define custom types to avoid 'any'
@@ -46,6 +47,17 @@ const HIGHLIGHT_STYLE = {
   dashArray: "10, 10",
 };
 
+// Map Geoman shapes to French names
+const SHAPE_NAMES: Record<string, string> = {
+  Marker: "Point",
+  Circle: "Cercle",
+  Polygon: "Polygone",
+  Rectangle: "Rectangle",
+  Line: "Ligne",
+  Text: "Texte",
+  CircleMarker: "Point (Cercle)",
+};
+
 export function GeomanControl() {
   const map = useMap();
   const {
@@ -60,7 +72,14 @@ export function GeomanControl() {
   const [pointToDelete, setPointToDelete] = useState<MapPoint | null>(null);
   const [featureToDelete, setFeatureToDelete] = useState<Feature | null>(null);
 
+  // Creation state
+  const [creationDialogOpen, setCreationDialogOpen] = useState(false);
+  const [pendingFeature, setPendingFeature] = useState<Feature | null>(null);
+  const [pendingLayer, setPendingLayer] = useState<GeomanLayer | null>(null);
+  const [pendingShapeType, setPendingShapeType] = useState<string>("");
+
   // Keep track of highlightedId in a ref to avoid stale closures in event listeners
+
   const highlightedIdRef = useRef(highlightedId);
   useEffect(() => {
     highlightedIdRef.current = highlightedId;
@@ -137,12 +156,40 @@ export function GeomanControl() {
             : "");
         if (text) {
           geoJson.properties.text = text;
+          geoJson.properties.name = text;
         }
       }
 
       updateFeature(geoJson);
     },
     [updateFeature]
+  );
+
+  // Handle creation confirmation
+  const handleCreationConfirm = useCallback(
+    (name: string, color: string) => {
+      if (!pendingFeature || !pendingLayer) return;
+
+      const updatedFeature = {
+        ...pendingFeature,
+        properties: {
+          ...pendingFeature.properties,
+          name,
+          color,
+        },
+      };
+
+      addFeature(updatedFeature);
+
+      // Remove the layer created by Geoman, so it can be recreated by the store sync with correct options (renderer)
+      map.removeLayer(pendingLayer);
+
+      // Reset state
+      setPendingFeature(null);
+      setPendingLayer(null);
+      setPendingShapeType("");
+    },
+    [pendingFeature, pendingLayer, addFeature, map]
   );
 
   // Initialize Geoman and setup listeners
@@ -224,6 +271,8 @@ export function GeomanControl() {
             : "");
         if (text) {
           geoJson.properties.text = text;
+          // For Text, the name is the text content
+          geoJson.properties.name = text;
         }
       }
 
@@ -235,10 +284,36 @@ export function GeomanControl() {
       layer.feature.properties.createdAt = now;
       layer.feature.properties.updatedAt = now;
 
-      addFeature(geoJson);
+      // For Text, skip dialog and save immediately
+      if (shape === "Text") {
+        addFeature(geoJson);
+        // Do NOT remove the layer created by Geoman for Text
+        // because it's tricky to recreate it perfectly with L.geoJSON immediately
+        // while preserving the exact DOM state Geoman expects.
+        // Instead, mark it as from store so the sync effect doesn't delete it.
+        layer._fromStore = true;
 
-      // Remove the layer created by Geoman, so it can be recreated by the store sync with correct options (renderer)
-      map.removeLayer(layer);
+        // Also ensure the sync effect knows about it by adding the ID to the layer
+        // (which we already did above via layer.feature.properties.id)
+
+        // IMPORTANT: Since we don't recreate the layer, we MUST attach event listeners here
+        // matching those in the sync effect
+        layer.on("pm:edit", handleEdit);
+        layer.on("pm:dragend", handleEdit);
+        layer.on("pm:markerdragend", handleEdit);
+        layer.on("pm:rotateend", handleEdit);
+        layer.on("pm:textchange", handleEdit);
+        layer.on("pm:cut", handleEdit);
+        layer.on("click", handleLayerClick);
+
+        return;
+      }
+
+      // Store pending data and open dialog
+      setPendingFeature(geoJson);
+      setPendingLayer(layer);
+      setPendingShapeType(SHAPE_NAMES[shape || ""] || shape || "Forme");
+      setCreationDialogOpen(true);
     });
 
     map.on("pm:remove", (e) => {
@@ -312,7 +387,14 @@ export function GeomanControl() {
       L.geoJSON(
         feature as GeoJsonObject,
         {
-          style: () => GEOMAN_STYLE,
+          style: (feature) => {
+            const color = feature?.properties?.color || themeColor;
+            return {
+              ...GEOMAN_STYLE,
+              color,
+              fillColor: color,
+            };
+          },
           renderer: svgRenderer,
           onEachFeature: (f, l) => {
             const layer = l as GeomanLayer;
@@ -372,13 +454,26 @@ export function GeomanControl() {
       if (!id) return;
 
       const isHighlighted = id === highlightedId;
+      const color = layer.feature?.properties?.color || themeColor;
+
+      const style = {
+        ...GEOMAN_STYLE,
+        color,
+        fillColor: color,
+      };
+
+      const highlightStyle = {
+        ...HIGHLIGHT_STYLE,
+        color,
+        fillColor: color,
+      };
 
       // Handle Style (Path)
       if (layer instanceof L.Path) {
         if (isHighlighted) {
-          layer.setStyle(HIGHLIGHT_STYLE);
+          layer.setStyle(highlightStyle);
         } else {
-          layer.setStyle(GEOMAN_STYLE);
+          layer.setStyle(style);
         }
       }
 
@@ -419,6 +514,26 @@ export function GeomanControl() {
           onOpenChange={(open) => !open && setFeatureToDelete(null)}
         />
       )}
+      <FeaturesActionDialog
+        open={creationDialogOpen}
+        onOpenChange={(open) => {
+          setCreationDialogOpen(open);
+          // If closed without saving, we might want to remove the pending layer or just leave it?
+          // Usually, if user cancels, we should probably remove the layer.
+          if (!open) {
+            if (pendingLayer) {
+              map.removeLayer(pendingLayer);
+            }
+            setPendingFeature(null);
+            setPendingLayer(null);
+          }
+        }}
+        shapeType={pendingShapeType}
+        existingNames={features
+          .map((f) => f.properties?.name)
+          .filter((n): n is string => !!n)}
+        onConfirm={handleCreationConfirm}
+      />
     </>
   );
 }

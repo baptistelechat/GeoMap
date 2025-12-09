@@ -13,7 +13,7 @@ interface FeaturePopupProps {
 }
 
 export function FeaturePopup({ feature, layer }: FeaturePopupProps) {
-  let title = "Mesures";
+  let title = "Forme";
   let content: React.ReactNode = null;
 
   // Determine title and content based on shape type
@@ -74,19 +74,16 @@ export function FeaturePopup({ feature, layer }: FeaturePopupProps) {
         </div>
       </>
     );
-  } else if (feature.properties?.shape === "CircleMarker") {
-    title = "Point";
+  } else if (
+    feature.properties?.shape === "CircleMarker" ||
+    feature.properties?.shape === "Text"
+  ) {
     content = null;
-  } else if (feature.properties?.shape === "Text") {
-    title = "Texte";
-    content = (
-      <div className="italic text-gray-600">
-        {feature.properties.text || "Sans texte"}
-      </div>
-    );
-  } else {
-    // Fallback for other shapes
-    title = "Forme";
+  }
+
+  // Override title if name exists
+  if (feature.properties?.name) {
+    title = feature.properties.name;
   }
 
   const handleAction = (action: string) => {
