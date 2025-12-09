@@ -56,6 +56,7 @@ export function GeomanControl() {
     addFeature,
     highlightedId,
     setHighlightedId,
+    showFeatures,
   } = useGeomarkStore();
   const isInitialized = useRef(false);
   const [pointToDelete, setPointToDelete] = useState<MapPoint | null>(null);
@@ -332,6 +333,16 @@ export function GeomanControl() {
 
   // Sync features from store to map
   useEffect(() => {
+    if (!showFeatures) {
+      map.eachLayer((layer) => {
+        const l = layer as GeomanLayer;
+        if (l.feature?.properties?.id) {
+          map.removeLayer(layer);
+        }
+      });
+      return;
+    }
+
     const storeIds = new Set(
       features.map((f) => f.properties?.id).filter(Boolean)
     );
@@ -422,7 +433,7 @@ export function GeomanControl() {
         } as L.GeoJSONOptions & { renderer: unknown }
       );
     });
-  }, [features, map, handleEdit, handleLayerClick]);
+  }, [features, map, handleEdit, handleLayerClick, showFeatures]);
 
   // Update styles and properties based on store changes and highlighted feature
   useEffect(() => {

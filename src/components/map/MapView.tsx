@@ -20,6 +20,7 @@ import MapController from "./MapController";
 import { MarkerIcon } from "./MarkerIcon";
 import { MarkerPopup } from "./MarkerPopup";
 import { MiniMapControl } from "./MiniMapControl";
+import { VisibilityControl } from "./VisibilityControl";
 
 // Fix for legacy plugins that expect L to be global
 if (typeof window !== "undefined") {
@@ -125,7 +126,8 @@ const MapMarker = memo(
 MapMarker.displayName = "MapMarker";
 
 export function MapView() {
-  const { points, highlightedId, setHighlightedId } = useGeomarkStore();
+  const { points, highlightedId, setHighlightedId, showPoints } =
+    useGeomarkStore();
 
   return (
     <div className="h-full w-full relative z-0">
@@ -145,36 +147,39 @@ export function MapView() {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        <MarkerClusterGroup
-          chunkedLoading
-          polygonOptions={{
-            fillColor: primaryColor,
-            color: primaryColor,
-            weight: 2,
-            opacity: 1,
-            fillOpacity: 0.3,
-          }}
-          iconCreateFunction={(cluster) => {
-            const count = cluster.getChildCount();
-            // Simple custom icon for cluster
-            return new L.DivIcon({
-              html: `<div class="flex items-center justify-center w-10 h-10 bg-primary text-primary-foreground rounded-full font-bold border-2 border-white shadow-lg">${count}</div>`,
-              className: "custom-marker-cluster",
-              iconSize: new L.Point(40, 40),
-            });
-          }}
-        >
-          {points.map((point) => (
-            <MapMarker
-              key={point.id}
-              point={point}
-              isHighlighted={point.id === highlightedId}
-              onClick={setHighlightedId}
-            />
-          ))}
-        </MarkerClusterGroup>
+        {showPoints && (
+          <MarkerClusterGroup
+            chunkedLoading
+            polygonOptions={{
+              fillColor: primaryColor,
+              color: primaryColor,
+              weight: 2,
+              opacity: 1,
+              fillOpacity: 0.3,
+            }}
+            iconCreateFunction={(cluster) => {
+              const count = cluster.getChildCount();
+              // Simple custom icon for cluster
+              return new L.DivIcon({
+                html: `<div class="flex items-center justify-center w-10 h-10 bg-primary text-primary-foreground rounded-full font-bold border-2 border-white shadow-lg">${count}</div>`,
+                className: "custom-marker-cluster",
+                iconSize: new L.Point(40, 40),
+              });
+            }}
+          >
+            {points.map((point) => (
+              <MapMarker
+                key={point.id}
+                point={point}
+                isHighlighted={point.id === highlightedId}
+                onClick={setHighlightedId}
+              />
+            ))}
+          </MarkerClusterGroup>
+        )}
         <MiniMapControl />
         <LocateControl />
+        <VisibilityControl />
       </MapContainer>
     </div>
   );

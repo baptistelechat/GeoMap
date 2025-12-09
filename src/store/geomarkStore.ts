@@ -19,6 +19,12 @@ interface GeomarkStore {
   setFeatures: (features: Feature[]) => void;
   clearFeatures: () => void;
 
+  // Visibility
+  showPoints: boolean;
+  setShowPoints: (show: boolean) => void;
+  showFeatures: boolean;
+  setShowFeatures: (show: boolean) => void;
+
   // Map Control
   flyToLocation: { lat: number; lng: number; zoom?: number } | null;
   setFlyToLocation: (
@@ -108,6 +114,12 @@ export const useGeomarkStore = create<GeomarkStore>()(
       setFeatures: (features) => set({ features }),
       clearFeatures: () => set({ features: [] }),
 
+      // Visibility Implementation
+      showPoints: true,
+      setShowPoints: (show) => set({ showPoints: show }),
+      showFeatures: true,
+      setShowFeatures: (show) => set({ showFeatures: show }),
+
       // Map Control Implementation
       flyToLocation: null,
       setFlyToLocation: (location) => set({ flyToLocation: location }),
@@ -123,6 +135,8 @@ export const useGeomarkStore = create<GeomarkStore>()(
       partialize: (state) => ({
         points: state.points,
         features: state.features,
+        showPoints: state.showPoints,
+        showFeatures: state.showFeatures,
         // Exclude flyToLocation and highlightedPointId from persistence
       }),
     }
