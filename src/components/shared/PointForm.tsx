@@ -196,7 +196,7 @@ export function PointForm({
           placeholder="Superbe vue depuis le Trocadéro..."
           value={formData.notes}
           onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-          className="h-20 resize-none"
+          className="h-25 resize-none"
         />
       </div>
 

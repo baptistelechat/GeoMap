@@ -103,7 +103,7 @@ const MapMarker = memo(
           },
         }}
       >
-        <Popup>
+        <Popup maxWidth={500} minWidth={300}>
           <MarkerPopup point={point} />
         </Popup>
       </Marker>
