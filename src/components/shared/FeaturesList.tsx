@@ -55,7 +55,12 @@ export function FeaturesList({
   onItemClick,
   onEditSuccess,
 }: FeaturesListProps) {
-  const { features, setFlyToBounds, setHighlightedId } = useGeomarkStore();
+  const {
+    features,
+    setFlyToBounds,
+    setHighlightedId,
+    highlightedId,
+  } = useGeomarkStore();
 
   // Sort features by last modification (if property exists) or creation
   const sortedFeatures = useMemo(() => {
@@ -91,8 +96,16 @@ export function FeaturesList({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleFeatureClick = (feature: any) => {
     const boundsData = getFeatureBounds(feature);
+    const isAlreadyHighlighted = feature.properties?.id === highlightedId;
+
     if (boundsData) {
-      setFlyToBounds(boundsData);
+      setFlyToBounds({
+        ...boundsData,
+        options: {
+          ...boundsData.options,
+          skipHideFeatures: isAlreadyHighlighted,
+        },
+      });
     }
 
     if (feature.properties?.id) {

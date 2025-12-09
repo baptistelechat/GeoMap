@@ -8,8 +8,14 @@ const SIDEBAR_WIDTH = 384; // 24rem from sidebar.tsx
 // Component to handle map actions from store (like flying to a location)
 const MapController = () => {
   const map = useMap();
-  const { flyToLocation, setFlyToLocation, flyToBounds, setFlyToBounds } =
-    useGeomarkStore();
+  const {
+    flyToLocation,
+    setFlyToLocation,
+    flyToBounds,
+    setFlyToBounds,
+    showFeatures,
+    setShowFeatures,
+  } = useGeomarkStore();
   const { state, isMobile } = useSidebar();
 
   // Handle map resize when sidebar toggles
@@ -35,15 +41,37 @@ const MapController = () => {
         }
       }
 
+      // Hide features during animation to avoid clutter (unless skipped)
+      const shouldHideFeatures =
+        showFeatures && !flyToBounds.options?.skipHideFeatures;
+      if (shouldHideFeatures) {
+        setShowFeatures(false);
+      }
+
       map.flyToBounds(flyToBounds.bounds, {
         paddingTopLeft: [paddingLeft, 0],
         animate: true,
         duration: 1.5,
         maxZoom: flyToBounds.options?.maxZoom,
       });
+
+      if (shouldHideFeatures) {
+        map.once("moveend", () => {
+          setShowFeatures(true);
+        });
+      }
+
       setFlyToBounds(null);
     }
-  }, [flyToBounds, map, setFlyToBounds, state, isMobile]);
+  }, [
+    flyToBounds,
+    map,
+    setFlyToBounds,
+    state,
+    isMobile,
+    showFeatures,
+    setShowFeatures,
+  ]);
 
   useEffect(() => {
     if (flyToLocation) {
@@ -72,14 +100,35 @@ const MapController = () => {
         }
       }
 
+      // Hide features during animation to avoid clutter
+      const shouldHideFeatures = showFeatures;
+      if (shouldHideFeatures) {
+        setShowFeatures(false);
+      }
+
       map.flyTo([targetLat, targetLng], zoom, {
         animate: true,
         duration: 1.5,
       });
+
+      if (shouldHideFeatures) {
+        map.once("moveend", () => {
+          setShowFeatures(true);
+        });
+      }
+
       // Reset state to allow re-triggering the same point if needed
       setFlyToLocation(null);
     }
-  }, [flyToLocation, map, setFlyToLocation, state, isMobile]);
+  }, [
+    flyToLocation,
+    map,
+    setFlyToLocation,
+    state,
+    isMobile,
+    showFeatures,
+    setShowFeatures,
+  ]);
 
   return null;
 };

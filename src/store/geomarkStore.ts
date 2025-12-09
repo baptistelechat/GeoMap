@@ -32,12 +32,12 @@ interface GeomarkStore {
   ) => void;
   flyToBounds: {
     bounds: [[number, number], [number, number]];
-    options?: { maxZoom?: number };
+    options?: { maxZoom?: number; skipHideFeatures?: boolean };
   } | null;
   setFlyToBounds: (
     data: {
       bounds: [[number, number], [number, number]];
-      options?: { maxZoom?: number };
+      options?: { maxZoom?: number; skipHideFeatures?: boolean };
     } | null
   ) => void;
 

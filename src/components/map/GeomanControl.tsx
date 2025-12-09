@@ -59,6 +59,12 @@ export function GeomanControl() {
     showFeatures,
   } = useGeomarkStore();
   const isInitialized = useRef(false);
+  const showFeaturesRef = useRef(showFeatures);
+
+  useEffect(() => {
+    showFeaturesRef.current = showFeatures;
+  }, [showFeatures]);
+
   const [pointToDelete, setPointToDelete] = useState<MapPoint | null>(null);
   const [featureToDelete, setFeatureToDelete] = useState<Feature | null>(null);
 
@@ -297,6 +303,9 @@ export function GeomanControl() {
     });
 
     map.on("pm:remove", (e) => {
+      // Ignore removal if features are currently hidden (programmatic removal)
+      if (!showFeaturesRef.current) return;
+
       const event = e as PmEvent;
       const layer = event.layer;
 
@@ -503,7 +512,7 @@ export function GeomanControl() {
         }
       }
     });
-  }, [highlightedId, map, features]);
+  }, [highlightedId, map, features, showFeatures]);
 
   return (
     <>
