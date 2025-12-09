@@ -82,6 +82,17 @@ export function GeomanControl() {
   // Function to calculate and show measurement on click
   const handleLayerClick = useCallback(
     (e: L.LeafletMouseEvent) => {
+      // Check for active modes to prevent popup
+      if (
+        map.pm.globalEditModeEnabled() ||
+        map.pm.globalDragModeEnabled() ||
+        map.pm.globalRemovalModeEnabled() ||
+        map.pm.globalRotateModeEnabled() ||
+        map.pm.globalCutModeEnabled()
+      ) {
+        return;
+      }
+
       L.DomEvent.stopPropagation(e.originalEvent);
       // Also prevent default to be safe against some browser behaviors
       L.DomEvent.preventDefault(e.originalEvent);
@@ -116,7 +127,7 @@ export function GeomanControl() {
         setTimeout(() => root.unmount(), 0);
       });
     },
-    [setHighlightedId]
+    [setHighlightedId, map]
   );
 
   // Handle Edit Events
