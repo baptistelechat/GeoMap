@@ -1,10 +1,11 @@
 import { primaryColor } from "@/constants/tailwindThemeColor";
+import { ANIMATION_DURATION, applyFadeOut, FADE_IN_CLASS } from "@/lib/map-animations";
 import { useGeomarkStore } from "@/store/geomarkStore";
 import { MapPoint } from "@/types/map";
 import "@/vendor/SmoothWheelZoom.js";
 import * as L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { memo, useEffect, useRef } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import { renderToString } from "react-dom/server";
 import {
   MapContainer,
@@ -56,7 +57,7 @@ const getIcon = (iconName: string, color: string, isHighlighted: boolean) => {
         className={`w-8 h-8 ${isHighlighted ? "animate-bounce" : ""}`}
       />
     ),
-    className: "bg-transparent",
+    className: `bg-transparent ${FADE_IN_CLASS}`,
     iconSize: [32, 32],
     iconAnchor: [16, 16],
     popupAnchor: [0, -16],
@@ -88,6 +89,14 @@ const MapMarker = memo(
         // Disable Geoman dragging for this marker
         if (markerRef.current.pm) {
           markerRef.current.pm.setOptions({ draggable: false });
+        }
+
+        const el = markerRef.current.getElement();
+        // Remove fade-in class after animation
+        if (el && el.classList.contains(FADE_IN_CLASS)) {
+          setTimeout(() => {
+            el.classList.remove(FADE_IN_CLASS);
+          }, 500);
         }
       }
     }, [point]);
@@ -129,6 +138,41 @@ MapMarker.displayName = "MapMarker";
 export function MapView() {
   const { points, highlightedId, setHighlightedId, showPoints } =
     useGeomarkStore();
+  const [shouldRenderPoints, setShouldRenderPoints] = useState(showPoints);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const clusterGroupRef = useRef<any>(null);
+
+  useEffect(() => {
+    if (showPoints) {
+      setShouldRenderPoints(true);
+    } else {
+      if (clusterGroupRef.current) {
+        const group = clusterGroupRef.current;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        group.eachLayer((layer: any) => {
+          if (layer.getElement) {
+            const el = layer.getElement();
+            if (el) applyFadeOut(el);
+          }
+        });
+
+        const map = group._map;
+        if (map) {
+          const clusters = map
+            .getPanes()
+            .markerPane.querySelectorAll(".marker-cluster");
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          clusters.forEach((el: any) => applyFadeOut(el));
+        }
+
+        setTimeout(() => {
+          setShouldRenderPoints(false);
+        }, ANIMATION_DURATION);
+      } else {
+        setShouldRenderPoints(false);
+      }
+    }
+  }, [showPoints]);
 
   return (
     <div className="h-full w-full relative z-0">
@@ -148,8 +192,9 @@ export function MapView() {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        {showPoints && (
+        {shouldRenderPoints && (
           <MarkerClusterGroup
+            ref={clusterGroupRef}
             chunkedLoading
             polygonOptions={{
               fillColor: primaryColor,
@@ -163,7 +208,7 @@ export function MapView() {
               // Simple custom icon for cluster
               return new L.DivIcon({
                 html: `<div class="flex items-center justify-center w-10 h-10 bg-primary text-primary-foreground rounded-full font-bold border-2 border-white shadow-lg">${count}</div>`,
-                className: "custom-marker-cluster",
+                className: `custom-marker-cluster ${FADE_IN_CLASS}`,
                 iconSize: new L.Point(40, 40),
               });
             }}

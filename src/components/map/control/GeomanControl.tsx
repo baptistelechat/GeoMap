@@ -1,4 +1,11 @@
 import { primaryColor } from "@/constants/tailwindThemeColor";
+import {
+  ANIMATION_DURATION,
+  applyFadeIn,
+  applyFadeOut,
+  FADE_IN_CLASS,
+  FADE_OUT_CLASS,
+} from "@/lib/map-animations";
 import { SHAPE_NAMES } from "@/lib/map";
 import { generateId } from "@/lib/utils";
 import { useGeomarkStore } from "@/store/geomarkStore";
@@ -336,11 +343,37 @@ export function GeomanControl() {
 
   // Sync features from store to map
   useEffect(() => {
+    // Helper to remove layer with fade-out animation
+    const removeLayerWithFade = (layer: GeomanLayer) => {
+      // Check if already removing to avoid double removal
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      if ((layer as any)._isRemoving) return;
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (layer as any)._isRemoving = true;
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const el = layer.getElement ? layer.getElement() : undefined;
+
+      if (el) {
+        applyFadeOut(el);
+        // Remove after animation
+        setTimeout(() => {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          if ((layer as any)._isRemoving) {
+            map.removeLayer(layer);
+          }
+        }, ANIMATION_DURATION);
+      } else {
+        map.removeLayer(layer);
+      }
+    };
+
     if (!showFeatures) {
       map.eachLayer((layer) => {
         const l = layer as GeomanLayer;
         if (l.feature?.properties?.id) {
-          map.removeLayer(layer);
+          removeLayerWithFade(l);
         }
       });
       return;
@@ -355,7 +388,7 @@ export function GeomanControl() {
       const l = layer as GeomanLayer;
       const id = l.feature?.properties?.id;
       if (id && !storeIds.has(id)) {
-        map.removeLayer(layer);
+        removeLayerWithFade(l);
       }
     });
 
@@ -365,13 +398,33 @@ export function GeomanControl() {
       if (!id) return;
 
       let exists = false;
+      let existingLayer: GeomanLayer | null = null;
+
       map.eachLayer((layer) => {
-        if ((layer as GeomanLayer).feature?.properties?.id === id) {
+        const l = layer as GeomanLayer;
+        if (l.feature?.properties?.id === id) {
           exists = true;
+          existingLayer = l;
         }
       });
 
-      if (exists) return;
+      // If exists, check if it was fading out and cancel it
+      if (exists && existingLayer) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        if ((existingLayer as any)._isRemoving) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (existingLayer as any)._isRemoving = false;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const el = existingLayer.getElement
+            ? existingLayer.getElement()
+            : undefined;
+          if (el) {
+            el.classList.remove(FADE_OUT_CLASS);
+            applyFadeIn(el);
+          }
+        }
+        return;
+      }
 
       // Force SVG renderer to allow CSS animations on elements
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -393,6 +446,16 @@ export function GeomanControl() {
             const layer = l as GeomanLayer;
             layer._fromStore = true;
             layer.addTo(map);
+
+            // Add fade-in class
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const el = (layer as any).getElement
+              ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                (layer as any).getElement()
+              : undefined;
+            if (el) {
+              applyFadeIn(el);
+            }
 
             if (
               f.properties?.shape === "Text" &&
