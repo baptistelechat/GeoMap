@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button";
+import { useGeomarkStore } from "@/store/geomarkStore";
 import * as L from "leaflet";
 import { Loader2, Locate } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createRoot, Root } from "react-dom/client";
 import { Circle, Marker, Popup, useMap } from "react-leaflet";
 
@@ -22,6 +23,12 @@ export function LocateControl() {
   const map = useMap();
   const [position, setPosition] = useState<L.LatLng | null>(null);
   const [accuracy, setAccuracy] = useState<number | null>(null);
+  const { showFeatures, setShowFeatures } = useGeomarkStore();
+  const showFeaturesRef = useRef(showFeatures);
+
+  useEffect(() => {
+    showFeaturesRef.current = showFeatures;
+  }, [showFeatures]);
 
   // Configuration: Disable large circle by default as requested
   const SHOW_ACCURACY_CIRCLE = false;
@@ -87,7 +94,20 @@ export function LocateControl() {
     const onLocationFound = (e: L.LocationEvent) => {
       setPosition(e.latlng);
       setAccuracy(e.accuracy);
+
+      const shouldHideFeatures = showFeaturesRef.current;
+      if (shouldHideFeatures) {
+        setShowFeatures(false);
+      }
+
       map.flyTo(e.latlng, 16);
+
+      if (shouldHideFeatures) {
+        map.once("moveend", () => {
+          setShowFeatures(true);
+        });
+      }
+
       renderButton(control.getContainer(), false);
     };
 
@@ -106,7 +126,18 @@ export function LocateControl() {
           setPosition(latlng);
           setAccuracy(5000); // Précision arbitraire "ville"
 
+          const shouldHideFeatures = showFeaturesRef.current;
+          if (shouldHideFeatures) {
+            setShowFeatures(false);
+          }
+
           map.flyTo(latlng, 13);
+
+          if (shouldHideFeatures) {
+            map.once("moveend", () => {
+              setShowFeatures(true);
+            });
+          }
 
           // Feedback utilisateur
           alert(
@@ -158,7 +189,7 @@ export function LocateControl() {
       map.off("locationfound", onLocationFound);
       map.off("locationerror", onLocationError);
     };
-  }, [map]);
+  }, [map, setShowFeatures]);
 
   return (
     <>
