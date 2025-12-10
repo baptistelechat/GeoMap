@@ -45,6 +45,10 @@ interface GeomarkStore {
   highlightedId: string | null;
   setHighlightedId: (id: string | null) => void;
 
+  // Edit Mode
+  isEditMode: boolean;
+  setIsEditMode: (isEditMode: boolean) => void;
+
   // Import
   importData: (points: MapPoint[], features: Feature[]) => void;
 }
@@ -129,6 +133,10 @@ export const useGeomarkStore = create<GeomarkStore>()(
       // Animation Implementation
       highlightedId: null,
       setHighlightedId: (id) => set({ highlightedId: id }),
+
+      // Edit Mode Implementation
+      isEditMode: false,
+      setIsEditMode: (isEditMode) => set({ isEditMode }),
     }),
     {
       name: "geomark-storage", // Unified storage key

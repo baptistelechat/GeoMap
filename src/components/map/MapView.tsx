@@ -1,5 +1,10 @@
 import { primaryColor } from "@/constants/tailwindThemeColor";
-import { ANIMATION_DURATION, applyFadeOut, FADE_IN_CLASS } from "@/lib/map-animations";
+import {
+  ANIMATION_DURATION,
+  applyFadeOut,
+  FADE_IN_CLASS,
+} from "@/lib/map-animations";
+import { cn } from "@/lib/utils";
 import { useGeomarkStore } from "@/store/geomarkStore";
 import { MapPoint } from "@/types/map";
 import "@/vendor/SmoothWheelZoom.js";
@@ -136,7 +141,7 @@ const MapMarker = memo(
 MapMarker.displayName = "MapMarker";
 
 export function MapView() {
-  const { points, highlightedId, setHighlightedId, showPoints } =
+  const { points, highlightedId, setHighlightedId, showPoints, isEditMode } =
     useGeomarkStore();
   const [shouldRenderPoints, setShouldRenderPoints] = useState(showPoints);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -229,6 +234,12 @@ export function MapView() {
         <LocateControl />
         <VisibilityControl />
       </MapContainer>
+      <div
+        className={cn(
+          "absolute inset-0 pointer-events-none z-[1000] transition-all duration-300 border-primary",
+          isEditMode ? "border-[6px] animate-pulse" : "border-0"
+        )}
+      />
     </div>
   );
 }

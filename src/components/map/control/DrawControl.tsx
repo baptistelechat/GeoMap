@@ -1,30 +1,22 @@
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { Indicator } from "@/components/ui/indicator";
+import { EDIT_ICONS, getFeatureIcon, SHAPE_ICONS } from "@/lib/map-icons";
 import { cn } from "@/lib/utils";
+import { useGeomarkStore } from "@/store/geomarkStore";
 import { AnimatePresence, motion } from "framer-motion";
 import * as L from "leaflet";
-import {
-  Circle,
-  CircleDot,
-  Hexagon,
-  LucideProps,
-  Move,
-  RotateCw,
-  SplinePointer,
-  Square,
-  Trash2,
-  Type,
-  Waypoints,
-} from "lucide-react";
+import { LucideProps } from "lucide-react";
 import {
   ForwardRefExoticComponent,
   RefAttributes,
+  useCallback,
   useEffect,
   useState,
 } from "react";
 import { createRoot, Root } from "react-dom/client";
 import { useMap } from "react-leaflet";
+import { toast } from "sonner";
 
 interface DrawToolbarProps {
   map: L.Map;
@@ -39,19 +31,23 @@ interface Tool {
 }
 
 const CREATION_TOOLS: Tool[] = [
-  { id: "Line", icon: Waypoints, title: "Dessiner une ligne" },
-  { id: "Rectangle", icon: Square, title: "Créer un rectangle" },
-  { id: "Polygon", icon: Hexagon, title: "Créer un polygone" },
-  { id: "Circle", icon: Circle, title: "Tracer un cercle" },
-  { id: "CircleMarker", icon: CircleDot, title: "Placer un Point - Cercle" },
-  { id: "Text", icon: Type, title: "Placer un texte" },
+  { id: "Line", icon: SHAPE_ICONS.Line, title: "Dessiner une ligne" },
+  { id: "Rectangle", icon: SHAPE_ICONS.Rectangle, title: "Créer un rectangle" },
+  { id: "Polygon", icon: SHAPE_ICONS.Polygon, title: "Créer un polygone" },
+  { id: "Circle", icon: SHAPE_ICONS.Circle, title: "Tracer un cercle" },
+  {
+    id: "CircleMarker",
+    icon: SHAPE_ICONS.CircleMarker,
+    title: "Placer un Point - Cercle",
+  },
+  { id: "Text", icon: SHAPE_ICONS.Text, title: "Placer un texte" },
 ];
 
 const EDIT_TOOLS: Tool[] = [
-  { id: "edit", icon: SplinePointer, title: "Modifier le tracé" },
-  { id: "drag", icon: Move, title: "Déplacer" },
-  { id: "rotate", icon: RotateCw, title: "Rotation" },
-  { id: "delete", icon: Trash2, title: "Effacer" },
+  { id: "edit", icon: EDIT_ICONS.edit, title: "Modifier le tracé" },
+  { id: "drag", icon: EDIT_ICONS.drag, title: "Déplacer" },
+  { id: "rotate", icon: EDIT_ICONS.rotate, title: "Rotation" },
+  { id: "delete", icon: EDIT_ICONS.delete, title: "Effacer" },
 ];
 
 export function DrawControl() {
@@ -106,6 +102,90 @@ export function DrawControl() {
 
 function DrawToolbar({ map }: DrawToolbarProps) {
   const [activeTool, setActiveTool] = useState<string | null>(null);
+  const { setIsEditMode } = useGeomarkStore();
+
+  useEffect(() => {
+    setIsEditMode(!!activeTool);
+  }, [activeTool, setIsEditMode]);
+
+  const handleToolClick = useCallback(
+    (toolId: string) => {
+      // Helper to safely disable modes
+      const safeDisable = () => {
+        try {
+          if (map.pm.globalDrawModeEnabled()) map.pm.disableDraw();
+          if (map.pm.globalEditModeEnabled()) map.pm.disableGlobalEditMode();
+          if (map.pm.globalRemovalModeEnabled())
+            map.pm.disableGlobalRemovalMode();
+          if (map.pm.globalDragModeEnabled()) map.pm.disableGlobalDragMode();
+          if (map.pm.globalRotateModeEnabled())
+            map.pm.disableGlobalRotateMode();
+        } catch (e) {
+          console.error("Error disabling Geoman modes:", e);
+        }
+      };
+
+      if (activeTool === toolId) {
+        safeDisable();
+        return;
+      }
+
+      // Reset others
+      safeDisable();
+
+      switch (toolId) {
+        case "edit":
+          map.pm.enableGlobalEditMode();
+          break;
+        case "delete":
+          map.pm.enableGlobalRemovalMode();
+          break;
+        case "drag":
+          map.pm.enableGlobalDragMode();
+          break;
+        case "rotate":
+          map.pm.enableGlobalRotateMode();
+          break;
+        default:
+          map.pm.enableDraw(toolId, {
+            snappable: true,
+            snapDistance: 20,
+            finishOn: null, // Allow finishing by clicking last point (default)
+          });
+          break;
+      }
+    },
+    [activeTool, map]
+  );
+
+  useEffect(() => {
+    if (activeTool) {
+      const tool = [...CREATION_TOOLS, ...EDIT_TOOLS].find(
+        (t) => t.id === activeTool
+      );
+      if (tool) {
+        const isCreationTool = CREATION_TOOLS.some((t) => t.id === activeTool);
+        const Icon = isCreationTool ? getFeatureIcon(activeTool) : tool.icon;
+
+        toast.success(tool.title, {
+          id: "edit-mode-toast",
+          description: "Mode édition activé",
+          duration: Infinity,
+          icon: <Icon className="w-5 h-5" />,
+          action: {
+            label: "Quitter",
+            onClick: () => handleToolClick(activeTool),
+          },
+          classNames: {
+            actionButton:
+              "!bg-primary !text-primary-foreground hover:!bg-primary/90 !border-primary !p-4",
+          },
+        });
+      }
+    } else {
+      toast.dismiss("edit-mode-toast");
+    }
+  }, [activeTool, handleToolClick]);
 
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -140,52 +220,6 @@ function DrawToolbar({ map }: DrawToolbarProps) {
       map.off("pm:globalrotatemodetoggled", onGlobalRotateModeToggled);
     };
   }, [map]);
-
-  const handleToolClick = (toolId: string) => {
-    // Helper to safely disable modes
-    const safeDisable = () => {
-      try {
-        if (map.pm.globalDrawModeEnabled()) map.pm.disableDraw();
-        if (map.pm.globalEditModeEnabled()) map.pm.disableGlobalEditMode();
-        if (map.pm.globalRemovalModeEnabled())
-          map.pm.disableGlobalRemovalMode();
-        if (map.pm.globalDragModeEnabled()) map.pm.disableGlobalDragMode();
-        if (map.pm.globalRotateModeEnabled()) map.pm.disableGlobalRotateMode();
-      } catch (e) {
-        console.error("Error disabling Geoman modes:", e);
-      }
-    };
-
-    if (activeTool === toolId) {
-      safeDisable();
-      return;
-    }
-
-    // Reset others
-    safeDisable();
-
-    switch (toolId) {
-      case "edit":
-        map.pm.enableGlobalEditMode();
-        break;
-      case "delete":
-        map.pm.enableGlobalRemovalMode();
-        break;
-      case "drag":
-        map.pm.enableGlobalDragMode();
-        break;
-      case "rotate":
-        map.pm.enableGlobalRotateMode();
-        break;
-      default:
-        map.pm.enableDraw(toolId, {
-          snappable: true,
-          snapDistance: 20,
-          finishOn: null, // Allow finishing by clicking last point (default)
-        });
-        break;
-    }
-  };
 
   const renderButton = (tool: Tool) => {
     const isActive = activeTool === tool.id;

@@ -4,23 +4,12 @@ import { SidebarList } from "@/components/shared/SidebarList";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { getFeatureBounds, SHAPE_NAMES } from "@/lib/map";
+import { getFeatureIcon } from "@/lib/map-icons";
 import { getContrastColorStyles } from "@/lib/tailwindColors";
 import { cn } from "@/lib/utils";
 import { useGeomarkStore } from "@/store/geomarkStore";
 import { motion, useInView } from "framer-motion";
-import {
-  Circle,
-  CircleDot,
-  Map,
-  MapPin,
-  MapPinOff,
-  Pencil,
-  Pentagon,
-  RectangleHorizontal,
-  Route,
-  Trash2,
-  Type,
-} from "lucide-react";
+import { MapPinOff, Pencil, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 interface FeaturesListProps {
@@ -29,38 +18,13 @@ interface FeaturesListProps {
   onEditSuccess?: () => void;
 }
 
-const getFeatureIcon = (shapeType: string | undefined) => {
-  switch (shapeType) {
-    case "Marker":
-      return MapPin;
-    case "Circle":
-      return Circle;
-    case "Polygon":
-      return Pentagon;
-    case "Rectangle":
-      return RectangleHorizontal;
-    case "Line":
-      return Route;
-    case "Text":
-      return Type;
-    case "CircleMarker":
-      return CircleDot;
-    default:
-      return Map;
-  }
-};
-
 export function FeaturesList({
   limit,
   onItemClick,
   onEditSuccess,
 }: FeaturesListProps) {
-  const {
-    features,
-    setFlyToBounds,
-    setHighlightedId,
-    highlightedId,
-  } = useGeomarkStore();
+  const { features, setFlyToBounds, setHighlightedId, highlightedId } =
+    useGeomarkStore();
 
   // Sort features by last modification (if property exists) or creation
   const sortedFeatures = useMemo(() => {

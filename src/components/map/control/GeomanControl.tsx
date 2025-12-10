@@ -1,12 +1,11 @@
 import { primaryColor } from "@/constants/tailwindThemeColor";
+import { SHAPE_NAMES } from "@/lib/map";
 import {
   ANIMATION_DURATION,
   applyFadeIn,
   applyFadeOut,
-  FADE_IN_CLASS,
   FADE_OUT_CLASS,
 } from "@/lib/map-animations";
-import { SHAPE_NAMES } from "@/lib/map";
 import { generateId } from "@/lib/utils";
 import { useGeomarkStore } from "@/store/geomarkStore";
 import { MapPoint } from "@/types/map";
@@ -352,7 +351,6 @@ export function GeomanControl() {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (layer as any)._isRemoving = true;
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const el = layer.getElement ? layer.getElement() : undefined;
 
       if (el) {
@@ -414,7 +412,6 @@ export function GeomanControl() {
         if ((existingLayer as any)._isRemoving) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (existingLayer as any)._isRemoving = false;
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const el = existingLayer.getElement
             ? existingLayer.getElement()
             : undefined;
