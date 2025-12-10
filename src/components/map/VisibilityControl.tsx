@@ -7,7 +7,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { primaryColor } from "@/constants/tailwindThemeColor";
 import { useGeomarkStore } from "@/store/geomarkStore";
+import { AnimatePresence, motion } from "framer-motion";
 import * as L from "leaflet";
 import { Layers, MapPin, Shapes } from "lucide-react";
 import { useEffect } from "react";
@@ -72,16 +74,37 @@ function VisibilityMenu() {
   const { showPoints, setShowPoints, showFeatures, setShowFeatures } =
     useGeomarkStore();
 
+  const hasHiddenLayers = !showPoints || !showFeatures;
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
           size="icon"
-          className="h-[30px] w-[30px] rounded-none bg-white hover:bg-gray-50 p-0"
+          className="h-[30px] w-[30px] rounded-none bg-white hover:bg-gray-50 p-0 relative"
           title="Gérer l'affichage"
         >
-          <Layers className="h-4 w-4 text-black" />
+          <motion.div
+            animate={{ color: hasHiddenLayers ? primaryColor : "#000000" }}
+            transition={{ duration: 0.3 }}
+          >
+            <Layers className="size-4" />
+          </motion.div>
+          <AnimatePresence>
+            {hasHiddenLayers && (
+              <motion.span
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="absolute top-1 right-1 flex size-2"
+              >
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75"></span>
+                <span className="relative inline-flex size-2 rounded-full bg-primary"></span>
+              </motion.span>
+            )}
+          </AnimatePresence>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
