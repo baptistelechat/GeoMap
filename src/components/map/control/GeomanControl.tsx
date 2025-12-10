@@ -10,10 +10,11 @@ import * as L from "leaflet";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { useMap } from "react-leaflet";
-import { DeleteFeatureDialog } from "../dialogs/DeleteFeatureDialog";
-import { DeletePointDialog } from "../dialogs/DeletePointDialog";
-import { FeaturesActionDialog } from "../dialogs/FeaturesActionDialog";
-import { FeaturePopup } from "./FeaturePopup";
+import { DeleteFeatureDialog } from "../../dialogs/DeleteFeatureDialog";
+import { DeletePointDialog } from "../../dialogs/DeletePointDialog";
+import { FeaturesActionDialog } from "../../dialogs/FeaturesActionDialog";
+import { FeaturePopup } from "../popup/FeaturePopup";
+import { DrawControl } from "./DrawControl";
 
 // Define custom types to avoid 'any'
 interface GeomanLayer extends L.Layer {
@@ -180,13 +181,6 @@ export function GeomanControl() {
   useEffect(() => {
     if (isInitialized.current) return;
     isInitialized.current = true;
-
-    // Initialize Geoman controls
-    map.pm.addControls({
-      position: "topleft",
-      drawMarker: false,
-      cutPolygon: false,
-    });
 
     // Initialize language
     map.pm.setLang("fr");
@@ -516,6 +510,7 @@ export function GeomanControl() {
 
   return (
     <>
+      <DrawControl />
       {pointToDelete && (
         <DeletePointDialog
           point={pointToDelete}

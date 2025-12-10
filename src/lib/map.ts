@@ -9,7 +9,7 @@ export const SHAPE_NAMES: Record<string, string> = {
   Rectangle: "Rectangle",
   Line: "Ligne",
   Text: "Texte",
-  CircleMarker: "Point (Cercle)",
+  CircleMarker: "Point - Cercle",
 };
 
 export interface FlyToBoundsResult {

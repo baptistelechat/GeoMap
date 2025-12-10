@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import * as L from "leaflet";
 import { Loader2, Locate } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -35,10 +36,7 @@ export function LocateControl() {
       },
 
       onAdd: function () {
-        const container = L.DomUtil.create(
-          "div",
-          "leaflet-bar leaflet-control flex flex-col"
-        );
+        const container = L.DomUtil.create("div");
 
         // Prevent map clicks/scrolls through the control
         L.DomEvent.disableClickPropagation(container);
@@ -46,6 +44,9 @@ export function LocateControl() {
 
         // Use React to render the button inside the Leaflet control container
         const root = createRoot(container);
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (container as any)._reactRoot = root;
 
         // For simplicity and robustness, we'll render a component that triggers the parent's logic
         root.render(
@@ -61,9 +62,6 @@ export function LocateControl() {
             isLoading={false}
           />
         );
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (container as any)._reactRoot = root;
 
         return container;
       },
@@ -197,29 +195,13 @@ function LocateButton({
   isLoading: boolean;
 }) {
   return (
-    <a
-      className="leaflet-control-locate flex items-center justify-center bg-white hover:bg-gray-50 text-black cursor-pointer"
-      href="#"
+    <Button
+      variant="outline"
+      size="icon"
+      onClick={onClick}
       title="Me localiser"
-      role="button"
-      onClick={(e) => {
-        e.preventDefault();
-        onClick();
-      }}
-      style={{
-        width: "30px",
-        height: "30px",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        borderBottom: "none",
-      }}
     >
-      {isLoading ? (
-        <Loader2 className="h-4 w-4 animate-spin text-primary" />
-      ) : (
-        <Locate className="h-4 w-4 text-black" />
-      )}
-    </a>
+      {isLoading ? <Loader2 className="animate-spin" /> : <Locate />}
+    </Button>
   );
 }

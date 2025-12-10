@@ -5,7 +5,7 @@ import { area as turfArea } from "@turf/area";
 import { length as turfLength } from "@turf/length";
 import { Feature } from "geojson";
 import { Move, Pencil, RotateCw, SplinePointer, Trash2 } from "lucide-react";
-import { FeaturesActionDialog } from "../dialogs/FeaturesActionDialog";
+import { FeaturesActionDialog } from "../../dialogs/FeaturesActionDialog";
 
 interface FeaturePopupProps {
   feature: Feature;

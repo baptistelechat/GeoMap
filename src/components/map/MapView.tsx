@@ -14,12 +14,13 @@ import {
   useMapEvents,
 } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
-import { GeomanControl } from "./GeomanControl";
-import { LocateControl } from "./LocateControl";
+import { GeomanControl } from "./control/GeomanControl";
+import { LocateControl } from "./control/LocateControl";
+import { ZoomControl } from "./control/ZoomControl";
 import MapController from "./MapController";
 import { MarkerIcon } from "./MarkerIcon";
-import { MarkerPopup } from "./MarkerPopup";
 import { MiniMapControl } from "./MiniMapControl";
+import { MarkerPopup } from "./popup/MarkerPopup";
 import { VisibilityControl } from "./VisibilityControl";
 
 // Fix for legacy plugins that expect L to be global
@@ -139,10 +140,10 @@ export function MapView() {
         smoothWheelZoom={true} // Enable smooth scroll wheel zoom
         smoothSensitivity={1} // Adjust sensitivity if needed
         preferCanvas={true} // Use Canvas renderer for better performance with many markers
+        zoomControl={false}
       >
         <MapController />
         <MapEvents />
-        <GeomanControl />
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -178,6 +179,8 @@ export function MapView() {
           </MarkerClusterGroup>
         )}
         <MiniMapControl />
+        <ZoomControl />
+        <GeomanControl />
         <LocateControl />
         <VisibilityControl />
       </MapContainer>

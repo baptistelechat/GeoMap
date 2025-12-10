@@ -4,8 +4,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { MapPoint } from "@/types/map";
 import { ExternalLink, Pencil, Trash2 } from "lucide-react";
-import { ScrollArea } from "../ui/scroll-area";
-import { MarkerIcon } from "./MarkerIcon";
+import { ScrollArea } from "../../ui/scroll-area";
+import { MarkerIcon } from "../MarkerIcon";
 
 interface MarkerPopupProps {
   point: MapPoint;
