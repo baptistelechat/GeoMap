@@ -241,7 +241,7 @@ export function GeomanControl() {
       geoJson.properties.shape = shape;
       geoJson.properties.createdAt = now;
       geoJson.properties.updatedAt = now;
-      geoJson.properties.color = primaryColor;
+      geoJson.properties.color = shape === "Text" ? "#ffffff" : primaryColor;
 
       // For circles, store radius
       if (shape === "Circle" && typeof layer.getRadius === "function") {
