@@ -1,5 +1,4 @@
-import { PointForm } from "@/components/PointForm";
-import { ImportDialog } from "@/components/ImportDialog";
+import { FeatureForm } from "@/components/shared/FeatureForm";
 import {
   Dialog,
   DialogContent,
@@ -7,28 +6,33 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { SHAPE_NAMES } from "@/lib/map";
 import { cn } from "@/lib/utils";
-import { MapPoint } from "@/types/map";
+import type { Feature } from "geojson";
 import { Pencil, Plus } from "lucide-react";
 import { useState } from "react";
 
-interface PointDialogProps {
-  trigger?: React.ReactNode;
+interface FeaturesActionDialogProps {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
-  className?: string;
-  point?: MapPoint;
+  shapeType?: string;
+  feature?: Feature;
+  isNew?: boolean;
+  trigger?: React.ReactNode;
   onSuccess?: () => void;
+  className?: string;
 }
 
-export function PointDialog({
-  trigger,
+export function FeaturesActionDialog({
   open,
   onOpenChange,
-  className,
-  point,
+  shapeType,
+  feature,
+  isNew,
+  trigger,
   onSuccess,
-}: PointDialogProps) {
+  className,
+}: FeaturesActionDialogProps) {
   const [internalOpen, setInternalOpen] = useState(false);
   const isControlled = open !== undefined;
   const show = isControlled ? open : internalOpen;
@@ -42,6 +46,11 @@ export function PointDialog({
     }
   };
 
+  // Determine effective shape type for title
+  const effectiveShapeType = shapeType || feature?.properties?.shape || "Forme";
+  const displayShapeType =
+    SHAPE_NAMES[effectiveShapeType] || effectiveShapeType;
+
   return (
     <Dialog open={show} onOpenChange={handleOpenChange}>
       {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
@@ -54,37 +63,32 @@ export function PointDialog({
           "sm:top-[50%] sm:left-[50%] sm:-translate-x-1/2 sm:-translate-y-1/2", // Desktop positioning
           className
         )}
+        onOpenAutoFocus={(e) => e.preventDefault()}
       >
         <DialogHeader>
-          <div className="flex items-center justify-between mr-8">
-            <DialogTitle className="flex items-center gap-2">
-              {point ? (
-                <>
-                  <Pencil className="size-6 text-primary" />
-                  Modifier le point
-                </>
-              ) : (
-                <>
-                  <Plus className="size-6 text-primary" />
-                  Ajouter un point
-                </>
-              )}
-            </DialogTitle>
-            {!point && (
-              <ImportDialog
-                mode="text"
-                onSuccess={() => handleOpenChange(false)}
-              />
+          <DialogTitle className="flex items-center gap-2">
+            {!isNew && feature ? (
+              <>
+                <Pencil className="size-5 text-primary" />
+                Modifier la forme
+              </>
+            ) : (
+              <>
+                <Plus className="size-5 text-primary" />
+                Nouvelle forme ({displayShapeType})
+              </>
             )}
-          </div>
+          </DialogTitle>
         </DialogHeader>
         <div className="flex-1 overflow-y-auto min-h-0">
-          <PointForm
+          <FeatureForm
+            feature={feature}
+            isNew={isNew !== undefined ? isNew : !feature}
+            shapeType={effectiveShapeType}
             onSuccess={() => {
-              handleOpenChange(false);
               onSuccess?.();
+              handleOpenChange(false);
             }}
-            point={point}
           />
         </div>
       </DialogContent>

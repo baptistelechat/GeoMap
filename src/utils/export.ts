@@ -1,3 +1,4 @@
+import { useGeomarkStore } from "@/store/geomarkStore";
 import { MapPoint } from "@/types/map";
 import { saveAs } from "file-saver";
 import { Feature } from "geojson";
@@ -46,11 +47,19 @@ const generateCSVContent = (points: MapPoint[], features: Feature[]) => {
   return Papa.unparse([...pointRows, ...featureRows]);
 };
 
-export function exportToCSV(data: {
+interface ExportData {
   points: MapPoint[];
   features: Feature[];
-}): void {
-  const { points, features } = data;
+}
+
+const getData = (data?: ExportData): ExportData => {
+  if (data) return data;
+  const state = useGeomarkStore.getState();
+  return { points: state.points, features: state.features };
+};
+
+export function exportToCSV(data?: ExportData): void {
+  const { points, features } = getData(data);
   const csv = generateCSVContent(points, features);
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
   const timestamp = getFormattedTimestamp();
@@ -61,25 +70,20 @@ export function exportToCSV(data: {
   );
 }
 
-export function exportToJSON(data: {
-  points: MapPoint[];
-  features: Feature[];
-}): void {
-  const json = JSON.stringify(data, null, 2);
+export function exportToJSON(data?: ExportData): void {
+  const finalData = getData(data);
+  const json = JSON.stringify(finalData, null, 2);
   const blob = new Blob([json], { type: "application/json;charset=utf-8;" });
   const timestamp = getFormattedTimestamp();
 
   saveAs(blob, `geomark-${timestamp}.json`);
   toast.success(
-    `Export JSON terminé : ${data.points.length} points et ${data.features.length} dessins`
+    `Export JSON terminé : ${finalData.points.length} points et ${finalData.features.length} dessins`
   );
 }
 
-export async function exportToZIP(data: {
-  points: MapPoint[];
-  features: Feature[];
-}): Promise<void> {
-  const { points, features } = data;
+export async function exportToZIP(data?: ExportData): Promise<void> {
+  const { points, features } = getData(data);
   const timestamp = getFormattedTimestamp();
   const zip = new JSZip();
 
@@ -88,7 +92,7 @@ export async function exportToZIP(data: {
   zip.file(`geomark-${timestamp}.csv`, csvContent);
 
   // Add JSON
-  const jsonContent = JSON.stringify(data, null, 2);
+  const jsonContent = JSON.stringify({ points, features }, null, 2);
   zip.file(`geomark-${timestamp}.json`, jsonContent);
 
   // Generate ZIP

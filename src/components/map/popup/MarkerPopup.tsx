@@ -1,10 +1,11 @@
-import { DeletePointDialog } from "@/components/DeletePointDialog";
-import { MarkerIcon } from "@/components/MarkerIcon";
-import { PointDialog } from "@/components/PointDialog";
+import { DeletePointDialog } from "@/components/dialogs/DeletePointDialog";
+import { PointActionDialog } from "@/components/dialogs/PointActionDialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { MapPoint } from "@/types/map";
 import { ExternalLink, Pencil, Trash2 } from "lucide-react";
+import { ScrollArea } from "../../ui/scroll-area";
+import { MarkerIcon } from "../MarkerIcon";
 
 interface MarkerPopupProps {
   point: MapPoint;
@@ -12,7 +13,7 @@ interface MarkerPopupProps {
 
 export function MarkerPopup({ point }: MarkerPopupProps) {
   return (
-    <div className="p-2 min-w-[200px] flex flex-col gap-2">
+    <div className="p-2 w-[300px] flex flex-col gap-2">
       <div className="flex items-center gap-2">
         <MarkerIcon
           iconName={point.icon}
@@ -29,7 +30,11 @@ export function MarkerPopup({ point }: MarkerPopupProps) {
         </Badge>
       </div>
       {point.notes && (
-        <p className="m-0 text-sm text-gray-600 break-words">{point.notes}</p>
+        <ScrollArea className="h-[75px] w-full">
+          <p className="m-0 text-sm text-gray-600 break-words whitespace-pre-wrap">
+            {point.notes}
+          </p>
+        </ScrollArea>
       )}
       <div className="flex items-center justify-between pt-2 mt-1 border-t gap-2">
         {point.url ? (
@@ -47,7 +52,7 @@ export function MarkerPopup({ point }: MarkerPopupProps) {
         )}
 
         <div className="flex items-center gap-1">
-          <PointDialog
+          <PointActionDialog
             point={point}
             trigger={
               <Button

@@ -1,9 +1,10 @@
-import { AVAILABLE_ICONS, MarkerIcon } from "@/components/MarkerIcon";
+import { AVAILABLE_ICONS, MarkerIcon } from "@/components/map/MarkerIcon";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { primaryColor } from "@/constants/tailwindThemeColor";
 import { TAILWIND_COLORS } from "@/lib/tailwindColors";
 import { generateId } from "@/lib/utils";
 import { useGeomarkStore } from "@/store/geomarkStore";
@@ -19,7 +20,7 @@ export function PointForm({
   onSuccess?: () => void;
   point?: MapPoint;
 }) {
-  const { addPoint, updatePoint, setFlyToLocation, setHighlightedPointId } =
+  const { addPoint, updatePoint, setFlyToLocation, setHighlightedId } =
     useGeomarkStore();
   const [isManualCoords, setIsManualCoords] = useState(false);
   const [formData, setFormData] = useState({
@@ -30,8 +31,8 @@ export function PointForm({
     url: point?.url || "",
     color:
       point?.color ||
-      TAILWIND_COLORS.find((c) => c.name === "green")?.shades["500"] ||
-      "#22c55e", // Default Green
+      TAILWIND_COLORS.find((c) => c.name === "lime")?.shades["600"] ||
+      primaryColor,
     icon: point?.icon || AVAILABLE_ICONS[0].name, // Default Pin
   });
 
@@ -46,8 +47,8 @@ export function PointForm({
         url: point.url || "",
         color:
           point?.color ||
-          TAILWIND_COLORS.find((c) => c.name === "green")?.shades["500"] ||
-          "#22c55e", // Default Green
+          TAILWIND_COLORS.find((c) => c.name === "lime")?.shades["600"] ||
+          primaryColor,
         icon: point.icon || AVAILABLE_ICONS[0].name,
       });
     }
@@ -110,13 +111,13 @@ export function PointForm({
       toast.success(`Le point "${newPoint.title}" a été modifié avec succès`);
       // On editing, we want to fly to the point to show the update
       setFlyToLocation({ lat: newPoint.lat, lng: newPoint.lng, zoom: 16 });
-      setHighlightedPointId(newPoint.id);
+      setHighlightedId(newPoint.id);
     } else {
       addPoint(newPoint);
       toast.success(`Le point "${newPoint.title}" a été ajouté avec succès`);
       // On creation, we also want to fly to the new point
       setFlyToLocation({ lat: newPoint.lat, lng: newPoint.lng, zoom: 16 });
-      setHighlightedPointId(newPoint.id);
+      setHighlightedId(newPoint.id);
     }
 
     setFormData({
@@ -125,7 +126,7 @@ export function PointForm({
       lng: "",
       notes: "",
       url: "",
-      color: "#22c55e",
+      color: primaryColor,
       icon: AVAILABLE_ICONS[0].name,
     });
     setIsManualCoords(false);
@@ -195,7 +196,7 @@ export function PointForm({
           placeholder="Superbe vue depuis le Trocadéro..."
           value={formData.notes}
           onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-          className="h-20 resize-none"
+          className="h-25 resize-none"
         />
       </div>
 
@@ -206,9 +207,7 @@ export function PointForm({
           type="url"
           placeholder="https://www.google.com/maps/..."
           value={formData.url}
-          onChange={(e) =>
-            setFormData({ ...formData, url: e.target.value })
-          }
+          onChange={(e) => setFormData({ ...formData, url: e.target.value })}
         />
         <p className="text-xs text-muted-foreground">
           Collez une URL Google Maps pour remplir automatiquement les

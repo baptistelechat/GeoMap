@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useGeomarkStore } from "@/store/geomarkStore";
 import { MapPoint } from "@/types/map";
+import { Trash2 } from "lucide-react";
 import { ReactNode } from "react";
 import { toast } from "sonner";
 
@@ -24,7 +25,12 @@ export function DeletePointDialog({
   point,
   trigger,
   onDelete,
-}: DeletePointDialogProps) {
+  open,
+  onOpenChange,
+}: DeletePointDialogProps & {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}) {
   const { removePoint } = useGeomarkStore();
 
   const handleDelete = (e: React.MouseEvent) => {
@@ -33,14 +39,18 @@ export function DeletePointDialog({
     removePoint(point.id);
     toast.success(`Le point "${point.title}" a été supprimé`);
     onDelete?.();
+    onOpenChange?.(false);
   };
 
   return (
-    <AlertDialog>
-      <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
+      {trigger && <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>}
       <AlertDialogContent onClick={(e) => e.stopPropagation()}>
         <AlertDialogHeader>
-          <AlertDialogTitle>Êtes-vous sûr ?</AlertDialogTitle>
+          <AlertDialogTitle className="flex items-center gap-2">
+            <Trash2 className="size-6 text-destructive" />
+            Êtes-vous sûr ?
+          </AlertDialogTitle>
           <AlertDialogDescription>
             Cette action est irréversible. Cela supprimera définitivement le
             point "{point.title}" de votre liste.

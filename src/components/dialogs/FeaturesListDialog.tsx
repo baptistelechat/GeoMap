@@ -1,5 +1,4 @@
-import { ClearPointsDialog } from "@/components/ClearPointsDialog";
-import { PointsList } from "@/components/PointsList";
+import { FeaturesList } from "@/components/shared/FeaturesList";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -12,61 +11,55 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import { useGeomarkStore } from "@/store/geomarkStore";
 import { exportToCSV, exportToJSON, exportToZIP } from "@/utils/export";
-import { Archive, FileJson, FileText, List } from "lucide-react";
+import { Archive, FileJson, FileText, Shapes } from "lucide-react";
 import { useState } from "react";
+import { ClearDataDialog } from "./ClearDataDialog";
 
-interface PointsListDialogProps {
+interface FeaturesListDialogProps {
   trigger?: React.ReactNode;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   className?: string;
 }
 
-export function PointsListDialog({
+export function FeaturesListDialog({
   trigger,
   open,
   onOpenChange,
   className,
-}: PointsListDialogProps) {
-  const { points, features } = useGeomarkStore();
+}: FeaturesListDialogProps) {
+  const { features, clearFeatures } = useGeomarkStore();
   const [internalOpen, setInternalOpen] = useState(false);
   const isControlled = open !== undefined;
   const show = isControlled ? open : internalOpen;
   const setShow = isControlled ? onOpenChange : setInternalOpen;
   const isMobile = useIsMobile();
 
-  const handleExportCSV = () => {
-    exportToCSV({ points, features });
-  };
-
-  const handleExportJSON = () => {
-    exportToJSON({ points, features });
-  };
-
-  const handleExportZIP = () => {
-    exportToZIP({ points, features });
-  };
-
   return (
     <Dialog open={show} onOpenChange={setShow}>
       {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
       <DialogContent
         className={cn(
-          "flex flex-col overflow-hidden", // Flex container for header/content/footer
-          "w-screen h-[100dvh] max-w-none rounded-none border-0 m-0", // Mobile fullscreen with dynamic viewport height
-          "top-0 left-0 translate-x-0 translate-y-0", // Mobile positioning
-          "sm:border sm:rounded-lg sm:h-[80vh] sm:max-w-lg sm:w-full", // Desktop reset (limited height)
-          "sm:top-[50%] sm:left-[50%] sm:-translate-x-1/2 sm:-translate-y-1/2", // Desktop positioning
+          "flex flex-col overflow-hidden",
+          "w-screen h-[100dvh] max-w-none rounded-none border-0 m-0",
+          "top-0 left-0 translate-x-0 translate-y-0",
+          "sm:border sm:rounded-lg sm:h-[80vh] sm:max-w-lg sm:w-full",
+          "sm:top-[50%] sm:left-[50%] sm:-translate-x-1/2 sm:-translate-y-1/2",
           className
         )}
       >
         <DialogHeader>
           <div className="flex items-center justify-between mr-8">
             <DialogTitle className="flex items-center gap-2">
-              <List className="size-6 text-primary" />
-              {isMobile ? "Points" : "Liste des points"} ({points.length})
+              <Shapes className="size-6 text-primary" />
+              {isMobile ? "Formes" : "Liste des formes"} ({features.length})
             </DialogTitle>
-            <ClearPointsDialog mode="text" />
+            <ClearDataDialog
+              count={features.length}
+              onClear={clearFeatures}
+              label="formes"
+              mode="text"
+            />
           </div>
         </DialogHeader>
 
@@ -74,8 +67,8 @@ export function PointsListDialog({
           <Button
             variant="outline"
             size="sm"
-            onClick={handleExportCSV}
-            disabled={points.length === 0}
+            onClick={() => exportToCSV()}
+            disabled={features.length === 0}
             className="flex-1"
           >
             <FileText className="mr-2 size-4 text-green-600" />
@@ -84,8 +77,8 @@ export function PointsListDialog({
           <Button
             variant="outline"
             size="sm"
-            onClick={handleExportJSON}
-            disabled={points.length === 0}
+            onClick={() => exportToJSON()}
+            disabled={features.length === 0}
             className="flex-1"
           >
             <FileJson className="mr-2 size-4 text-primary" />
@@ -94,8 +87,8 @@ export function PointsListDialog({
           <Button
             variant="outline"
             size="sm"
-            onClick={handleExportZIP}
-            disabled={points.length === 0}
+            onClick={() => exportToZIP()}
+            disabled={features.length === 0}
             className="flex-1"
           >
             <Archive className="mr-2 size-4 text-amber-500" />
@@ -103,9 +96,9 @@ export function PointsListDialog({
           </Button>
         </div>
 
-        <div className="flex-1 overflow-y-auto min-h-0">
-          <PointsList
-            onPointClick={() => setShow(false)}
+        <div className="flex-1 overflow-y-auto -mx-6 px-6">
+          <FeaturesList
+            onItemClick={() => setShow(false)}
             onEditSuccess={() => setShow(false)}
           />
         </div>

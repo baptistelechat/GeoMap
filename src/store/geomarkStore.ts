@@ -19,15 +19,35 @@ interface GeomarkStore {
   setFeatures: (features: Feature[]) => void;
   clearFeatures: () => void;
 
+  // Visibility
+  showPoints: boolean;
+  setShowPoints: (show: boolean) => void;
+  showFeatures: boolean;
+  setShowFeatures: (show: boolean) => void;
+
   // Map Control
   flyToLocation: { lat: number; lng: number; zoom?: number } | null;
   setFlyToLocation: (
     location: { lat: number; lng: number; zoom?: number } | null
   ) => void;
+  flyToBounds: {
+    bounds: [[number, number], [number, number]];
+    options?: { maxZoom?: number; skipHideFeatures?: boolean };
+  } | null;
+  setFlyToBounds: (
+    data: {
+      bounds: [[number, number], [number, number]];
+      options?: { maxZoom?: number; skipHideFeatures?: boolean };
+    } | null
+  ) => void;
 
   // Animation
-  highlightedPointId: string | null;
-  setHighlightedPointId: (id: string | null) => void;
+  highlightedId: string | null;
+  setHighlightedId: (id: string | null) => void;
+
+  // Edit Mode
+  isEditMode: boolean;
+  setIsEditMode: (isEditMode: boolean) => void;
 
   // Import
   importData: (points: MapPoint[], features: Feature[]) => void;
@@ -98,19 +118,33 @@ export const useGeomarkStore = create<GeomarkStore>()(
       setFeatures: (features) => set({ features }),
       clearFeatures: () => set({ features: [] }),
 
+      // Visibility Implementation
+      showPoints: true,
+      setShowPoints: (show) => set({ showPoints: show }),
+      showFeatures: true,
+      setShowFeatures: (show) => set({ showFeatures: show }),
+
       // Map Control Implementation
       flyToLocation: null,
       setFlyToLocation: (location) => set({ flyToLocation: location }),
+      flyToBounds: null,
+      setFlyToBounds: (data) => set({ flyToBounds: data }),
 
       // Animation Implementation
-      highlightedPointId: null,
-      setHighlightedPointId: (id) => set({ highlightedPointId: id }),
+      highlightedId: null,
+      setHighlightedId: (id) => set({ highlightedId: id }),
+
+      // Edit Mode Implementation
+      isEditMode: false,
+      setIsEditMode: (isEditMode) => set({ isEditMode }),
     }),
     {
       name: "geomark-storage", // Unified storage key
       partialize: (state) => ({
         points: state.points,
         features: state.features,
+        showPoints: state.showPoints,
+        showFeatures: state.showFeatures,
         // Exclude flyToLocation and highlightedPointId from persistence
       }),
     }

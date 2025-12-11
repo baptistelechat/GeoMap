@@ -1,11 +1,13 @@
-import { AppSidebar } from "@/components/AppSidebar";
-import { DevTools } from "@/components/DevTools";
-import { MapView } from "@/components/MapView";
-import { PointDialog } from "@/components/PointDialog";
-import { PointsListDialog } from "@/components/PointsListDialog";
+import { FeaturesListDialog } from "@/components/dialogs/FeaturesListDialog";
+import { PointActionDialog } from "@/components/dialogs/PointActionDialog";
+import { PointsListDialog } from "@/components/dialogs/PointsListDialog";
+import { MapView } from "@/components/map/MapView";
+import { StressTestButton } from "@/components/shared/devtools/StressTestButton";
+import { TestPointsButton } from "@/components/shared/devtools/TestPointsButton";
+import { AppSidebar } from "@/components/sidebar/AppSidebar";
 import { Button } from "@/components/ui/button";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import { FlaskConical, List, Plus } from "lucide-react";
+import { Dices, MapPin, Plus, Shapes, Zap } from "lucide-react";
 
 export default function MainMap() {
   return (
@@ -17,7 +19,7 @@ export default function MainMap() {
         </div>
 
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex gap-4 md:hidden">
-          <PointDialog
+          <PointActionDialog
             trigger={
               <Button
                 className="rounded-full shadow-lg size-12"
@@ -36,19 +38,41 @@ export default function MainMap() {
                 size="icon"
                 title="Liste des points"
               >
-                <List className="size-6" />
+                <MapPin className="size-6" />
+              </Button>
+            }
+          />
+          <FeaturesListDialog
+            trigger={
+              <Button
+                className="rounded-full shadow-lg size-12"
+                variant="secondary"
+                size="icon"
+                title="Liste des formes"
+              >
+                <Shapes className="size-6" />
               </Button>
             }
           />
           {import.meta.env.DEV && (
-            <DevTools
-              className="rounded-full shadow-lg size-12"
-              variant="outline"
-              size="icon"
-              title="Générer des points"
-            >
-              <FlaskConical className="size-6" />
-            </DevTools>
+            <>
+              <TestPointsButton
+                className="rounded-full shadow-lg size-12"
+                variant="outline"
+                size="icon"
+                title="Générer 15 points"
+              >
+                <Dices className="size-6 text-amber-500" />
+              </TestPointsButton>
+              <StressTestButton
+                className="rounded-full shadow-lg size-12"
+                variant="outline"
+                size="icon"
+                title="Stress Test (2000 points)"
+              >
+                <Zap className="size-6 text-destructive" />
+              </StressTestButton>
+            </>
           )}
         </div>
       </SidebarInset>

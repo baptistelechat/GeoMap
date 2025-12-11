@@ -11,20 +11,26 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useGeomarkStore } from "@/store/geomarkStore";
 import { Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-interface ClearPointsDialogProps {
+interface ClearDataDialogProps {
+  count: number;
+  onClear: () => void;
+  label: string; // "points" or "formes"
   mode?: "icon" | "text";
 }
 
-export function ClearPointsDialog({ mode = "icon" }: ClearPointsDialogProps) {
-  const { points, clearPoints } = useGeomarkStore();
+export function ClearDataDialog({
+  count,
+  onClear,
+  label,
+  mode = "icon",
+}: ClearDataDialogProps) {
   const [open, setOpen] = useState(false);
 
-  if (points.length === 0) return null;
+  if (count === 0) return null;
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
@@ -36,7 +42,7 @@ export function ClearPointsDialog({ mode = "icon" }: ClearPointsDialogProps) {
             "text-muted-foreground hover:text-destructive hover:bg-destructive/10",
             mode === "icon" ? "size-8" : ""
           )}
-          title="Tout supprimer"
+          title={`Tout supprimer (${label})`}
         >
           <Trash2 className={cn("size-4", mode === "text" && "mr-2")} />
           {mode === "text" && "Tout supprimer"}
@@ -44,18 +50,21 @@ export function ClearPointsDialog({ mode = "icon" }: ClearPointsDialogProps) {
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Tout supprimer ?</AlertDialogTitle>
+          <AlertDialogTitle className="flex items-center gap-2">
+            <Trash2 className="size-6 text-destructive" />
+            Tout supprimer ?
+          </AlertDialogTitle>
           <AlertDialogDescription>
-            Cette action est irréversible. Cela supprimera définitivement les {points.length} points enregistrés.
+            Cette action est irréversible. Cela supprimera définitivement les{" "}
+            {count} {label} enregistrés.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Annuler</AlertDialogCancel>
           <AlertDialogAction
             onClick={() => {
-              const count = points.length;
-              clearPoints();
-              toast.success(`${count} points ont été supprimés`);
+              onClear();
+              toast.success(`${count} ${label} ont été supprimés`);
               setOpen(false);
             }}
             className="bg-destructive hover:bg-destructive/90"

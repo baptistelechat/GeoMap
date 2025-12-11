@@ -30,7 +30,7 @@ export function ExportDialog({
   const handleExportCSV = async () => {
     setIsExporting(true);
     try {
-      exportToCSV({ points, features });
+      exportToCSV();
     } finally {
       setIsExporting(false);
     }
@@ -39,7 +39,7 @@ export function ExportDialog({
   const handleExportJSON = async () => {
     setIsExporting(true);
     try {
-      exportToJSON({ points, features });
+      exportToJSON();
     } finally {
       setIsExporting(false);
     }
@@ -48,7 +48,7 @@ export function ExportDialog({
   const handleExportZIP = async () => {
     setIsExporting(true);
     try {
-      await exportToZIP({ points, features });
+      await exportToZIP();
     } finally {
       setIsExporting(false);
     }

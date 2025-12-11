@@ -8,7 +8,14 @@ const SIDEBAR_WIDTH = 384; // 24rem from sidebar.tsx
 // Component to handle map actions from store (like flying to a location)
 const MapController = () => {
   const map = useMap();
-  const { flyToLocation, setFlyToLocation } = useGeomarkStore();
+  const {
+    flyToLocation,
+    setFlyToLocation,
+    flyToBounds,
+    setFlyToBounds,
+    showFeatures,
+    setShowFeatures,
+  } = useGeomarkStore();
   const { state, isMobile } = useSidebar();
 
   // Handle map resize when sidebar toggles
@@ -18,6 +25,53 @@ const MapController = () => {
     }, 300); // Wait for transition
     return () => clearTimeout(timer);
   }, [state, map]);
+
+  useEffect(() => {
+    if (flyToBounds) {
+      let paddingLeft = 0;
+
+      // Adjust for sidebar if expanded and not mobile
+      if (!isMobile && state === "expanded") {
+        const containerWidth = map.getContainer().clientWidth;
+        const windowWidth = window.innerWidth;
+
+        // Only apply offset if map hasn't resized to fit (meaning it's full width)
+        if (containerWidth > windowWidth - 100) {
+          paddingLeft = SIDEBAR_WIDTH;
+        }
+      }
+
+      // Hide features during animation to avoid clutter (unless skipped)
+      const shouldHideFeatures =
+        showFeatures && !flyToBounds.options?.skipHideFeatures;
+      if (shouldHideFeatures) {
+        setShowFeatures(false);
+      }
+
+      map.flyToBounds(flyToBounds.bounds, {
+        paddingTopLeft: [paddingLeft, 0],
+        animate: true,
+        duration: 1.5,
+        maxZoom: flyToBounds.options?.maxZoom,
+      });
+
+      if (shouldHideFeatures) {
+        map.once("moveend", () => {
+          setShowFeatures(true);
+        });
+      }
+
+      setFlyToBounds(null);
+    }
+  }, [
+    flyToBounds,
+    map,
+    setFlyToBounds,
+    state,
+    isMobile,
+    showFeatures,
+    setShowFeatures,
+  ]);
 
   useEffect(() => {
     if (flyToLocation) {
@@ -46,14 +100,35 @@ const MapController = () => {
         }
       }
 
+      // Hide features during animation to avoid clutter
+      const shouldHideFeatures = showFeatures;
+      if (shouldHideFeatures) {
+        setShowFeatures(false);
+      }
+
       map.flyTo([targetLat, targetLng], zoom, {
         animate: true,
         duration: 1.5,
       });
+
+      if (shouldHideFeatures) {
+        map.once("moveend", () => {
+          setShowFeatures(true);
+        });
+      }
+
       // Reset state to allow re-triggering the same point if needed
       setFlyToLocation(null);
     }
-  }, [flyToLocation, map, setFlyToLocation, state, isMobile]);
+  }, [
+    flyToLocation,
+    map,
+    setFlyToLocation,
+    state,
+    isMobile,
+    showFeatures,
+    setShowFeatures,
+  ]);
 
   return null;
 };
