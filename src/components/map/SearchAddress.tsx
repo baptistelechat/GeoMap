@@ -1,12 +1,18 @@
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { primaryColor } from "@/constants/tailwindThemeColor";
 import { generateId } from "@/lib/utils";
 import { useGeomarkStore } from "@/store/geomarkStore";
 import { MapPoint } from "@/types/map";
-import { Loader2, MapPin, Search, X } from "lucide-react";
+import { Loader2, MapPin, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import {
+  Command,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "../ui/command";
 
 // Interface pour les résultats de l'API Geoplateforme Autocompletion
 interface CompletionResult {
@@ -120,67 +126,68 @@ export function SearchAddress() {
       ref={wrapperRef}
       className="relative w-full max-w-sm pointer-events-auto"
     >
-      <div className="relative">
-        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-        <Input
-          type="text"
-          placeholder="Rechercher une adresse..."
-          className="pl-9 pr-8 bg-background/95 backdrop-blur shadow-md border-muted"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          onFocus={() => {
-            if (results.length > 0) setIsOpen(true);
-          }}
-        />
-        {loading && (
-          <div className="absolute right-2.5 top-2.5">
-            <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+      <Command
+        shouldFilter={false}
+        className="overflow-visible bg-transparent [&_[data-slot=command-input-wrapper]]:bg-background/95 [&_[data-slot=command-input-wrapper]]:backdrop-blur [&_[data-slot=command-input-wrapper]]:shadow-md [&_[data-slot=command-input-wrapper]]:border [&_[data-slot=command-input-wrapper]]:border-muted [&_[data-slot=command-input-wrapper]]:rounded-md [&_[data-slot=command-input-wrapper]]:px-3"
+      >
+        <div className="relative">
+          <CommandInput
+            placeholder="Rechercher une adresse..."
+            value={query}
+            onValueChange={setQuery}
+            className="h-10"
+          />
+          {loading && (
+            <div className="absolute right-2.5 top-1/2 -translate-y-1/2">
+              <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+            </div>
+          )}
+          {!loading && query && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 text-muted-foreground hover:text-foreground"
+              onClick={clearSearch}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
+
+        {isOpen && results.length > 0 && (
+          <div className="absolute top-full mt-1 w-full bg-background/95 backdrop-blur rounded-md border shadow-lg overflow-hidden z-50">
+            <CommandList>
+              <CommandGroup>
+                {results.map((result) => (
+                  <CommandItem
+                    key={result.fulltext}
+                    value={result.fulltext}
+                    onSelect={() => handleSelect(result)}
+                    className="cursor-pointer"
+                  >
+                    <MapPin className="h-4 w-4 mr-2 text-primary shrink-0" />
+                    <div className="flex flex-col min-w-0 flex-1">
+                      <span className="font-medium truncate block">
+                        {result.fulltext}
+                      </span>
+                      <span className="text-xs text-muted-foreground truncate block">
+                        {result.zipcode} {result.city}
+                      </span>
+                    </div>
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </CommandList>
           </div>
         )}
-        {!loading && query && (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute right-0 top-0 h-9 w-9 text-muted-foreground hover:text-foreground"
-            onClick={clearSearch}
-          >
-            <X className="h-4 w-4" />
-          </Button>
+
+        {/* Message si aucun résultat */}
+        {isOpen && !loading && query.length > 2 && results.length === 0 && (
+          <div className="absolute top-full mt-1 w-full bg-background/95 backdrop-blur rounded-md border shadow-lg p-3 text-sm text-muted-foreground text-center z-50">
+            Aucune adresse trouvée
+          </div>
         )}
-      </div>
-
-      {/* Liste des résultats */}
-      {isOpen && results.length > 0 && (
-        <div className="absolute top-full mt-1 w-full bg-background/95 backdrop-blur rounded-md border shadow-lg overflow-hidden z-50">
-          <ul className="py-1">
-            {results.map((result, index) => (
-              <li key={index}>
-                <button
-                  className="w-full text-left px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground flex items-start gap-2 transition-colors"
-                  onClick={() => handleSelect(result)}
-                >
-                  <MapPin className="h-4 w-4 mt-0.5 text-primary shrink-0" />
-                  <div>
-                    <div className="font-medium truncate">
-                      {result.fulltext}
-                    </div>
-                    <div className="text-xs text-muted-foreground truncate">
-                      {result.zipcode} {result.city}
-                    </div>
-                  </div>
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {/* Message si aucun résultat */}
-      {isOpen && !loading && query.length > 2 && results.length === 0 && (
-        <div className="absolute top-full mt-1 w-full bg-background/95 backdrop-blur rounded-md border shadow-lg p-3 text-sm text-muted-foreground text-center z-50">
-          Aucune adresse trouvée
-        </div>
-      )}
+      </Command>
     </div>
   );
 }
