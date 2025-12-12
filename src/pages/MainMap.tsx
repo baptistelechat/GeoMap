@@ -9,6 +9,7 @@ import { AppSidebar } from "@/components/sidebar/AppSidebar";
 import { Button } from "@/components/ui/button";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 import { Dices, MapPin, Plus, Shapes, Zap } from "lucide-react";
 
 export default function MainMap() {
@@ -16,7 +17,10 @@ export default function MainMap() {
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset className="relative">
-        <div
+        <motion.div
+          initial={{ y: -75, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 1, ease: "easeOut" }}
           className={cn(
             "absolute top-4 z-50 transition-all duration-300",
             // Mobile (default): Décalé à droite pour éviter Geoman
@@ -26,7 +30,7 @@ export default function MainMap() {
           )}
         >
           <SearchAddress />
-        </div>
+        </motion.div>
         <div className="flex-1 h-screen">
           <MapView />
         </div>

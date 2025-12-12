@@ -75,43 +75,49 @@ function VisibilityMenu() {
   const hasHiddenLayers = !showPoints || !showFeatures;
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon" title="Gérer l'affichage">
-          <motion.div
-            animate={{ color: hasHiddenLayers ? primaryColor : "" }}
-            transition={{ duration: 0.3 }}
+    <motion.div
+      initial={{ x: -20, opacity: 0 }}
+      animate={{ x: 0, opacity: 1 }}
+      transition={{ duration: 0.3, delay: 0.6 }}
+    >
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" size="icon" title="Gérer l'affichage">
+            <motion.div
+              animate={{ color: hasHiddenLayers ? primaryColor : "" }}
+              transition={{ duration: 0.3 }}
+            >
+              <Layers className="size-4" />
+            </motion.div>
+            <Indicator isVisible={hasHiddenLayers} />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent
+          align="start"
+          side="right"
+          sideOffset={10}
+          className="z-[9999]"
+        >
+          <DropdownMenuLabel>Calques</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuCheckboxItem
+            checked={showPoints}
+            onCheckedChange={setShowPoints}
+            className="flex gap-2 justify-between"
           >
-            <Layers className="size-4" />
-          </motion.div>
-          <Indicator isVisible={hasHiddenLayers} />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent
-        align="start"
-        side="right"
-        sideOffset={10}
-        className="z-[9999]"
-      >
-        <DropdownMenuLabel>Calques</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuCheckboxItem
-          checked={showPoints}
-          onCheckedChange={setShowPoints}
-          className="flex gap-2 justify-between"
-        >
-          Points
-          <MapPin className="size-4 text-primary" />
-        </DropdownMenuCheckboxItem>
-        <DropdownMenuCheckboxItem
-          checked={showFeatures}
-          onCheckedChange={setShowFeatures}
-          className="flex gap-2 justify-between"
-        >
-          Formes
-          <Shapes className="size-4 text-primary" />
-        </DropdownMenuCheckboxItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+            Points
+            <MapPin className="size-4 text-primary" />
+          </DropdownMenuCheckboxItem>
+          <DropdownMenuCheckboxItem
+            checked={showFeatures}
+            onCheckedChange={setShowFeatures}
+            className="flex gap-2 justify-between"
+          >
+            Formes
+            <Shapes className="size-4 text-primary" />
+          </DropdownMenuCheckboxItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </motion.div>
   );
 }
