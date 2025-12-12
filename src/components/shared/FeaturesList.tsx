@@ -4,13 +4,11 @@ import { SidebarList } from "@/components/shared/SidebarList";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { getFeatureBounds, SHAPE_NAMES } from "@/lib/map";
-import { getFeatureIcon } from "@/lib/map-icons";
-import { getContrastColorStyles } from "@/lib/tailwindColors";
-import { cn } from "@/lib/utils";
 import { useGeomarkStore } from "@/store/geomarkStore";
 import { motion, useInView } from "framer-motion";
 import { MapPinOff, Pencil, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { FeatureIconDisplay } from "./FeatureIconDisplay";
 
 interface FeaturesListProps {
   limit?: number;
@@ -95,9 +93,6 @@ export function FeaturesList({
         items={displayFeatures}
         emptyMessage={emptyMessage}
         renderItem={(feature) => {
-          const ShapeIcon = getFeatureIcon(feature.properties?.shape);
-          const colorStyles = getContrastColorStyles(feature.properties?.color);
-
           return (
             <motion.div
               key={feature.properties?.id || Math.random()}
@@ -110,23 +105,12 @@ export function FeaturesList({
               onClick={() => handleFeatureClick(feature)}
             >
               <div className="flex items-center gap-3 overflow-hidden">
-                <div
-                  className={cn(
-                    "flex items-center justify-center size-8 rounded-full shrink-0",
-                    "bg-[var(--bg-color)] text-[var(--icon-color)]",
-                    "dark:bg-[var(--dark-bg-color)] dark:text-[var(--dark-icon-color)]"
-                  )}
-                  style={
-                    {
-                      "--bg-color": colorStyles.backgroundColor,
-                      "--icon-color": colorStyles.iconColor,
-                      "--dark-bg-color": colorStyles.darkBackgroundColor,
-                      "--dark-icon-color": colorStyles.darkIconColor,
-                    } as React.CSSProperties
-                  }
-                >
-                  <ShapeIcon className="size-4" />
-                </div>
+                <FeatureIconDisplay
+                  shape={feature.properties?.shape}
+                  color={feature.properties?.color}
+                  className="size-8"
+                  iconClassName="size-4"
+                />
                 <div className="flex flex-col overflow-hidden">
                   <span className="font-medium truncate text-sm">
                     {feature.properties?.name || "Forme sans nom"}
