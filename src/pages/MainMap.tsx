@@ -2,11 +2,14 @@ import { FeaturesListDialog } from "@/components/dialogs/FeaturesListDialog";
 import { PointActionDialog } from "@/components/dialogs/PointActionDialog";
 import { PointsListDialog } from "@/components/dialogs/PointsListDialog";
 import { MapView } from "@/components/map/MapView";
+import { SearchAddress } from "@/components/map/SearchAddress";
 import { StressTestButton } from "@/components/shared/devtools/StressTestButton";
 import { TestPointsButton } from "@/components/shared/devtools/TestPointsButton";
 import { AppSidebar } from "@/components/sidebar/AppSidebar";
 import { Button } from "@/components/ui/button";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 import { Dices, MapPin, Plus, Shapes, Zap } from "lucide-react";
 
 export default function MainMap() {
@@ -14,6 +17,20 @@ export default function MainMap() {
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset className="relative">
+        <motion.div
+          initial={{ y: -75, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 1, ease: "easeOut" }}
+          className={cn(
+            "absolute top-4 z-50 transition-all duration-300",
+            // Mobile (default): Décalé à droite pour éviter Geoman
+            "right-4 w-[calc(100%-80px)] max-w-[300px]",
+            // Desktop (md+): Centré
+            "md:right-auto md:left-1/2 md:-translate-x-1/2 md:w-[90%] md:max-w-sm"
+          )}
+        >
+          <SearchAddress />
+        </motion.div>
         <div className="flex-1 h-screen">
           <MapView />
         </div>

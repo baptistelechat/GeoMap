@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useGeomarkStore } from "@/store/geomarkStore";
+import { motion } from "framer-motion";
 import * as L from "leaflet";
 import { Loader2, Locate } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -226,13 +227,19 @@ function LocateButton({
   isLoading: boolean;
 }) {
   return (
-    <Button
-      variant="outline"
-      size="icon"
-      onClick={onClick}
-      title="Me localiser"
+    <motion.div
+      initial={{ x: -20, opacity: 0 }}
+      animate={{ x: 0, opacity: 1 }}
+      transition={{ duration: 0.3, delay: 0.5 }}
     >
-      {isLoading ? <Loader2 className="animate-spin" /> : <Locate />}
-    </Button>
+      <Button
+        variant="outline"
+        size="icon"
+        onClick={onClick}
+        title="Me localiser"
+      >
+        {isLoading ? <Loader2 className="animate-spin" /> : <Locate />}
+      </Button>
+    </motion.div>
   );
 }

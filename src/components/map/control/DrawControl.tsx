@@ -261,7 +261,12 @@ function DrawToolbar({ map }: DrawToolbarProps) {
   };
 
   return (
-    <div className="flex flex-col gap-2">
+    <motion.div
+      initial={{ x: -20, opacity: 0 }}
+      animate={{ x: 0, opacity: 1 }}
+      transition={{ duration: 0.3, delay: 0.4 }}
+      className="flex flex-col gap-2"
+    >
       <ButtonGroup orientation="vertical">
         {/* Creation Tools */}
         {CREATION_TOOLS.map(renderButton)}
@@ -271,6 +276,6 @@ function DrawToolbar({ map }: DrawToolbarProps) {
         {/* Edit Tools */}
         {EDIT_TOOLS.map(renderButton)}
       </ButtonGroup>
-    </div>
+    </motion.div>
   );
 }

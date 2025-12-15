@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
+import { motion } from "framer-motion";
 import * as L from "leaflet";
 import { Minus, Plus } from "lucide-react";
 import { useEffect } from "react";
@@ -58,23 +59,29 @@ export function ZoomControl() {
 
 function ZoomButtons({ map }: { map: L.Map }) {
   return (
-    <ButtonGroup orientation="vertical">
-      <Button
-        variant="outline"
-        size="icon"
-        onClick={() => map.zoomIn()}
-        title="Zoom avant"
-      >
-        <Plus />
-      </Button>
-      <Button
-        variant="outline"
-        size="icon"
-        onClick={() => map.zoomOut()}
-        title="Zoom arrière"
-      >
-        <Minus />
-      </Button>
-    </ButtonGroup>
+    <motion.div
+      initial={{ x: -20, opacity: 0 }}
+      animate={{ x: 0, opacity: 1 }}
+      transition={{ duration: 0.3, delay: 0.3 }}
+    >
+      <ButtonGroup orientation="vertical">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => map.zoomIn()}
+          title="Zoom avant"
+        >
+          <Plus />
+        </Button>
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => map.zoomOut()}
+          title="Zoom arrière"
+        >
+          <Minus />
+        </Button>
+      </ButtonGroup>
+    </motion.div>
   );
 }
