@@ -29,12 +29,6 @@ import { MiniMapControl } from "./MiniMapControl";
 import { MarkerPopup } from "./popup/MarkerPopup";
 import { VisibilityControl } from "./VisibilityControl";
 
-// Fix for legacy plugins that expect L to be global
-if (typeof window !== "undefined") {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (window as any).L = L;
-}
-
 const MapEvents = () => {
   const { setHighlightedId } = useGeomarkStore();
   useMapEvents({
