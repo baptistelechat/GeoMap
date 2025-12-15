@@ -27,9 +27,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <Map className="size-6" />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">GeoMap</span>
+                  <span className="truncate font-semibold">GeoMapy</span>
                   <span className="truncate text-xs font-normal text-muted-foreground">
-                    Gérez vos points
+                    Cartographier devient simple
                   </span>
                 </div>
               </div>
