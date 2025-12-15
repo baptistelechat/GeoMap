@@ -1,0 +1,106 @@
+import { AVAILABLE_ICONS } from "@/components/map/MarkerIcon";
+import { Button } from "@/components/ui/button";
+import { testPointColor } from "@/constants/tailwindThemeColor";
+import { generateId } from "@/lib/utils";
+import { useGeomarkStore } from "@/store/geomarkStore";
+import { MapPoint } from "@/types/map";
+import { toast } from "sonner";
+
+export function TestPointsButton({
+  className,
+  variant = "outline",
+  children,
+  ...props
+}: React.ComponentProps<typeof Button>) {
+  const { addPoint } = useGeomarkStore();
+
+  const generateTestPoints = () => {
+    // Coordonnées de base pour Nantes, Le Mans et Tours
+    const centers = {
+      nantes: { lat: 47.2184, lng: -1.5536 },
+      leMans: { lat: 48.0061, lng: 0.1996 },
+      tours: { lat: 47.3941, lng: 0.6848 },
+    };
+
+    const points: MapPoint[] = [];
+
+    // Générer 5 points pour Nantes
+    for (let i = 0; i < 5; i++) {
+      const lat = centers.nantes.lat + (Math.random() - 0.5) * 0.04; // ~2-3km dispersion
+      const lng = centers.nantes.lng + (Math.random() - 0.5) * 0.04;
+
+      points.push({
+        id: generateId(),
+        title: `Nantes Point ${i + 1}`,
+        lat,
+        lng,
+        notes: "Point de test généré automatiquement - Cluster Nantes",
+        url: `https://www.google.com/maps/@${lat.toFixed(6)},${lng.toFixed(
+          6
+        )},3a,75y,90t/data=!3m6!1e1!3m4!1sTEST_ID_${i}!2e0`,
+        color: testPointColor,
+        icon: AVAILABLE_ICONS[0].name, // Pin
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      });
+    }
+
+    // Générer 5 points pour Le Mans
+    for (let i = 0; i < 5; i++) {
+      const lat = centers.leMans.lat + (Math.random() - 0.5) * 0.04;
+      const lng = centers.leMans.lng + (Math.random() - 0.5) * 0.04;
+
+      points.push({
+        id: generateId(),
+        title: `Le Mans Point ${i + 1}`,
+        lat,
+        lng,
+        notes: "Point de test généré automatiquement - Cluster Le Mans",
+        url: `https://www.google.com/maps/@${lat.toFixed(6)},${lng.toFixed(
+          6
+        )},3a,75y,90t/data=!3m6!1e1!3m4!1sTEST_ID_${i + 5}!2e0`,
+        color: "#fbbf24", // Amber-400
+        icon: AVAILABLE_ICONS[0].name, // Pin
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      });
+    }
+
+    // Générer 5 points pour Tours
+    for (let i = 0; i < 5; i++) {
+      const lat = centers.tours.lat + (Math.random() - 0.5) * 0.04;
+      const lng = centers.tours.lng + (Math.random() - 0.5) * 0.04;
+
+      points.push({
+        id: generateId(),
+        title: `Tours Point ${i + 1}`,
+        lat,
+        lng,
+        notes: "Point de test généré automatiquement - Cluster Tours",
+        url: `https://www.google.com/maps/@${lat.toFixed(6)},${lng.toFixed(
+          6
+        )},3a,75y,90t/data=!3m6!1e1!3m4!1sTEST_ID_${i + 10}!2e0`,
+        color: "#fbbf24", // Amber-400
+        icon: AVAILABLE_ICONS[0].name, // Pin
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      });
+    }
+
+    // Ajouter tous les points au store
+    points.forEach((point) => addPoint(point));
+    toast.success(`${points.length} points de test générés avec succès`);
+  };
+
+  return (
+    <Button
+      variant={variant}
+      className={className ?? "w-full justify-start gap-2 p-6"}
+      onClick={generateTestPoints}
+      title="Générer 15 points de test (Nantes, Le Mans & Tours)"
+      {...props}
+    >
+      {children}
+    </Button>
+  );
+}
