@@ -1,6 +1,6 @@
 {
   "name": "geomark",
-  "description": "GeoMark is a web application that allows users to mark points on a map and export them to a CSV file.",
+  "description": "GeoMap is a web application that allows users to mark points on a map and export them to a CSV file.",
   "private": true,
   "version": "0.0.0",
   "type": "module",

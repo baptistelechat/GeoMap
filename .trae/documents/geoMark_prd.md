@@ -1,6 +1,6 @@
 ## 1. Product Overview
 
-GeoMark est une application web légère permettant de créer et gérer des points d'intérêt sur une carte OpenStreetMap avec intégration Google Street View. Elle s'adresse aux professionnels et particuliers ayant besoin de cartographier et documenter des lieux précis avec des notes visuelles.
+GeoMap est une application web légère permettant de créer et gérer des points d'intérêt sur une carte OpenStreetMap avec intégration Google Street View. Elle s'adresse aux professionnels et particuliers ayant besoin de cartographier et documenter des lieux précis avec des notes visuelles.
 
 L'application permet de sauvegarder localement les données et d'exporter les points en CSV/JSON pour une utilisation professionnelle.
 
@@ -13,7 +13,7 @@ L'application permet de sauvegarder localement les données et d'exporter les po
 
 ### 2.2 Feature Module
 
-L'application GeoMark comprend les pages suivantes :
+L'application GeoMap comprend les pages suivantes :
 
 1. **Page Carte Principale** : carte interactive OSM, sidebar de gestion, formulaire d'ajout de points
 2. **Page Export** : interface d'export des données en CSV/JSON

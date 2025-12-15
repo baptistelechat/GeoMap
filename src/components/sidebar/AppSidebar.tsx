@@ -8,7 +8,7 @@ import {
   SidebarRail,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { MapPin } from "lucide-react";
+import { Map } from "lucide-react";
 import { SidebarAddPoint } from "./SidebarAddPoint";
 import { SidebarDevSection } from "./SidebarDevSection";
 import { SidebarFeaturesList } from "./SidebarFeaturesList";
@@ -23,11 +23,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <div className="flex items-center justify-between p-2 w-full">
               <div className="flex items-center gap-2 font-bold text-sidebar-foreground group-data-[collapsible=icon]:hidden">
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                  <MapPin className="size-4" />
+                <div className="flex aspect-square size-9 items-center justify-center rounded-md bg-gradient-to-tr from-primary to-lime-500 text-primary-foreground">
+                  <Map className="size-6" />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">GeoMark</span>
+                  <span className="truncate font-semibold">GeoMap</span>
                   <span className="truncate text-xs font-normal text-muted-foreground">
                     Gérez vos points
                   </span>
