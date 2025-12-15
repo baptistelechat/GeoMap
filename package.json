@@ -1,5 +1,5 @@
 {
-  "name": "geomark",
+  "name": "geomapy",
   "description": "GeoMapy is a web application that allows users to mark points on a map and export them to a CSV file.",
   "private": true,
   "version": "1.0.0",
