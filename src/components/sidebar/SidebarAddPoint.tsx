@@ -7,14 +7,23 @@ import {
   SidebarGroupContent,
   SidebarGroupLabel,
 } from "@/components/ui/sidebar";
+import { useOnboardingStore } from "@/store/onboardingStore";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 
 export function SidebarAddPoint() {
   const [pointDialogOpen, setPointDialogOpen] = useState(false);
+  const { notifyAction } = useOnboardingStore();
+
+  const handleOpenDialog = (open: boolean) => {
+    setPointDialogOpen(open);
+    if (open) {
+      notifyAction("OPEN_ADD_POINT");
+    }
+  };
 
   return (
-    <SidebarGroup>
+    <SidebarGroup id="onboarding-add-point">
       <div className="flex items-center justify-between px-2 py-1 group-data-[collapsible=icon]:hidden">
         <SidebarGroupLabel className="group-data-[collapsible=icon]:hidden mb-2 p-0">
           <Plus className="mr-2 size-4 text-primary" />
@@ -32,7 +41,7 @@ export function SidebarAddPoint() {
         <div className="hidden group-data-[collapsible=icon]:flex justify-center py-2">
           <PointActionDialog
             open={pointDialogOpen}
-            onOpenChange={setPointDialogOpen}
+            onOpenChange={handleOpenDialog}
             trigger={
               <Button
                 variant="ghost"

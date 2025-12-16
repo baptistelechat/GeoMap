@@ -3,6 +3,7 @@ import { PointActionDialog } from "@/components/dialogs/PointActionDialog";
 import { PointsListDialog } from "@/components/dialogs/PointsListDialog";
 import { MapView } from "@/components/map/MapView";
 import { SearchAddress } from "@/components/map/SearchAddress";
+import { Onboarding } from "@/components/onboarding/Onboarding";
 import { StressTestButton } from "@/components/shared/devtools/StressTestButton";
 import { TestPointsButton } from "@/components/shared/devtools/TestPointsButton";
 import { AppSidebar } from "@/components/sidebar/AppSidebar";
@@ -15,9 +16,11 @@ import { Dices, MapPin, Plus, Shapes, Zap } from "lucide-react";
 export default function MainMap() {
   return (
     <SidebarProvider>
+      <Onboarding />
       <AppSidebar />
       <SidebarInset className="relative">
         <motion.div
+          id="onboarding-search-address"
           initial={{ y: -75, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 1, ease: "easeOut" }}

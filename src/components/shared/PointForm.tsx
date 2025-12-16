@@ -8,6 +8,7 @@ import { primaryColor } from "@/constants/tailwindThemeColor";
 import { TAILWIND_COLORS } from "@/lib/tailwindColors";
 import { generateId } from "@/lib/utils";
 import { useGeomarkStore } from "@/store/geomarkStore";
+import { useOnboardingStore } from "@/store/onboardingStore";
 import { MapPoint } from "@/types/map";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -22,6 +23,7 @@ export function PointForm({
 }) {
   const { addPoint, updatePoint, setFlyToLocation, setHighlightedId } =
     useGeomarkStore();
+  const { notifyAction } = useOnboardingStore();
   const [isManualCoords, setIsManualCoords] = useState(false);
   const [formData, setFormData] = useState({
     title: point?.title || "",
@@ -118,6 +120,7 @@ export function PointForm({
       // On creation, we also want to fly to the new point
       setFlyToLocation({ lat: newPoint.lat, lng: newPoint.lng, zoom: 16 });
       setHighlightedId(newPoint.id);
+      notifyAction("POINT_ADDED");
     }
 
     setFormData({

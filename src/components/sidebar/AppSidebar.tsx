@@ -7,7 +7,9 @@ import {
   SidebarMenuItem,
   SidebarRail,
   SidebarTrigger,
+  useSidebar,
 } from "@/components/ui/sidebar";
+import { useOnboardingStore } from "@/store/onboardingStore";
 import { Map } from "lucide-react";
 import { SidebarAddPoint } from "./SidebarAddPoint";
 import { SidebarDevSection } from "./SidebarDevSection";
@@ -16,6 +18,13 @@ import { SidebarFooterActions } from "./SidebarFooterActions";
 import { SidebarPointsList } from "./SidebarPointsList";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { notifyAction } = useOnboardingStore();
+  const { state } = useSidebar();
+
+  const handleSidebarToggle = () => {
+    notifyAction("TOGGLE_SIDEBAR");
+  };
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader className="border-b border-sidebar-border">
@@ -35,11 +44,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               </div>
 
               <div className="flex items-center gap-2 group-data-[collapsible=icon]:hidden">
-                <SidebarTrigger />
+                <SidebarTrigger
+                  id={state === "expanded" ? "onboarding-sidebar-trigger" : undefined}
+                  onClick={handleSidebarToggle}
+                />
               </div>
 
               <div className="hidden group-data-[collapsible=icon]:flex w-full justify-center">
-                <SidebarTrigger />
+                <SidebarTrigger
+                  id={state === "collapsed" ? "onboarding-sidebar-trigger" : undefined}
+                  onClick={handleSidebarToggle}
+                />
               </div>
             </div>
           </SidebarMenuItem>

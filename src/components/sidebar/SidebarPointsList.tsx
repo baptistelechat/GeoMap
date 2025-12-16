@@ -17,7 +17,10 @@ export function SidebarPointsList() {
   const [listPointsDialogOpen, setListPointsDialogOpen] = useState(false);
 
   return (
-    <SidebarGroup className="border-t border-sidebar-border flex-1 group-data-[collapsible=icon]:flex-none">
+    <SidebarGroup
+      id="onboarding-points-list"
+      className="border-t border-sidebar-border flex-1 group-data-[collapsible=icon]:flex-none"
+    >
       <div className="flex items-center justify-between px-2 py-1 group-data-[collapsible=icon]:hidden">
         <SidebarGroupLabel className="group-data-[collapsible=icon]:hidden mb-2">
           <MapPin className="mr-2 size-4 text-primary" />
