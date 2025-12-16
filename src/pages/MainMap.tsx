@@ -4,6 +4,7 @@ import { PointsListDialog } from "@/components/dialogs/PointsListDialog";
 import { MapView } from "@/components/map/MapView";
 import { SearchAddress } from "@/components/map/SearchAddress";
 import { Onboarding } from "@/components/onboarding/Onboarding";
+import { ResetButton } from "@/components/shared/devtools/ResetButton";
 import { StressTestButton } from "@/components/shared/devtools/StressTestButton";
 import { TestPointsButton } from "@/components/shared/devtools/TestPointsButton";
 import { AppSidebar } from "@/components/sidebar/AppSidebar";
@@ -74,6 +75,9 @@ export default function MainMap() {
               </Button>
             }
           />
+        </div>
+
+        <div className="absolute bottom-4 left-4 z-50 flex flex-col gap-2 md:hidden">
           {import.meta.env.DEV && (
             <>
               <TestPointsButton
@@ -92,6 +96,11 @@ export default function MainMap() {
               >
                 <Zap className="size-6 text-destructive" />
               </StressTestButton>
+              <ResetButton
+                className="rounded-full shadow-lg size-12"
+                variant="outline"
+                size="icon"
+              />
             </>
           )}
         </div>

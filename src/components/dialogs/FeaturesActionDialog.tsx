@@ -61,6 +61,7 @@ export function FeaturesActionDialog({
           "top-0 left-0 translate-x-0 translate-y-0", // Mobile positioning
           "sm:border sm:rounded-lg sm:h-auto sm:max-w-lg sm:w-full", // Desktop reset
           "sm:top-[50%] sm:left-[50%] sm:-translate-x-1/2 sm:-translate-y-1/2", // Desktop positioning
+          "!z-[20000]", // Ensure dialog is above onboarding overlay (usually z-index 10000)
           className
         )}
         onOpenAutoFocus={(e) => e.preventDefault()}

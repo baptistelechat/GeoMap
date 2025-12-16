@@ -52,6 +52,7 @@ export function PointActionDialog({
           "top-0 left-0 translate-x-0 translate-y-0", // Mobile positioning
           "sm:border sm:rounded-lg sm:h-auto sm:max-w-lg sm:w-full", // Desktop reset
           "sm:top-[50%] sm:left-[50%] sm:-translate-x-1/2 sm:-translate-y-1/2", // Desktop positioning
+          "z-[10005]", // Ensure dialog is above onboarding overlay
           className
         )}
       >

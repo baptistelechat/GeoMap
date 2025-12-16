@@ -5,6 +5,7 @@ import { SidebarList } from "@/components/shared/SidebarList";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useGeomarkStore } from "@/store/geomarkStore";
+import { useOnboardingStore } from "@/store/onboardingStore";
 import { MapPoint } from "@/types/map";
 import { motion, useInView } from "framer-motion";
 import { MapPinOff, Pencil, Trash2 } from "lucide-react";
@@ -25,6 +26,7 @@ interface PointItemProps {
 
 const PointItem = ({ point, onPointClick, onEditSuccess }: PointItemProps) => {
   const { setFlyToLocation, setHighlightedId } = useGeomarkStore();
+  const { run } = useOnboardingStore();
 
   return (
     <div className="px-2 py-1">
@@ -54,7 +56,7 @@ const PointItem = ({ point, onPointClick, onEditSuccess }: PointItemProps) => {
           </div>
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          <div onClick={(e) => e.stopPropagation()}>
+          <div onClick={(e) => e.stopPropagation()} className="flex gap-1">
             <PointActionDialog
               point={point}
               onSuccess={onEditSuccess}
@@ -63,6 +65,8 @@ const PointItem = ({ point, onPointClick, onEditSuccess }: PointItemProps) => {
                   variant="ghost"
                   size="icon"
                   className="size-8 text-muted-foreground hover:text-primary hover:bg-primary/10"
+                  disabled={run}
+                  title={run ? "Désactivé pendant le tutoriel" : "Modifier"}
                 >
                   <Pencil className="size-4" />
                 </Button>
@@ -75,6 +79,8 @@ const PointItem = ({ point, onPointClick, onEditSuccess }: PointItemProps) => {
                   variant="ghost"
                   size="icon"
                   className="size-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                  disabled={run}
+                  title={run ? "Désactivé pendant le tutoriel" : "Supprimer"}
                 >
                   <Trash2 className="size-4" />
                 </Button>

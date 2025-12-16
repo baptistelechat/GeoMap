@@ -174,7 +174,7 @@ export function MapView() {
   }, [showPoints]);
 
   return (
-    <div className="h-full w-full relative z-0">
+    <div id="onboarding-map" className="h-full w-full relative z-0">
       <MapContainer
         center={[46.603354, 1.888334]}
         zoom={6}

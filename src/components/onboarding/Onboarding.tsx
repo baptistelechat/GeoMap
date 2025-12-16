@@ -2,7 +2,8 @@ import { useSidebar } from "@/components/ui/sidebar";
 import { useOnboardingStore } from "@/store/onboardingStore";
 import { useTheme } from "next-themes";
 import { useEffect, useMemo, useState } from "react";
-import Joyride, { CallBackProps, EVENTS, STATUS, Step } from "react-joyride";
+import Joyride, { CallBackProps, EVENTS, STATUS } from "react-joyride";
+import { getOnboardingSteps } from "./onboarding-steps";
 
 export function Onboarding() {
   const {
@@ -35,166 +36,26 @@ export function Onboarding() {
     }
   }, [mounted, onboardingCompleted, run, startOnboarding]);
 
-  const steps: Step[] = useMemo(
-    () => [
-      {
-        target: "body",
-        content: (
-          <div className="space-y-2">
-            <h3 className="font-bold text-lg">Bienvenue sur GeoMapy ! 👋</h3>
-            <p>
-              Laissez-nous vous guider à travers les fonctionnalités principales
-              de l'application pour une prise en main rapide et efficace.
-            </p>
-          </div>
-        ),
-        placement: "center",
-        disableBeacon: true,
-      },
-      {
-        target: "#onboarding-search-address",
-        content: (
-          <div className="space-y-2">
-            <h3 className="font-bold">Recherche d'adresse</h3>
-            <p>
-              Commencez par rechercher une adresse, une ville ou un lieu pour
-              centrer la carte.
-            </p>
-          </div>
-        ),
-        placement: "bottom",
-      },
-      {
-        target: "#onboarding-sidebar-trigger",
-        content: (
-          <div className="space-y-2">
-            <h3 className="font-bold">Navigation</h3>
-            <p>
-              Cliquez sur ce bouton pour replier ou déplier le panneau latéral.
-            </p>
-          </div>
-        ),
-        placement: "right",
-        disableOverlayClose: true,
-        spotlightClicks: true,
-        styles: {
-          buttonNext: {
-            display: "none",
-          },
-        },
-        data: { expectedAction: "TOGGLE_SIDEBAR" },
-      },
-      ...(sidebarState === "collapsed"
-        ? [
-            {
-              target: "#onboarding-add-point",
-              content: (
-                <div className="space-y-2">
-                  <h3 className="font-bold">Ajouter un point</h3>
-                  <p>
-                    Cliquez sur le bouton "+" pour ouvrir le formulaire d'ajout
-                    de point.
-                  </p>
-                </div>
-              ),
-              placement: "right" as const,
-              disableOverlayClose: true,
-              spotlightClicks: true,
-              styles: {
-                buttonNext: {
-                  display: "none",
-                },
-              },
-              data: { expectedAction: "OPEN_ADD_POINT" },
-            },
-          ]
-        : []),
-      {
-        target: sidebarState === "collapsed" ? "body" : "#onboarding-add-point",
-        content: (
-          <div className="space-y-2">
-            <h3 className="font-bold">Remplissez le formulaire</h3>
-            <p>
-              Saisissez les informations de votre point et validez pour le
-              créer.
-            </p>
-          </div>
-        ),
-        placement: sidebarState === "collapsed" ? "center" : "right",
-        disableOverlayClose: true,
-        styles: {
-          buttonNext: {
-            display: "none",
-          },
-        },
-        data: { expectedAction: "POINT_ADDED" },
-      },
-      {
-        target: "#onboarding-points-list",
-        content: (
-          <div className="space-y-2">
-            <h3 className="font-bold">Vos points</h3>
-            <p>
-              Retrouvez ici la liste de tous vos points. Vous pouvez les
-              modifier, les supprimer ou zoomer dessus.
-            </p>
-          </div>
-        ),
-        placement: "right",
-      },
-      {
-        target: "#onboarding-features-list",
-        content: (
-          <div className="space-y-2">
-            <h3 className="font-bold">Vos formes</h3>
-            <p>
-              Gérez ici les formes géométriques (lignes, polygones) que vous
-              avez dessinées sur la carte.
-            </p>
-          </div>
-        ),
-        placement: "right",
-      },
-      {
-        target: "#onboarding-footer-actions",
-        content: (
-          <div className="space-y-2">
-            <h3 className="font-bold">Import / Export</h3>
-            <p>
-              Sauvegardez votre travail en exportant vos données (JSON/CSV) ou
-              importez des données existantes.
-            </p>
-          </div>
-        ),
-        placement: "top",
-      },
-      {
-        target: "body",
-        content: (
-          <div className="space-y-2">
-            <h3 className="font-bold text-lg">C'est parti ! 🚀</h3>
-            <p>
-              Vous êtes maintenant prêt à utiliser GeoMapy. Bonne cartographie !
-            </p>
-          </div>
-        ),
-        placement: "center",
-      },
-    ],
+  const steps = useMemo(
+    () => getOnboardingSteps(sidebarState),
     [sidebarState]
   );
 
   const handleJoyrideCallback = (data: CallBackProps) => {
     const { status, type, index } = data;
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if ([STATUS.FINISHED, STATUS.SKIPPED].includes(status as any)) {
       completeOnboarding();
     } else if (type === EVENTS.STEP_AFTER || type === EVENTS.TARGET_NOT_FOUND) {
-      // Passer à l'étape suivante (automatique via joyride state interne normalement,
-      // mais on synchronise notre store)
-      // Only advance if it wasn't an automated advance via lastAction effect to avoid double jump
-      // Actually Joyride controls the index if we pass it.
-      if (!steps[index]?.data?.expectedAction) {
+      // Gestion de la navigation (précédent / suivant)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const actionType = (data as any).action;
+      
+      if (actionType === 'prev') {
+        setStepIndex(index - 1);
+      } else if (!steps[index]?.data?.expectedAction) {
+        // Avancer seulement si on n'attend pas une action spécifique
         setStepIndex(index + 1);
       }
     }
@@ -221,14 +82,14 @@ export function Onboarding() {
       run={run}
       stepIndex={stepIndex}
       continuous
-      showProgress
+      showProgress={false}
       showSkipButton
       hideCloseButton
       callback={handleJoyrideCallback}
       styles={{
         options: {
           zIndex: 10000,
-          primaryColor: "#000", // Will be overridden
+          primaryColor: "#65a30d", // primary / lime-600
           backgroundColor: theme === "dark" ? "#18181b" : "#ffffff",
           textColor: theme === "dark" ? "#f4f4f5" : "#09090b",
           arrowColor: theme === "dark" ? "#18181b" : "#ffffff",

@@ -6,6 +6,7 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { ColorPicker } from "./ColorPicker";
+import { useOnboardingStore } from "@/store/onboardingStore";
 
 interface FeatureFormProps {
   feature?: Feature;
@@ -29,6 +30,7 @@ export function FeatureForm({
     setFlyToBounds,
     setHighlightedId,
   } = useGeomarkStore();
+  const { notifyAction } = useOnboardingStore();
 
   const [name, setName] = useState("");
   const [color, setColor] = useState(DEFAULT_COLOR);
@@ -99,6 +101,7 @@ export function FeatureForm({
 
     if (isNew) {
       addFeature(updatedFeature);
+      notifyAction("FEATURE_ADDED");
     } else {
       updateFeature(updatedFeature);
       // Fly to the feature only on edit

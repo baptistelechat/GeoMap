@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { getFeatureBounds, SHAPE_NAMES } from "@/lib/map";
 import { useGeomarkStore } from "@/store/geomarkStore";
+import { useOnboardingStore } from "@/store/onboardingStore";
 import { motion, useInView } from "framer-motion";
 import { MapPinOff, Pencil, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -23,6 +24,7 @@ export function FeaturesList({
 }: FeaturesListProps) {
   const { features, setFlyToBounds, setHighlightedId, highlightedId } =
     useGeomarkStore();
+  const { run } = useOnboardingStore();
 
   // Sort features by last modification (if property exists) or creation
   const sortedFeatures = useMemo(() => {
@@ -122,7 +124,10 @@ export function FeaturesList({
                 </div>
               </div>
               <div className="flex items-center gap-2 shrink-0">
-                <div onClick={(e) => e.stopPropagation()}>
+                <div
+                  onClick={(e) => e.stopPropagation()}
+                  className="flex gap-1"
+                >
                   <FeaturesActionDialog
                     feature={feature}
                     onSuccess={onEditSuccess}
@@ -131,7 +136,10 @@ export function FeaturesList({
                         variant="ghost"
                         size="icon"
                         className="size-8 text-muted-foreground hover:text-primary hover:bg-primary/10"
-                        title="Modifier"
+                        title={
+                          run ? "Désactivé pendant le tutoriel" : "Modifier"
+                        }
+                        disabled={run}
                       >
                         <Pencil className="size-4" />
                       </Button>
@@ -144,7 +152,10 @@ export function FeaturesList({
                         variant="ghost"
                         size="icon"
                         className="size-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-                        title="Supprimer"
+                        title={
+                          run ? "Désactivé pendant le tutoriel" : "Supprimer"
+                        }
+                        disabled={run}
                       >
                         <Trash2 className="size-4" />
                       </Button>

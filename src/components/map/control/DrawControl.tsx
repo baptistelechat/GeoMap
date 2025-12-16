@@ -4,6 +4,7 @@ import { Indicator } from "@/components/ui/indicator";
 import { EDIT_ICONS, getFeatureIcon, SHAPE_ICONS } from "@/lib/map-icons";
 import { cn } from "@/lib/utils";
 import { useGeomarkStore } from "@/store/geomarkStore";
+import { useOnboardingStore } from "@/store/onboardingStore";
 import { AnimatePresence, motion } from "framer-motion";
 import * as L from "leaflet";
 import { LucideProps } from "lucide-react";
@@ -103,10 +104,7 @@ export function DrawControl() {
 function DrawToolbar({ map }: DrawToolbarProps) {
   const [activeTool, setActiveTool] = useState<string | null>(null);
   const { setIsEditMode } = useGeomarkStore();
-
-  useEffect(() => {
-    setIsEditMode(!!activeTool);
-  }, [activeTool, setIsEditMode]);
+  const { run, lastAction } = useOnboardingStore();
 
   const handleToolClick = useCallback(
     (toolId: string) => {
@@ -157,6 +155,27 @@ function DrawToolbar({ map }: DrawToolbarProps) {
     },
     [activeTool, map]
   );
+
+  useEffect(() => {
+    if (run && lastAction === "FEATURE_ADDED") {
+      // Force disable all modes
+      try {
+        if (map.pm.globalDrawModeEnabled()) map.pm.disableDraw();
+        if (map.pm.globalEditModeEnabled()) map.pm.disableGlobalEditMode();
+        if (map.pm.globalRemovalModeEnabled())
+          map.pm.disableGlobalRemovalMode();
+        if (map.pm.globalDragModeEnabled()) map.pm.disableGlobalDragMode();
+        if (map.pm.globalRotateModeEnabled()) map.pm.disableGlobalRotateMode();
+        setActiveTool(null);
+      } catch (e) {
+        console.error("Error disabling Geoman modes:", e);
+      }
+    }
+  }, [run, lastAction, map]);
+
+  useEffect(() => {
+    setIsEditMode(!!activeTool);
+  }, [activeTool, setIsEditMode]);
 
   useEffect(() => {
     if (activeTool) {
@@ -262,6 +281,7 @@ function DrawToolbar({ map }: DrawToolbarProps) {
 
   return (
     <motion.div
+      id="onboarding-toolbar"
       initial={{ x: -20, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.3, delay: 0.4 }}

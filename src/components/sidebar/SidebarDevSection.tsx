@@ -5,7 +5,8 @@ import {
   SidebarGroupContent,
   SidebarGroupLabel,
 } from "@/components/ui/sidebar";
-import { Dices, FlaskConical, Zap } from "lucide-react";
+import { Dices, FlaskConical, RotateCcw, Zap } from "lucide-react";
+import { ResetButton } from "../shared/devtools/ResetButton";
 
 export function SidebarDevSection() {
   if (!import.meta.env.DEV) return null;
@@ -26,6 +27,14 @@ export function SidebarDevSection() {
             <Zap className="size-4" />
             Stress Test (2000)
           </StressTestButton>
+          <ResetButton
+            className="w-full justify-start gap-2 text-destructive hover:text-destructive hover:bg-destructive/10"
+            size="default"
+            variant="ghost"
+          >
+            <RotateCcw className="size-4" />
+            Réinitialiser
+          </ResetButton>
         </div>
         <div className="hidden group-data-[collapsible=icon]:flex flex-col gap-2 items-center justify-center py-2">
           <TestPointsButton
@@ -44,6 +53,10 @@ export function SidebarDevSection() {
           >
             <Zap className="size-5" />
           </StressTestButton>
+          <ResetButton
+            variant="destructive"
+            className="size-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+          />
         </div>
       </SidebarGroupContent>
     </SidebarGroup>

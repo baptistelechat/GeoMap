@@ -9,11 +9,13 @@ import {
   SidebarGroupLabel,
 } from "@/components/ui/sidebar";
 import { useGeomarkStore } from "@/store/geomarkStore";
+import { useOnboardingStore } from "@/store/onboardingStore";
 import { MapPin } from "lucide-react";
 import { useState } from "react";
 
 export function SidebarPointsList() {
   const { points, clearPoints } = useGeomarkStore();
+  const { notifyAction } = useOnboardingStore();
   const [listPointsDialogOpen, setListPointsDialogOpen] = useState(false);
 
   return (
@@ -39,7 +41,10 @@ export function SidebarPointsList() {
       <SidebarGroupContent>
         {/* Liste visible en mode étendu */}
         <div className="group-data-[collapsible=icon]:hidden">
-          <PointsList limit={5} />
+          <PointsList 
+            limit={5} 
+            onPointClick={() => notifyAction("POINT_CLICKED")} 
+          />
           {points.length > 5 && (
             <Button
               variant="link"
