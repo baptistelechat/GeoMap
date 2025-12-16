@@ -1,57 +1,110 @@
-# React + TypeScript + Vite
+<h1 align="center">GeoMapy 🌍📍</h1>
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+<img src="./public/icon.png" height="150" align="right">
 
-Currently, two official plugins are available:
+Welcome to **GeoMapy**, an interactive web application designed to map, annotate, and manage points of interest and geographic zones.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Initially conceived for field survey needs (structural engineering type), this tool allows creating visual notes on a map, tracing zones, and easily exporting data.
 
-## Expanding the ESLint configuration
+🔗 Go to https://geomapy.vercel.app/ to view the project.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 📸 Project's Screenshots
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+![main page](./public/screenshot.png)
+
+## 🚀 Key Features
+
+### 🗺️ Advanced Mapping
+
+- **Interactive Map**: Based on OpenStreetMap and Leaflet.
+- **Shape Drawing**: Advanced drawing tools (Polygons, Lines, Rectangles) via `Geoman`.
+- **Custom Markers**: Add points with titles, notes, and customizable icons.
+- **Address Search**: Integrated search bar for quick positioning.
+- **Mini-Map**: Overview map for better orientation.
+
+### 📝 Data Management
+
+- **Control Sidebar**: List of points and traced zones.
+- **Import / Export**:
+  - Export data in **JSON** or **CSV**.
+  - Support for **ZIP** files for complete exports.
+  - Import existing data.
+- **Persistence**: Automatic saving in the browser (LocalStorage) via Zustand. No data is stored on a server.
+
+### 🛠️ Utility Tools
+
+- **Developer Mode**: Stress-test buttons and test point generation.
+- **Modern Interface**: Polished UI/UX with Shadcn/UI and smooth animations.
+
+## 💻 Technical Stack
+
+The project uses a modern and performant stack:
+
+| Category   | Technologies                                                                                                                                                           |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Core**   | ![React](https://img.shields.io/badge/React-18-blue) ![Vite](https://img.shields.io/badge/Vite-6-purple) ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue) |
+| **Styles** | ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-cyan) ![Shadcn/UI](https://img.shields.io/badge/Shadcn_UI-Latest-black)                                    |
+| **Map**    | Leaflet, React-Leaflet, Geoman (Drawing), Turf.js (Calculations)                                                                                                       |
+| **State**  | Zustand (Global state management)                                                                                                                                      |
+| **Utils**  | Zod (Validation), PapaParse (CSV), JSZip                                                                                                                               |
+
+## 📦 Installation & Getting Started
+
+Make sure you have **Node.js** and **PNPM** installed.
+
+1. **Clone the project**
+
+   ```bash
+   git clone <your-repo>
+   cd GeoMapy
+   ```
+
+2. **Install dependencies**
+
+   ```bash
+   pnpm install
+   ```
+
+3. **Start the development server**
+
+   ```bash
+   pnpm dev
+   ```
+
+   The application will be accessible at `http://localhost:5173`.
+
+4. **Build for production**
+   ```bash
+   pnpm build
+   ```
+
+## 📂 Project Structure
+
+Here is an overview of the source code organization:
+
+```
+src/
+├── components/
+│   ├── map/           # Components related to the map (View, Controls, Popups)
+│   ├── sidebar/       # Sidebar components (Lists, Actions)
+│   ├── dialogs/       # Modales (Export, Import, Delete)
+│   ├── ui/            # Base components (Shadcn/UI)
+│   └── shared/        # Reusable components (Forms, Lists)
+├── lib/               # Utilities and configurations (Map setup, Utils)
+├── store/             # Global state management (Zustand)
+├── types/             # TypeScript definitions
+├── utils/             # Export/Import logic
+└── pages/             # Main pages (MainMap)
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 🛡️ Best Practices
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+This project follows defined code standards:
 
-export default tseslint.config({
-  extends: [
-    // other configs...
-    // Enable lint rules for React
-    reactX.configs['recommended-typescript'],
-    // Enable lint rules for React DOM
-    reactDom.configs.recommended,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+- **Linting**: `pnpm lint` to check code quality.
+- **Architecture**: Clear separation between UI, Logic (Hooks/Store), and Data.
+- **Clean Code**: Explicit variables, short functions, and strict typing.
+
+---
+
+_Made with ❤️ by [Baptiste Lechat](https://github.com/baptistelechat)_
