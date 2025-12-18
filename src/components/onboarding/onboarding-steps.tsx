@@ -1,16 +1,14 @@
 import { Step } from "react-joyride";
 
-export const getOnboardingSteps = (
-  sidebarState: "expanded" | "collapsed"
-): Step[] => [
+export const getOnboardingSteps = (sidebarState: "expanded" | "collapsed"): Step[] => [
   {
     target: "body",
     content: (
       <div className="space-y-2">
         <h3 className="font-bold text-lg">Bienvenue sur GeoMapy ! 👋</h3>
         <p>
-          Découvrez comment créer et gérer vos points et formes géographiques en
-          quelques étapes.
+          Découvrez comment créer et gérer vos points et formes en quelques
+          étapes.
         </p>
       </div>
     ),
@@ -21,7 +19,7 @@ export const getOnboardingSteps = (
     target: "#onboarding-sidebar",
     content: (
       <div className="space-y-2">
-        <h3 className="font-bold">Zone de gestion</h3>
+        <h3 className="font-bold">⚙️ Zone de gestion</h3>
         <p>
           C'est ici que vous pourrez ajouter des points, voir vos listes et
           accéder aux outils d'import/export.
@@ -34,11 +32,11 @@ export const getOnboardingSteps = (
     target: "#onboarding-map",
     content: (
       <div className="space-y-2">
-        <h3 className="font-bold">La Carte</h3>
-        <p>
-          Le cœur de l'application. Naviguez, zoomez et visualisez vos données
-          géographiques.
+        <h3 className="font-bold">🗺️ La Carte</h3>
+        <p className="text-sm text-muted-foreground">
+          Le cœur de l'application.
         </p>
+        <p>Naviguez, zoomez et visualisez vos données géographiques.</p>
       </div>
     ),
     placement: "center",
@@ -50,10 +48,12 @@ export const getOnboardingSteps = (
     target: "#onboarding-toolbar",
     content: (
       <div className="space-y-2">
-        <h3 className="font-bold">Barre d'outils</h3>
+        <h3 className="font-bold">🔧 Barre d'outils</h3>
+        <p className="text-sm text-muted-foreground">
+          Ligne, Rectangle, Polygone, Cercle, Point, Texte, ...
+        </p>
         <p>
-          Utilisez ces outils pour dessiner des formes (lignes, polygones,
-          cercles) directement sur la carte.
+          Utilisez ces outils pour dessiner des formes directement sur la carte.
         </p>
       </div>
     ),
@@ -63,9 +63,13 @@ export const getOnboardingSteps = (
     target: "#onboarding-search-address",
     content: (
       <div className="space-y-2">
-        <h3 className="font-bold">Barre de recherche</h3>
+        <h3 className="font-bold">🔍 Barre de recherche</h3>
         <p>
-          Recherchez une adresse pour vous déplacer rapidement sur la carte.
+          Recherchez une adresse ou un élément sur la carte pour vous déplacer
+          rapidement.
+        </p>
+        <p className="text-sm text-red-400 italic">
+          Recherche d'une adresse uniquement disponible en France
         </p>
       </div>
     ),
@@ -78,7 +82,7 @@ export const getOnboardingSteps = (
         : "#onboarding-add-point",
     content: (
       <div className="space-y-2">
-        <h3 className="font-bold">Créer un point</h3>
+        <h3 className="font-bold">📍 Créer un point</h3>
         <p>
           Pour la démonstration, copiez ce lien Google Maps ci-dessous et
           collez-le dans le champ "URL" du formulaire :
@@ -102,10 +106,10 @@ export const getOnboardingSteps = (
     target: "#onboarding-points-list",
     content: (
       <div className="space-y-2">
-        <h3 className="font-bold">Liste des points</h3>
+        <h3 className="font-bold">📋 Liste des points</h3>
         <p>
-          Votre point apparaît ici. Vous pouvez cliquer dessus pour le voir sur
-          la carte ou le modifier.
+          Vos points apparaissent ici. Vous pouvez cliquer dessus pour le voir
+          sur la carte ou le modifier.
         </p>
       </div>
     ),
@@ -118,11 +122,11 @@ export const getOnboardingSteps = (
     target: "#onboarding-toolbar",
     content: (
       <div className="space-y-2">
-        <h3 className="font-bold">Créer une forme</h3>
-        <p>
-          Sélectionnez un outil de dessin (ex: Polygone) et dessinez sur la
-          carte. Double-cliquez pour terminer la forme.
+        <h3 className="font-bold">📐 Créer une forme</h3>
+        <p className="text-sm text-muted-foreground">
+          Ligne, Rectangle, Polygone, Cercle, Point, Texte, ...
         </p>
+        <p>Sélectionnez un outil de dessin et dessinez sur la carte.</p>
       </div>
     ),
     placement: "right",
@@ -136,10 +140,10 @@ export const getOnboardingSteps = (
     target: "#onboarding-features-list",
     content: (
       <div className="space-y-2">
-        <h3 className="font-bold">Liste des formes</h3>
+        <h3 className="font-bold">📋 Liste des formes</h3>
         <p>
           Vos formes dessinées apparaissent ici. Vous pouvez les gérer comme les
-          points.
+          points et cliquer dessus pour les voir sur la carte.
         </p>
       </div>
     ),
@@ -149,7 +153,7 @@ export const getOnboardingSteps = (
     target: "#onboarding-search-address",
     content: (
       <div className="space-y-2">
-        <h3 className="font-bold">Astuce recherche</h3>
+        <h3 className="font-bold">💡 Astuce recherche</h3>
         <p>
           La barre de recherche est optimisée pour trouver facilement des
           adresses en <strong>France</strong> uniquement.

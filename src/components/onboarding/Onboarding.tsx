@@ -12,7 +12,6 @@ export function Onboarding() {
     onboardingCompleted,
     lastAction,
     startOnboarding,
-    stopOnboarding,
     completeOnboarding,
     setStepIndex,
   } = useOnboardingStore();
@@ -72,7 +71,7 @@ export function Onboarding() {
     ) {
       setStepIndex(stepIndex + 1);
     }
-  }, [lastAction, run, stepIndex, mounted]); // steps is constant
+  }, [lastAction, run, stepIndex, mounted, steps, setStepIndex]);
 
   if (!mounted) return null;
 
