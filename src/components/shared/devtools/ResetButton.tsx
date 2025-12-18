@@ -41,7 +41,7 @@ export function ResetButton({
           title="Réinitialiser l'application"
           {...props}
         >
-          {children || <RotateCcw className="size-6 text-destructive" />}
+          {children || <RotateCcw className="size-5" />}
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>

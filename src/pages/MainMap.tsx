@@ -97,7 +97,7 @@ export default function MainMap() {
                 <Zap className="size-6 text-destructive" />
               </StressTestButton>
               <ResetButton
-                className="rounded-full shadow-lg size-12"
+                className="rounded-full shadow-lg size-12 text-destructive"
                 variant="outline"
                 size="icon"
               />

@@ -52,6 +52,47 @@ function DialogContent({
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
   showCloseButton?: boolean
 }) {
+  const unmountingRef = React.useRef(false)
+  const pushedRef = React.useRef(false)
+
+  React.useEffect(() => {
+    const handlePopState = (event: PopStateEvent) => {
+      // If the back button is pressed, we prevent the default navigation
+      // and close the dialog instead by simulating an Escape key press.
+      event.preventDefault()
+      unmountingRef.current = true
+      const escapeEvent = new KeyboardEvent("keydown", {
+        key: "Escape",
+        bubbles: true,
+        cancelable: true,
+        view: window,
+      })
+      document.dispatchEvent(escapeEvent)
+    }
+
+    // Delay the pushState to avoid issues with React Strict Mode
+    // where the component mounts, unmounts, and mounts again immediately.
+    // Without delay, this causes push -> back -> push which can confuse the router.
+    const timeout = setTimeout(() => {
+      if (!pushedRef.current) {
+        window.history.pushState({ dialogOpen: true }, "", window.location.href)
+        window.addEventListener("popstate", handlePopState)
+        pushedRef.current = true
+      }
+    }, 50)
+
+    return () => {
+      clearTimeout(timeout)
+      window.removeEventListener("popstate", handlePopState)
+      // If the dialog is closing but NOT via the back button (i.e. clicked X or outside),
+      // we need to remove the history entry we added.
+      if (pushedRef.current && !unmountingRef.current) {
+        window.history.back()
+        pushedRef.current = false
+      }
+    }
+  }, [])
+
   return (
     <DialogPortal data-slot="dialog-portal">
       <DialogOverlay />

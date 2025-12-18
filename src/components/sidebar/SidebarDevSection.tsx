@@ -53,10 +53,7 @@ export function SidebarDevSection() {
           >
             <Zap className="size-5" />
           </StressTestButton>
-          <ResetButton
-            variant="destructive"
-            className="size-8 text-destructive hover:text-destructive hover:bg-destructive/10"
-          />
+          <ResetButton variant="ghost" className="size-8 text-destructive" />
         </div>
       </SidebarGroupContent>
     </SidebarGroup>
