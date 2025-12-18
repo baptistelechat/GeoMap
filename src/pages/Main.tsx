@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { Dices, MapPin, Plus, Shapes, Zap } from "lucide-react";
 
-export default function MainMap() {
+export default function Main() {
   return (
     <SidebarProvider>
       <Onboarding />

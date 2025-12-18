@@ -23,6 +23,7 @@ import MarkerClusterGroup from "react-leaflet-cluster";
 import { GeomanControl } from "./control/GeomanControl";
 import { LocateControl } from "./control/LocateControl";
 import { ZoomControl } from "./control/ZoomControl";
+import { HelpControl } from "./HelpControl";
 import MapController from "./MapController";
 import { MarkerIcon } from "./MarkerIcon";
 import { MiniMapControl } from "./MiniMapControl";
@@ -227,6 +228,7 @@ export function MapView() {
         <GeomanControl />
         <LocateControl />
         <VisibilityControl />
+        <HelpControl />
       </MapContainer>
       <div
         className={cn(

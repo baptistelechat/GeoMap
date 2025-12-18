@@ -1,6 +1,6 @@
-import { useEffect } from "react";
 import { Toaster } from "@/components/ui/sonner";
-import MainMap from "@/pages/MainMap";
+import Main from "@/pages/Main";
+import { useEffect } from "react";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import { useGeomarkStore } from "./store/geomarkStore";
 
@@ -24,7 +24,7 @@ export default function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<MainMap />} />
+        <Route path="/" element={<Main />} />
       </Routes>
       <Toaster richColors position="top-right" expand={isEditMode} />
     </Router>
