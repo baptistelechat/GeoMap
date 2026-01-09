@@ -1,168 +1,256 @@
 import { Step } from "react-joyride";
 
-export const getOnboardingSteps = (sidebarState: "expanded" | "collapsed"): Step[] => [
-  {
-    target: "body",
-    content: (
-      <div className="space-y-2">
-        <h3 className="font-bold text-lg">Bienvenue sur GeoMapy ! 👋</h3>
-        <p>
-          Découvrez comment créer et gérer vos points et formes en quelques
-          étapes.
-        </p>
-      </div>
-    ),
-    placement: "center",
-    disableBeacon: true,
-  },
-  {
-    target: "#onboarding-sidebar",
-    content: (
-      <div className="space-y-2">
-        <h3 className="font-bold">⚙️ Zone de gestion</h3>
-        <p>
-          C'est ici que vous pourrez ajouter des points, voir vos listes et
-          accéder aux outils d'import/export.
-        </p>
-      </div>
-    ),
-    placement: "right",
-  },
-  {
-    target: "#onboarding-map",
-    content: (
-      <div className="space-y-2">
-        <h3 className="font-bold">🗺️ La Carte</h3>
-        <p className="text-sm text-muted-foreground">
-          Le cœur de l'application.
-        </p>
-        <p>Naviguez, zoomez et visualisez vos données géographiques.</p>
-      </div>
-    ),
-    placement: "center",
-    spotlightClicks: true, // Permettre l'interaction avec la carte
-    disableOverlayClose: true,
-    disableOverlay: true,
-  },
-  {
-    target: "#onboarding-toolbar",
-    content: (
-      <div className="space-y-2">
-        <h3 className="font-bold">🔧 Barre d'outils</h3>
-        <p className="text-sm text-muted-foreground">
-          Ligne, Rectangle, Polygone, Cercle, Point, Texte, ...
-        </p>
-        <p>
-          Utilisez ces outils pour dessiner des formes directement sur la carte.
-        </p>
-      </div>
-    ),
-    placement: "right",
-  },
-  {
-    target: "#onboarding-search-address",
-    content: (
-      <div className="space-y-2">
-        <h3 className="font-bold">🔍 Barre de recherche</h3>
-        <p>
-          Recherchez une adresse ou un élément sur la carte pour vous déplacer
-          rapidement.
-        </p>
-        <p className="text-sm text-red-400 italic">
-          Recherche d'une adresse uniquement disponible en France
-        </p>
-      </div>
-    ),
-    placement: "bottom",
-  },
-  {
-    target:
-      sidebarState === "collapsed"
-        ? "#onboarding-sidebar-trigger"
-        : "#onboarding-add-point",
-    content: (
-      <div className="space-y-2">
-        <h3 className="font-bold">📍 Créer un point</h3>
-        <p>
-          Pour la démonstration, copiez ce lien Google Maps ci-dessous et
-          collez-le dans le champ "URL" du formulaire :
-        </p>
-        <div className="p-2 bg-muted rounded border text-xs font-mono break-all select-all">
-          https://www.google.fr/maps/@48.8583701,2.2944813,17z
+export const getOnboardingSteps = (
+  sidebarState: "expanded" | "collapsed",
+  isMobile: boolean = false
+): Step[] => {
+  const commonSteps: Step[] = [
+    {
+      target: "body",
+      content: (
+        <div className="space-y-2">
+          <h3 className="font-bold text-lg">Bienvenue sur GeoMapy ! 👋</h3>
+          <p>
+            Découvrez comment créer et gérer vos points et formes en quelques
+            étapes.
+          </p>
         </div>
-        <p className="text-sm text-muted-foreground mt-2">
-          {sidebarState === "collapsed"
-            ? "Ouvrez la sidebar pour accéder au formulaire."
-            : "Remplissez le formulaire et validez."}
-        </p>
-      </div>
-    ),
-    placement: "right",
-    spotlightClicks: true,
-    disableOverlayClose: true,
-    data: { expectedAction: "POINT_ADDED" },
-  },
-  {
-    target: "#onboarding-points-list",
-    content: (
-      <div className="space-y-2">
-        <h3 className="font-bold">📋 Liste des points</h3>
-        <p>
-          Vos points apparaissent ici. Vous pouvez cliquer dessus pour le voir
-          sur la carte ou le modifier.
-        </p>
-      </div>
-    ),
-    placement: "right",
-    spotlightClicks: true,
-    disableOverlayClose: true,
-  },
-  {
-    // Cible la toolbar personnalisée (DrawControl)
-    target: "#onboarding-toolbar",
-    content: (
-      <div className="space-y-2">
-        <h3 className="font-bold">📐 Créer une forme</h3>
-        <p className="text-sm text-muted-foreground">
-          Ligne, Rectangle, Polygone, Cercle, Point, Texte, ...
-        </p>
-        <p>Sélectionnez un outil de dessin et dessinez sur la carte.</p>
-      </div>
-    ),
-    placement: "right",
-    spotlightClicks: true,
-    disableOverlayClose: true,
-    disableOverlay: true,
-    // On attend que l'utilisateur ait fini de dessiner et validé le dialogue
-    data: { expectedAction: "FEATURE_ADDED" },
-  },
-  {
-    target: "#onboarding-features-list",
-    content: (
-      <div className="space-y-2">
-        <h3 className="font-bold">📋 Liste des formes</h3>
-        <p>
-          Vos formes dessinées apparaissent ici. Vous pouvez les gérer comme les
-          points et cliquer dessus pour les voir sur la carte.
-        </p>
-      </div>
-    ),
-    placement: "right",
-  },
-  {
-    target: "#onboarding-search-address",
-    content: (
-      <div className="space-y-2">
-        <h3 className="font-bold">💡 Astuce recherche</h3>
-        <p>
-          La barre de recherche est optimisée pour trouver facilement des
-          adresses en <strong>France</strong> uniquement.
-        </p>
-      </div>
-    ),
-    placement: "bottom",
-  },
-  {
+      ),
+      placement: "center",
+      disableBeacon: true,
+    },
+  ];
+
+  const desktopSteps: Step[] = [
+    {
+      target: "#onboarding-sidebar",
+      content: (
+        <div className="space-y-2">
+          <h3 className="font-bold">⚙️ Zone de gestion</h3>
+          <p>
+            C'est ici que vous pourrez ajouter des points, voir vos listes et
+            accéder aux outils d'import/export.
+          </p>
+        </div>
+      ),
+      placement: "right",
+    },
+    {
+      target: "#onboarding-map",
+      content: (
+        <div className="space-y-2">
+          <h3 className="font-bold">🗺️ La Carte</h3>
+          <p className="text-sm text-muted-foreground">
+            Le cœur de l'application.
+          </p>
+          <p>Naviguez, zoomez et visualisez vos données géographiques.</p>
+        </div>
+      ),
+      placement: "center",
+      spotlightClicks: true,
+      disableOverlayClose: true,
+      disableOverlay: true,
+    },
+    {
+      target: "#onboarding-toolbar",
+      content: (
+        <div className="space-y-2">
+          <h3 className="font-bold">🔧 Barre d'outils</h3>
+          <p className="text-sm text-muted-foreground">
+            Ligne, Rectangle, Polygone, Cercle, Point, Texte, ...
+          </p>
+          <p>
+            Utilisez ces outils pour dessiner des formes directement sur la
+            carte.
+          </p>
+        </div>
+      ),
+      placement: "right",
+    },
+    {
+      target: "#onboarding-search-address",
+      content: (
+        <div className="space-y-2">
+          <h3 className="font-bold">🔍 Barre de recherche</h3>
+          <p>
+            Recherchez une adresse ou un élément sur la carte pour vous déplacer
+            rapidement.
+          </p>
+          <p className="text-sm text-red-400 italic">
+            Recherche d'une adresse uniquement disponible en France
+          </p>
+        </div>
+      ),
+      placement: "bottom",
+    },
+    {
+      target:
+        sidebarState === "collapsed"
+          ? "#onboarding-sidebar-trigger"
+          : "#onboarding-add-point",
+      content: (
+        <div className="space-y-2">
+          <h3 className="font-bold">📍 Créer un point</h3>
+          <p>
+            Pour la démonstration, copiez ce lien Google Maps ci-dessous et
+            collez-le dans le champ "URL" du formulaire :
+          </p>
+          <div className="p-2 bg-muted rounded border text-xs font-mono break-all select-all">
+            https://www.google.fr/maps/@48.8583701,2.2944813,17z
+          </div>
+          <p className="text-sm text-muted-foreground mt-2">
+            {sidebarState === "collapsed"
+              ? "Ouvrez la sidebar pour accéder au formulaire."
+              : "Remplissez le formulaire et validez."}
+          </p>
+        </div>
+      ),
+      placement: "right",
+      spotlightClicks: true,
+      disableOverlayClose: true,
+      data: { expectedAction: "POINT_ADDED" },
+    },
+    {
+      target: "#onboarding-points-list",
+      content: (
+        <div className="space-y-2">
+          <h3 className="font-bold">📋 Liste des points</h3>
+          <p>
+            Vos points apparaissent ici. Vous pouvez cliquer dessus pour le voir
+            sur la carte ou le modifier.
+          </p>
+        </div>
+      ),
+      placement: "right",
+      spotlightClicks: true,
+      disableOverlayClose: true,
+    },
+    {
+      target: "#onboarding-toolbar",
+      content: (
+        <div className="space-y-2">
+          <h3 className="font-bold">📐 Créer une forme</h3>
+          <p className="text-sm text-muted-foreground">
+            Ligne, Rectangle, Polygone, Cercle, Point, Texte, ...
+          </p>
+          <p>Sélectionnez un outil de dessin et dessinez sur la carte.</p>
+        </div>
+      ),
+      placement: "right",
+      spotlightClicks: true,
+      disableOverlayClose: true,
+      disableOverlay: true,
+      data: { expectedAction: "FEATURE_ADDED" },
+    },
+    {
+      target: "#onboarding-features-list",
+      content: (
+        <div className="space-y-2">
+          <h3 className="font-bold">📋 Liste des formes</h3>
+          <p>
+            Vos formes dessinées apparaissent ici. Vous pouvez les gérer comme
+            les points et cliquer dessus pour les voir sur la carte.
+          </p>
+        </div>
+      ),
+      placement: "right",
+    },
+    {
+      target: "#onboarding-search-address",
+      content: (
+        <div className="space-y-2">
+          <h3 className="font-bold">💡 Astuce recherche</h3>
+          <p>
+            La barre de recherche est optimisée pour trouver facilement des
+            adresses en <strong>France</strong> uniquement.
+          </p>
+        </div>
+      ),
+      placement: "bottom",
+    },
+  ];
+
+  const mobileSteps: Step[] = [
+    {
+      target: "#onboarding-map",
+      content: (
+        <div className="space-y-2">
+          <h3 className="font-bold">🗺️ La Carte</h3>
+          <p className="text-sm text-muted-foreground">
+            Le cœur de l'application.
+          </p>
+          <p>Naviguez, zoomez et visualisez vos données géographiques.</p>
+        </div>
+      ),
+      placement: "center",
+      spotlightClicks: true,
+      disableOverlayClose: true,
+      disableOverlay: true,
+    },
+    {
+      target: "#onboarding-toolbar",
+      content: (
+        <div className="space-y-2">
+          <h3 className="font-bold">🔧 Barre d'outils</h3>
+          <p>
+            Utilisez ces outils pour dessiner des formes directement sur la
+            carte.
+          </p>
+        </div>
+      ),
+      placement: "bottom",
+    },
+    {
+      target: "#onboarding-search-address",
+      content: (
+        <div className="space-y-2">
+          <h3 className="font-bold">🔍 Barre de recherche</h3>
+          <p>
+            Recherchez une adresse ou un élément sur la carte pour vous déplacer
+            rapidement.
+          </p>
+          <p className="text-sm text-red-400 italic">
+            Recherche d'une adresse uniquement disponible en France
+          </p>
+        </div>
+      ),
+      placement: "bottom",
+    },
+    {
+      target: "#onboarding-mobile-add-point",
+      content: (
+        <div className="space-y-2">
+          <h3 className="font-bold">📍 Ajouter un point</h3>
+          <p>Appuyez ici pour créer un nouveau point sur la carte.</p>
+        </div>
+      ),
+      placement: "top",
+      spotlightClicks: true,
+      disableOverlayClose: true,
+    },
+    {
+      target: "#onboarding-mobile-points-list",
+      content: (
+        <div className="space-y-2">
+          <h3 className="font-bold">📋 Liste des points</h3>
+          <p>Retrouvez tous vos points enregistrés ici.</p>
+        </div>
+      ),
+      placement: "top",
+    },
+    {
+      target: "#onboarding-mobile-features-list",
+      content: (
+        <div className="space-y-2">
+          <h3 className="font-bold">📐 Liste des formes</h3>
+          <p>Retrouvez toutes vos formes géométriques ici.</p>
+        </div>
+      ),
+      placement: "top",
+    },
+  ];
+
+  const finalStep: Step = {
     target: "body",
     content: (
       <div className="space-y-2">
@@ -175,5 +263,11 @@ export const getOnboardingSteps = (sidebarState: "expanded" | "collapsed"): Step
       </div>
     ),
     placement: "center",
-  },
-];
+  };
+
+  return [
+    ...commonSteps,
+    ...(isMobile ? mobileSteps : desktopSteps),
+    finalStep,
+  ];
+};

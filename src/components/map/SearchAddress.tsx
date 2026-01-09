@@ -179,6 +179,7 @@ export function SearchAddress() {
 
   return (
     <div
+      id="onboarding-search-address"
       ref={wrapperRef}
       className="relative w-full max-w-sm pointer-events-auto"
     >

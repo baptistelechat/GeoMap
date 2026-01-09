@@ -43,6 +43,7 @@ export default function Main() {
           <PointActionDialog
             trigger={
               <Button
+                id="onboarding-mobile-add-point"
                 className="rounded-full shadow-lg size-12"
                 size="icon"
                 title="Ajouter un point"
@@ -54,6 +55,7 @@ export default function Main() {
           <PointsListDialog
             trigger={
               <Button
+                id="onboarding-mobile-points-list"
                 className="rounded-full shadow-lg size-12"
                 variant="secondary"
                 size="icon"
@@ -66,6 +68,7 @@ export default function Main() {
           <FeaturesListDialog
             trigger={
               <Button
+                id="onboarding-mobile-features-list"
                 className="rounded-full shadow-lg size-12"
                 variant="secondary"
                 size="icon"

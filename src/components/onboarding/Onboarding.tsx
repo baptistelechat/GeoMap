@@ -16,7 +16,7 @@ export function Onboarding() {
     setStepIndex,
   } = useOnboardingStore();
 
-  const { state: sidebarState } = useSidebar();
+  const { state: sidebarState, isMobile } = useSidebar();
   const { theme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
@@ -36,8 +36,8 @@ export function Onboarding() {
   }, [mounted, onboardingCompleted, run, startOnboarding]);
 
   const steps = useMemo(
-    () => getOnboardingSteps(sidebarState),
-    [sidebarState]
+    () => getOnboardingSteps(sidebarState, isMobile),
+    [sidebarState, isMobile]
   );
 
   const handleJoyrideCallback = (data: CallBackProps) => {
